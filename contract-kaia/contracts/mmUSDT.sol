@@ -86,5 +86,16 @@ contract mmUSDT is
         onlyRole(UPGRADER_ROLE) 
     {}
 
+    function supportsInterface(bytes4 interfaceId) 
+        public 
+        view 
+        virtual 
+        override(AccessControlUpgradeable) 
+        returns (bool) 
+    {
+        return interfaceId == 0x65787371 || // KIP-7 interface ID
+               super.supportsInterface(interfaceId);
+    }
+
     uint256[49] private __gap;
 }

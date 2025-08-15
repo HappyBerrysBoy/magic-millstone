@@ -215,7 +215,8 @@ contract WithdrawNFT is
         override(ERC721Upgradeable, AccessControlUpgradeable)
         returns (bool)
     {
-        return super.supportsInterface(interfaceId);
+        return interfaceId == 0x80ac58cd || // KIP-17 interface ID  
+               super.supportsInterface(interfaceId);
     }
 
     function _exists(uint256 tokenId) internal view returns (bool) {
