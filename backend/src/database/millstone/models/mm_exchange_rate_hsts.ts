@@ -4,7 +4,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 export interface mm_exchange_rate_hstsAttributes {
   tokenAddress: string;
   datetime: Date;
-  rate?: string;
+  rate?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -17,7 +17,7 @@ export type mm_exchange_rate_hstsCreationAttributes = Optional<mm_exchange_rate_
 export class mm_exchange_rate_hsts extends Model<mm_exchange_rate_hstsAttributes, mm_exchange_rate_hstsCreationAttributes> implements mm_exchange_rate_hstsAttributes {
   tokenAddress!: string;
   datetime!: Date;
-  rate?: string;
+  rate?: number;
   createdAt?: Date;
   updatedAt?: Date;
 
@@ -35,7 +35,7 @@ export class mm_exchange_rate_hsts extends Model<mm_exchange_rate_hstsAttributes
       primaryKey: true
     },
     rate: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.DECIMAL(20,6),
       allowNull: true
     }
   }, {

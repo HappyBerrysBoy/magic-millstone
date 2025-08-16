@@ -13,8 +13,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppMiddleware } from './app.middleware';
 import { JwtService } from '@common/jwt/jwt.service';
 import { MillstoneModule } from '@database/millstone/millstone.module';
-import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +26,7 @@ import { UserModule } from './user/user.module';
     ScheduleModule.forRoot(),
     MillstoneModule,
     UserModule,
+    PortfolioModule,
   ],
   controllers: [AppController],
   providers: [

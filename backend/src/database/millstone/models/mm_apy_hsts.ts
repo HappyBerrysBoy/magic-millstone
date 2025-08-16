@@ -1,29 +1,29 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 
-export interface mm_tvl_hstsAttributes {
+export interface mm_apy_hstsAttributes {
   portfolioId: string;
   datetime: Date;
-  value?: number;
+  value: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type mm_tvl_hstsPk = "portfolioId" | "datetime";
-export type mm_tvl_hstsId = mm_tvl_hsts[mm_tvl_hstsPk];
-export type mm_tvl_hstsOptionalAttributes = "value" | "createdAt" | "updatedAt";
-export type mm_tvl_hstsCreationAttributes = Optional<mm_tvl_hstsAttributes, mm_tvl_hstsOptionalAttributes>;
+export type mm_apy_hstsPk = "portfolioId" | "datetime";
+export type mm_apy_hstsId = mm_apy_hsts[mm_apy_hstsPk];
+export type mm_apy_hstsOptionalAttributes = "createdAt" | "updatedAt";
+export type mm_apy_hstsCreationAttributes = Optional<mm_apy_hstsAttributes, mm_apy_hstsOptionalAttributes>;
 
-export class mm_tvl_hsts extends Model<mm_tvl_hstsAttributes, mm_tvl_hstsCreationAttributes> implements mm_tvl_hstsAttributes {
+export class mm_apy_hsts extends Model<mm_apy_hstsAttributes, mm_apy_hstsCreationAttributes> implements mm_apy_hstsAttributes {
   portfolioId!: string;
   datetime!: Date;
-  value?: number;
+  value!: number;
   createdAt?: Date;
   updatedAt?: Date;
 
 
-  static initModel(sequelize: Sequelize.Sequelize): typeof mm_tvl_hsts {
-    return mm_tvl_hsts.init({
+  static initModel(sequelize: Sequelize.Sequelize): typeof mm_apy_hsts {
+    return mm_apy_hsts.init({
     portfolioId: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -35,12 +35,12 @@ export class mm_tvl_hsts extends Model<mm_tvl_hstsAttributes, mm_tvl_hstsCreatio
       primaryKey: true
     },
     value: {
-      type: DataTypes.DECIMAL(20,3),
-      allowNull: true
+      type: DataTypes.DECIMAL(20,6),
+      allowNull: false
     }
   }, {
     sequelize,
-    tableName: 'mm_tvl_hsts',
+    tableName: 'mm_apy_hsts',
     timestamps: true,
     indexes: [
       {
