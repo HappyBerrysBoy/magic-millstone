@@ -8,6 +8,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node16",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "outDir": "dist"
-  }
+  },
+  "include": ["contracts/**/*", "scripts/**/*", "test/**/*", "hardhat.config.ts"]
 }

@@ -1,20 +1,27 @@
-# Node modules
+# 하드햇 프로젝트용 .gitignore 예시
+
+# node_modules (패키지)
 /node_modules
 
-# Compilation output
-/dist
-
-# pnpm deploy output
-/bundle
-
-# Hardhat Build Artifacts
+# 하드햇 아티팩트 및 캐시
 /artifacts
-
-# Hardhat compilation (v2) support directory
 /cache
 
-# Typechain output
+# 타입체인 결과물
 /types
 
-# Hardhat coverage reports
+# 하드햇 커버리지 리포트
 /coverage
+
+# 배포 번들 및 빌드 산출물
+/dist
+/bundle
+
+# 환경 변수 파일
+.env
+.env*
+
+# 기타 IDE/OS 관련 파일 무시 예시 (필요시 추가)
+/.vscode
+.DS_Store
+# End of Selection
