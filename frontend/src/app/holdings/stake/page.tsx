@@ -1,28 +1,20 @@
 "use client";
-import { WalletButton } from "@/components/Button/WalletButton";
-import { useState, useEffect } from "react";
+
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
-import Modal from "@/components/Common/Modal";
 import DepositForm from "@/components/DepositForm";
 import { keiHexToKaiaDecimal, microUSDTHexToUSDTDecimal } from "@/utils/format";
-import MillstoneIcon from "public/svgs/MillstoneIcon";
-import VaultStats from "@/components/Dashboard/VaultStats";
-import HomeStats from "@/components/HomeStats";
-import NextMagicTime from "@/components/NextMagicTime";
-import { time } from "console";
-import Button from "@/components/Common/Button";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const USDTContractAddress = "0xf6A77faA9d860a9218E0ab02Ac77AEe03c027372";
 
-export default function Home() {
+export default function StakePage() {
   const { account } = useWalletAccountStore();
   const { getBalance, getErc20TokenBalance } = useKaiaWalletSdk();
   const [kaiaBalance, setKaiaBalance] = useState<number | string>("-");
   const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
   const [depositOpen, setDepositOpen] = useState(false);
-  const router = useRouter();
+
   // 임시 데이터
   const tvl = "1,234,567";
   const apy = "8.5%";
@@ -46,7 +38,6 @@ export default function Home() {
       });
     }
   };
-
   useEffect(() => {
     fetchBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,35 +46,36 @@ export default function Home() {
   const handleStake = async (amount: number) => {
     // TODO: 실제 deposit 로직으로 대체
     // await deposit(amount);
-    // setDepositOpen(false);
-    // await fetchBalance(); // 예치 후 잔액 새로고침
-    // router.push("/holdings/stake");
+    setDepositOpen(false);
+    await fetchBalance(); // 예치 후 잔액 새로고침
   };
 
   return (
-    <div className="relative h-full w-full flex-col">
-      <header className="mb-[8px] flex justify-center">
-        <MillstoneIcon className="text-primary" />
-        {/* <span className="text-primary">MagicMillstone</span> */}
+    <div>
+      <header className="mb-[8px] flex h-14 items-center">
+        <button
+          type="button"
+          onClick={() => window.history.back()}
+          className="flex items-center"
+        >
+          <svg
+            width="24"
+            height="24"
+            fill="none"
+            viewBox="0 0 24 24"
+            className="text-primary"
+          >
+            <path
+              d="M15 19l-7-7 7-7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </header>
-      <main className="mx-auto w-full max-w-md flex-1 justify-between">
-        <HomeStats tvl={tvl} apy={apy} />
-        <div className="mt-[60px]">
-          <NextMagicTime timeLeft={timeLeft} />
-        </div>
-        <div className="">
-          {account ? (
-            <Button
-              className="mx-4 mb-4"
-              onClick={() => router.push("/holdings/stake")}
-            >
-              Stake USDT
-            </Button>
-          ) : (
-            <WalletButton />
-          )}
-        </div>
-      </main>
+      <DepositForm balance={Number(usdtBalance)} onStake={handleStake} />
     </div>
   );
 }
