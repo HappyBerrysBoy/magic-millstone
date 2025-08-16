@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a Dapp Starter for easier Dapp development integrated with dapp-portal-sdk and liff.
 
 ## Getting Started
 
-First, run the development server:
+1. First, install packages. This project is tested with node version v20.18.0. At least Node.js >=18.0.0 is recommended. 
 
 ```bash
-npm run dev
+npm install
 # or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Add `.env.local and .env.production` file. 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+If needed, other environment files can be added.
+To open template code, `.env*` file should include basic variables. Here's example for `.env.local` file.  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+NODE_ENV=local
+NEXT_PUBLIC_CLIENT_ID={clientId provided when applying for the SDK}
+NEXT_PUBLIC_CHAIN_ID=1001 //testnet
+CLIENT_SECRET={clientSecret provided when applying for the SDK}
+BASE_API_URL=https://dapp-starter.netlify.app //change with your domain
+NEXT_PUBLIC_LIFF_ID={LIFF ID provided when enrolling LIFF app at LINE Developers}
+```
 
-## Learn More
+3. Create trusted SSL certificates for local development.
 
-To learn more about Next.js, take a look at the following resources:
+[1] Install mkcert
+```bash
+brew install mkcert
+brew install nss  # Only needed for Firefox support
+```
+[2] Create a local Certificate Authority
+```bash
+mkcert -install
+```
+[3] Make a cert directory and generate a certificate for local domains
+```bash
+mkdir cert
+cd cert
+mkcert -cert-file cert.pem -key-file key.pem localhost 127.0.0.1 ::1
+```
+[4] Start Dapp Starter 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash 
+#To use port 3000
+npm run dev
+# or 
+pnpm dev
+#To use port 443 (required to get webhook)
+npm run dev:https
+# or
+pnpm dev:https
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Learn More About dapp-portal-sdk
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [dapp-portal-sdk guide](https://docs.dappportal.io/mini-dapp/mini-dapp-sdk) Get more information about dapp-portal-sdk!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
