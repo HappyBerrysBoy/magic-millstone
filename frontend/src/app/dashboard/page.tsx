@@ -15,7 +15,7 @@ export default function Dashboard() {
   const timeLeft = "01:23:45";
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col">
       <Header />
       <main className="mx-auto w-full max-w-md flex-1 p-4">
         <VaultStats tvl={tvl} apy={apy} timeLeft={timeLeft} />

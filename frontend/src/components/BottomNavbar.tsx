@@ -12,8 +12,8 @@ export default function BottomNavbar() {
 
   const navItems = [
     { href: "/", label: "", icon: <HomeIcon /> },
-    { href: "/holdings", label: "", icon: <DatabaseIcon /> },
     { href: "/dashboard", label: "", icon: <TrendingUpIcon /> },
+    { href: "/holdings", label: "", icon: <DatabaseIcon /> },
     { href: "/profile", label: "", icon: <AccountIcon /> },
   ];
 
