@@ -29,6 +29,7 @@
     "@nestjs/schedule": "^6.0.0",
     "@nestjs/swagger": "^11.2.0",
     "class-validator": "^0.14.2",
+    "cross-env": "^10.0.0",
     "express-basic-auth": "^1.2.1",
     "jsonwebtoken": "^9.0.2",
     "next-auth": "^4.24.11",
