@@ -2,8 +2,9 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 
 export interface mm_portfolio_allocationsAttributes {
-  name: string;
+  portfolioId: string;
   platform: string;
+  vaultChainId: number;
   vaultContractName: string;
   vaultContractAddress: string;
   vaultTokenAddress: string;
@@ -13,14 +14,15 @@ export interface mm_portfolio_allocationsAttributes {
   updatedAt?: Date;
 }
 
-export type mm_portfolio_allocationsPk = "name" | "platform";
+export type mm_portfolio_allocationsPk = "portfolioId" | "platform" | "vaultContractAddress";
 export type mm_portfolio_allocationsId = mm_portfolio_allocations[mm_portfolio_allocationsPk];
 export type mm_portfolio_allocationsOptionalAttributes = "allocationAmount" | "targetRate" | "createdAt" | "updatedAt";
 export type mm_portfolio_allocationsCreationAttributes = Optional<mm_portfolio_allocationsAttributes, mm_portfolio_allocationsOptionalAttributes>;
 
 export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttributes, mm_portfolio_allocationsCreationAttributes> implements mm_portfolio_allocationsAttributes {
-  name!: string;
+  portfolioId!: string;
   platform!: string;
+  vaultChainId!: number;
   vaultContractName!: string;
   vaultContractAddress!: string;
   vaultTokenAddress!: string;
@@ -32,7 +34,7 @@ export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttr
 
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_portfolio_allocations {
     return mm_portfolio_allocations.init({
-    name: {
+    portfolioId: {
       type: DataTypes.STRING(100),
       allowNull: false,
       primaryKey: true
@@ -42,13 +44,18 @@ export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttr
       allowNull: false,
       primaryKey: true
     },
+    vaultChainId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     vaultContractName: {
       type: DataTypes.STRING(100),
       allowNull: false
     },
     vaultContractAddress: {
       type: DataTypes.STRING(100),
-      allowNull: false
+      allowNull: false,
+      primaryKey: true
     },
     vaultTokenAddress: {
       type: DataTypes.STRING(100),
@@ -72,8 +79,9 @@ export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttr
         unique: true,
         using: "BTREE",
         fields: [
-          { name: "name" },
+          { name: "portfolioId" },
           { name: "platform" },
+          { name: "vaultContractAddress" },
         ]
       },
     ]

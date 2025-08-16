@@ -2,9 +2,11 @@ import { IsString, IsOptional,IsNumber,IsDate } from 'class-validator';
 
 export class MmPortfolioAllocationsDto {
   @IsString()
-  name: string;
+  portfolioId: string;
   @IsString()
   platform: string;
+  @IsNumber()
+  vaultChainId: number;
   @IsString()
   vaultContractName: string;
   @IsString()
