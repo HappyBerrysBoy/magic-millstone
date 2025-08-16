@@ -4,26 +4,33 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@nomicfoundation/hardhat-ethers": "^4.0.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
+    "@nomicfoundation/hardhat-ethers": "3.0.8",
     "@nomicfoundation/hardhat-ethers-chai-matchers": "^3.0.0",
     "@nomicfoundation/hardhat-ignition": "^3.0.0",
     "@nomicfoundation/hardhat-ignition-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-keystore": "^3.0.0",
     "@nomicfoundation/hardhat-mocha": "^3.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^3.0.0",
-    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@nomicfoundation/hardhat-typechain": "^3.0.0",
     "@nomicfoundation/hardhat-verify": "^3.0.0",
+    "@openzeppelin/hardhat-upgrades": "^3.9.1",
     "@types/chai": "^4.2.0",
     "@types/chai-as-promised": "^8.0.1",
     "@types/mocha": ">=10.0.10",
     "@types/node": "^22.8.5",
-    "chai": "^5.1.2",
+    "chai": "4.3.7",
     "ethers": "^6.14.0",
     "forge-std": "foundry-rs/forge-std#v1.9.4",
-    "hardhat": "^3.0.0",
+    "hardhat": "2.22.12",
     "mocha": "^11.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "~5.8.0"
   },
-  "type": "module"
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "@openzeppelin/contracts-upgradeable": "^5.4.0",
+    "dotenv": "^17.2.1"
+  }
 }

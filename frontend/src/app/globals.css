@@ -50,6 +50,8 @@
   --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
   --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
   /* ... */
+  --color-mm-gray-default: #ABB4B4;
+  --color-mm-gray-light: #C7D2D3;
 }
 
 html,
