@@ -2,308 +2,30 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0x8F8e2fA96e173400E944f977AAA07D41cCbeA04d",
-      "txHash": "0xc5fe516b8f163afdaf78af56da2d8eeac281b98b6218fd13cb04ddf4bb1b84f1",
+      "address": "0x3902Ed112C9cea12E30227572e97490942258c38",
+      "txHash": "0x7ce1de67dcb1c599c871b0b8dd2967390c549a100da7ae84ac3aef7bda77cb93",
       "kind": "uups"
     },
     {
-      "address": "0xCF367c170BD7939b4E19C77d83722A3Ed1326230",
-      "txHash": "0x37e5d62e2ec4f3d21ef2501564ea04340f0d27c249b40e9f454286f372575f8e",
+      "address": "0x148F0133f10280C3957B9A445eb4D6761EeA0482",
+      "txHash": "0x332e5c957f2864090f0cebc3c55fd823e161f9d60c6d1d3737919ac316b87530",
       "kind": "uups"
     },
     {
-      "address": "0xeF45dEf402035A6B83045fffF56FAFDc47332479",
-      "txHash": "0xf02b07e52940c7889862e36e404f79b9dd026cd64b0144f3521a9657715969ef",
+      "address": "0xb7E5C1BAA24A50aa20734952406AD8E395FF009B",
+      "txHash": "0xf33defc88440ed39997818ff3893e1e507ea100fd86c3033c1f0a7246cb3cb3d",
       "kind": "uups"
     },
     {
-      "address": "0xA7b8c0FCa3d20919bae055621aa1ec2AABca2B5c",
-      "txHash": "0x34e6d61ca47d6d54e91b16e10120b74c5ce7a9d677f21f8b500be9ab9ccb97fb",
-      "kind": "uups"
-    },
-    {
-      "address": "0xF649468026fEC52A5876ab1b20634eAe43150A1C",
-      "txHash": "0xc718c0cc303b0c712531aff08f8e043ae69ba3830dbfe9d0fc6728f71b11d92b",
-      "kind": "uups"
-    },
-    {
-      "address": "0xcd46921014278621A4397B2c3959aE35B908f128",
-      "txHash": "0xa0588ab7bb4dcfcdd4f224dded5e820044c3bc89952045a024a2dd195db88c92",
-      "kind": "uups"
-    },
-    {
-      "address": "0x557d39Ea0BCdCf490f3dd29C6CF0dae1c8123f6e",
-      "txHash": "0x2934a41d2322fe062113143aadb88c0fdaf33bd64979dbe53c998431dff7ccb0",
-      "kind": "uups"
-    },
-    {
-      "address": "0xbd48c6e553D67131D381d0f09D5A0f4b032D4d87",
-      "txHash": "0xc613243943d9b77283eb3f5db45f5b8732c99d03983883a94259ec45bbdac24d",
-      "kind": "uups"
-    },
-    {
-      "address": "0x87deEaA5E15aB31E3A1730F1bE5ec2b511382606",
-      "txHash": "0x140e09c7f61724b64f015c3ae7f5bf859310e46f559be244e8e3b9313291d01b",
+      "address": "0x123CF934F5591Ab6a04C546765A150d7BD321DdF",
+      "txHash": "0xc137e16b415c420daa27c3d5b46b61e6e82a2698d922a66cee4c3bf1a42b6e6f",
       "kind": "uups"
     }
   ],
   "impls": {
-    "cb085eaeec7ff7ac818dc2fc67bbde39cbc430da0e0004107b68763f4e02c38c": {
-      "address": "0x48679572513911931e43CE31D5825721341aD310",
-      "txHash": "0xc8c8f54f4dd841753fea30120e3373f76518ebe960ce07bb4911675132fa953e",
-      "layout": {
-        "solcVersion": "0.8.24",
-        "storage": [
-          {
-            "label": "_decimals",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "mmUSDT",
-            "src": "contracts/mmUSDT.sol:22"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "mmUSDT",
-            "src": "contracts/mmUSDT.sol:89"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes32": {
-            "label": "bytes32",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_bool)": {
-            "label": "mapping(address => bool)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(address => mapping(address => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
-            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
-            "numberOfBytes": "32"
-          },
-          "t_string_storage": {
-            "label": "string",
-            "numberOfBytes": "32"
-          },
-          "t_struct(AccessControlStorage)36_storage": {
-            "label": "struct AccessControlUpgradeable.AccessControlStorage",
-            "members": [
-              {
-                "label": "_roles",
-                "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
-                "offset": 0,
-                "slot": "0"
-              }
-            ],
-            "numberOfBytes": "32"
-          },
-          "t_struct(ERC20Storage)296_storage": {
-            "label": "struct ERC20Upgradeable.ERC20Storage",
-            "members": [
-              {
-                "label": "_balances",
-                "type": "t_mapping(t_address,t_uint256)",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "_allowances",
-                "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-                "offset": 0,
-                "slot": "1"
-              },
-              {
-                "label": "_totalSupply",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "2"
-              },
-              {
-                "label": "_name",
-                "type": "t_string_storage",
-                "offset": 0,
-                "slot": "3"
-              },
-              {
-                "label": "_symbol",
-                "type": "t_string_storage",
-                "offset": 0,
-                "slot": "4"
-              }
-            ],
-            "numberOfBytes": "160"
-          },
-          "t_struct(InitializableStorage)147_storage": {
-            "label": "struct Initializable.InitializableStorage",
-            "members": [
-              {
-                "label": "_initialized",
-                "type": "t_uint64",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "_initializing",
-                "type": "t_bool",
-                "offset": 8,
-                "slot": "0"
-              }
-            ],
-            "numberOfBytes": "32"
-          },
-          "t_struct(PausableStorage)826_storage": {
-            "label": "struct PausableUpgradeable.PausableStorage",
-            "members": [
-              {
-                "label": "_paused",
-                "type": "t_bool",
-                "offset": 0,
-                "slot": "0"
-              }
-            ],
-            "numberOfBytes": "32"
-          },
-          "t_struct(RoleData)26_storage": {
-            "label": "struct AccessControlUpgradeable.RoleData",
-            "members": [
-              {
-                "label": "hasRole",
-                "type": "t_mapping(t_address,t_bool)",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "adminRole",
-                "type": "t_bytes32",
-                "offset": 0,
-                "slot": "1"
-              }
-            ],
-            "numberOfBytes": "64"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint64": {
-            "label": "uint64",
-            "numberOfBytes": "8"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        },
-        "namespaces": {
-          "erc7201:openzeppelin.storage.Pausable": [
-            {
-              "contract": "PausableUpgradeable",
-              "label": "_paused",
-              "type": "t_bool",
-              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
-              "offset": 0,
-              "slot": "0"
-            }
-          ],
-          "erc7201:openzeppelin.storage.AccessControl": [
-            {
-              "contract": "AccessControlUpgradeable",
-              "label": "_roles",
-              "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
-              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
-              "offset": 0,
-              "slot": "0"
-            }
-          ],
-          "erc7201:openzeppelin.storage.ERC20": [
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_balances",
-              "type": "t_mapping(t_address,t_uint256)",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:33",
-              "offset": 0,
-              "slot": "0"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_allowances",
-              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:35",
-              "offset": 0,
-              "slot": "1"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_totalSupply",
-              "type": "t_uint256",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:37",
-              "offset": 0,
-              "slot": "2"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_name",
-              "type": "t_string_storage",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:39",
-              "offset": 0,
-              "slot": "3"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_symbol",
-              "type": "t_string_storage",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:40",
-              "offset": 0,
-              "slot": "4"
-            }
-          ],
-          "erc7201:openzeppelin.storage.Initializable": [
-            {
-              "contract": "Initializable",
-              "label": "_initialized",
-              "type": "t_uint64",
-              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
-              "offset": 0,
-              "slot": "0"
-            },
-            {
-              "contract": "Initializable",
-              "label": "_initializing",
-              "type": "t_bool",
-              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
-              "offset": 8,
-              "slot": "0"
-            }
-          ]
-        }
-      }
-    },
-    "7eeb39cb423463c5d811f8a686576d33e6b011bd12c1808903d3b7ac55eba5c2": {
-      "address": "0xfd338eF4A9d53FE82BC128a5781c42860B31BEc0",
-      "txHash": "0x47b032a0a79055a27b4fa225b9c4dce5e4157d5bc6af647627fab9f712bd75b5",
+    "cd6b4420c469704dacbce2710caf5c8babd5ff528b5600172a2ef858bb3b1aab": {
+      "address": "0x1E62B6348768932B05D67107bB116013Bd493AdD",
+      "txHash": "0xbc5e0504a6a18c584903660b26aa572b59731aac53e4d9abd7e454f1ba53b0c7",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
@@ -313,23 +35,31 @@
             "slot": "0",
             "type": "t_uint256",
             "contract": "WithdrawNFT",
-            "src": "contracts/WithdrawNFT.sol:37"
+            "src": "contracts/WithdrawNFT.sol:26"
           },
           {
-            "label": "withdrawRequests",
+            "label": "withdrawalAmounts",
             "offset": 0,
             "slot": "1",
-            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)11357_storage)",
+            "type": "t_mapping(t_uint256,t_uint256)",
             "contract": "WithdrawNFT",
-            "src": "contracts/WithdrawNFT.sol:38"
+            "src": "contracts/WithdrawNFT.sol:29"
+          },
+          {
+            "label": "vaultContract",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "WithdrawNFT",
+            "src": "contracts/WithdrawNFT.sol:32"
           },
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "2",
-            "type": "t_array(t_uint256)47_storage",
+            "slot": "3",
+            "type": "t_array(t_uint256)48_storage",
             "contract": "WithdrawNFT",
-            "src": "contracts/WithdrawNFT.sol:225"
+            "src": "contracts/WithdrawNFT.sol:244"
           }
         ],
         "types": {
@@ -479,58 +209,13 @@
             "label": "uint64",
             "numberOfBytes": "8"
           },
-          "t_array(t_uint256)47_storage": {
-            "label": "uint256[47]",
-            "numberOfBytes": "1504"
+          "t_array(t_uint256)48_storage": {
+            "label": "uint256[48]",
+            "numberOfBytes": "1536"
           },
-          "t_enum(WithdrawStatus)11345": {
-            "label": "enum WithdrawNFT.WithdrawStatus",
-            "members": [
-              "PENDING",
-              "READY",
-              "CLAIMED"
-            ],
-            "numberOfBytes": "1"
-          },
-          "t_mapping(t_uint256,t_struct(WithdrawRequest)11357_storage)": {
-            "label": "mapping(uint256 => struct WithdrawNFT.WithdrawRequest)",
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
             "numberOfBytes": "32"
-          },
-          "t_struct(WithdrawRequest)11357_storage": {
-            "label": "struct WithdrawNFT.WithdrawRequest",
-            "members": [
-              {
-                "label": "amount",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "requestTime",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "1"
-              },
-              {
-                "label": "readyTime",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "2"
-              },
-              {
-                "label": "status",
-                "type": "t_enum(WithdrawStatus)11345",
-                "offset": 0,
-                "slot": "3"
-              },
-              {
-                "label": "requester",
-                "type": "t_address",
-                "offset": 1,
-                "slot": "3"
-              }
-            ],
-            "numberOfBytes": "128"
           }
         },
         "namespaces": {
@@ -625,9 +310,9 @@
         }
       }
     },
-    "aaea56506c394844a845171315a96b7fe3e6b68ac045977b1166ff557340849f": {
-      "address": "0x1E62f0f930370d7b17c92937A22380dfDc4dA2E2",
-      "txHash": "0xe0222a01ff245191e112c39ff52ffaf050fdebc9b39cc9e464702a25a1c52011",
+    "3fba9150c9f74b2d2128365b411ddb0385e4e2fad54642997a61ea5edf6c248e": {
+      "address": "0x7De8c7C2761A1eDd5e1b6b1a126c8555e976295E",
+      "txHash": "0xe4a78a6213760783ced1d5a5a6b8a95296d07e094c8f46b84ae454b386019275",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
@@ -637,23 +322,23 @@
             "slot": "0",
             "type": "t_contract(IERC20)4272",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:28"
+            "src": "contracts/VaultContract.sol:27"
           },
           {
             "label": "mmUSDTToken",
             "offset": 0,
             "slot": "1",
-            "type": "t_contract(mmUSDT)12094",
+            "type": "t_contract(mmUSDT)12449",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:29"
+            "src": "contracts/VaultContract.sol:28"
           },
           {
             "label": "withdrawNFT",
             "offset": 0,
             "slot": "2",
-            "type": "t_contract(WithdrawNFT)11885",
+            "type": "t_contract(WithdrawNFT)12221",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:30"
+            "src": "contracts/VaultContract.sol:29"
           },
           {
             "label": "totalDeposited",
@@ -661,7 +346,7 @@
             "slot": "3",
             "type": "t_uint256",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:32"
+            "src": "contracts/VaultContract.sol:31"
           },
           {
             "label": "totalWithdrawn",
@@ -669,7 +354,7 @@
             "slot": "4",
             "type": "t_uint256",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:33"
+            "src": "contracts/VaultContract.sol:32"
           },
           {
             "label": "bridgeBalance",
@@ -677,18 +362,18 @@
             "slot": "5",
             "type": "t_uint256",
             "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:33"
+          },
+          {
+            "label": "exchangeRate",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "VaultContract",
             "src": "contracts/VaultContract.sol:34"
           },
           {
             "label": "userDeposits",
-            "offset": 0,
-            "slot": "6",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:39"
-          },
-          {
-            "label": "userWithdrawals",
             "offset": 0,
             "slot": "7",
             "type": "t_mapping(t_address,t_uint256)",
@@ -696,12 +381,28 @@
             "src": "contracts/VaultContract.sol:40"
           },
           {
-            "label": "__gap",
+            "label": "userWithdrawals",
             "offset": 0,
             "slot": "8",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:41"
+          },
+          {
+            "label": "withdrawRequests",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)10699_storage)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:54"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "10",
             "type": "t_array(t_uint256)40_storage",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:259"
+            "src": "contracts/VaultContract.sol:383"
           }
         ],
         "types": {
@@ -813,17 +514,65 @@
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },
-          "t_contract(WithdrawNFT)11885": {
+          "t_contract(WithdrawNFT)12221": {
             "label": "contract WithdrawNFT",
             "numberOfBytes": "20"
           },
-          "t_contract(mmUSDT)12094": {
+          "t_contract(mmUSDT)12449": {
             "label": "contract mmUSDT",
             "numberOfBytes": "20"
+          },
+          "t_enum(WithdrawStatus)10687": {
+            "label": "enum VaultContract.WithdrawStatus",
+            "members": [
+              "PENDING",
+              "READY"
+            ],
+            "numberOfBytes": "1"
           },
           "t_mapping(t_address,t_uint256)": {
             "label": "mapping(address => uint256)",
             "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(WithdrawRequest)10699_storage)": {
+            "label": "mapping(uint256 => struct VaultContract.WithdrawRequest)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(WithdrawRequest)10699_storage": {
+            "label": "struct VaultContract.WithdrawRequest",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "requestTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "readyTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(WithdrawStatus)10687",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "requester",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
           }
         },
         "namespaces": {
@@ -878,27 +627,99 @@
         }
       }
     },
-    "587a14bf2842ecd2f0478c62e3f387a5562968273ff8487d267349beb30a476e": {
-      "address": "0xaCc887937A7ec5667De55c1Ef424a53a9cBd0Cf5",
-      "txHash": "0xc218dda93efe9f57ad263b51648bf7cfa1aa45a283c0f0531964cf401b1e7328",
+    "c36013921519fb5eb567843ed61ff621bbfdd988c4f2b5178364d2e3b1eeefc0": {
+      "address": "0xCa7Cc242a295E66ccca5BA76c8164A479B5FFAe4",
+      "txHash": "0x4f87284075a676be6441f5bf50fe1034b1d9b775829fb73eb7865188bfad0987",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
           {
-            "label": "_decimals",
+            "label": "usdt",
             "offset": 0,
             "slot": "0",
-            "type": "t_uint8",
-            "contract": "mmUSDT",
-            "src": "contracts/mmUSDT.sol:22"
+            "type": "t_contract(IERC20)3609",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:27"
+          },
+          {
+            "label": "mmUSDTToken",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(mmUSDT)11679",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:28"
+          },
+          {
+            "label": "withdrawNFT",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(WithdrawNFT)11451",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:29"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:31"
+          },
+          {
+            "label": "totalWithdrawn",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:32"
+          },
+          {
+            "label": "bridgeBalance",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:33"
+          },
+          {
+            "label": "exchangeRate",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:34"
+          },
+          {
+            "label": "userDeposits",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:40"
+          },
+          {
+            "label": "userWithdrawals",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:41"
+          },
+          {
+            "label": "withdrawRequests",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:54"
           },
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "mmUSDT",
-            "src": "contracts/mmUSDT.sol:100"
+            "slot": "10",
+            "type": "t_array(t_uint256)40_storage",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:384"
           }
         ],
         "types": {
@@ -918,20 +739,8 @@
             "label": "mapping(address => bool)",
             "numberOfBytes": "32"
           },
-          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(address => mapping(address => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
           "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
             "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
-            "numberOfBytes": "32"
-          },
-          "t_string_storage": {
-            "label": "string",
             "numberOfBytes": "32"
           },
           "t_struct(AccessControlStorage)36_storage": {
@@ -945,42 +754,6 @@
               }
             ],
             "numberOfBytes": "32"
-          },
-          "t_struct(ERC20Storage)296_storage": {
-            "label": "struct ERC20Upgradeable.ERC20Storage",
-            "members": [
-              {
-                "label": "_balances",
-                "type": "t_mapping(t_address,t_uint256)",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "_allowances",
-                "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-                "offset": 0,
-                "slot": "1"
-              },
-              {
-                "label": "_totalSupply",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "2"
-              },
-              {
-                "label": "_name",
-                "type": "t_string_storage",
-                "offset": 0,
-                "slot": "3"
-              },
-              {
-                "label": "_symbol",
-                "type": "t_string_storage",
-                "offset": 0,
-                "slot": "4"
-              }
-            ],
-            "numberOfBytes": "160"
           },
           "t_struct(InitializableStorage)147_storage": {
             "label": "struct Initializable.InitializableStorage",
@@ -1006,6 +779,18 @@
               {
                 "label": "_paused",
                 "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)890_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
                 "offset": 0,
                 "slot": "0"
               }
@@ -1038,16 +823,86 @@
             "label": "uint64",
             "numberOfBytes": "8"
           },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
+          "t_array(t_uint256)40_storage": {
+            "label": "uint256[40]",
+            "numberOfBytes": "1280"
           },
-          "t_uint8": {
-            "label": "uint8",
+          "t_contract(IERC20)3609": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(WithdrawNFT)11451": {
+            "label": "contract WithdrawNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(mmUSDT)11679": {
+            "label": "contract mmUSDT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(WithdrawStatus)9913": {
+            "label": "enum VaultContract.WithdrawStatus",
+            "members": [
+              "PENDING",
+              "READY"
+            ],
             "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)": {
+            "label": "mapping(uint256 => struct VaultContract.WithdrawRequest)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(WithdrawRequest)9925_storage": {
+            "label": "struct VaultContract.WithdrawRequest",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "requestTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "readyTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(WithdrawStatus)9913",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "requester",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
           }
         },
         "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
           "erc7201:openzeppelin.storage.Pausable": [
             {
               "contract": "PausableUpgradeable",
@@ -1066,48 +921,6 @@
               "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
               "offset": 0,
               "slot": "0"
-            }
-          ],
-          "erc7201:openzeppelin.storage.ERC20": [
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_balances",
-              "type": "t_mapping(t_address,t_uint256)",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:33",
-              "offset": 0,
-              "slot": "0"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_allowances",
-              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:35",
-              "offset": 0,
-              "slot": "1"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_totalSupply",
-              "type": "t_uint256",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:37",
-              "offset": 0,
-              "slot": "2"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_name",
-              "type": "t_string_storage",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:39",
-              "offset": 0,
-              "slot": "3"
-            },
-            {
-              "contract": "ERC20Upgradeable",
-              "label": "_symbol",
-              "type": "t_string_storage",
-              "src": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol:40",
-              "offset": 0,
-              "slot": "4"
             }
           ],
           "erc7201:openzeppelin.storage.Initializable": [
@@ -1131,9 +944,643 @@
         }
       }
     },
-    "dcb756ef441506ee1617963c1d4b3d2006577a199a129ed49d33cb556c7b95ae": {
-      "address": "0x30C5f423478BD334B3Cc53091aB59216EC121085",
-      "txHash": "0x06ba4a1d8d17370abeec1175316b9565b2516c1133377b9af25fbeb4caaf2222",
+    "bdf0068f84ccd53220bfbbae67ff741836e6616d08520cca2b8271c9357673f4": {
+      "address": "0x342bce59c6Bb6E506CB44588Bf50A78E04E029ed",
+      "txHash": "0x0b7b189c32cd02cbd28297bc1c6c1c0ccb6921449321d320540e6d43b2efbff5",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "usdt",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IERC20)3609",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:27"
+          },
+          {
+            "label": "mmUSDTToken",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(mmUSDT)11721",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:28"
+          },
+          {
+            "label": "withdrawNFT",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(WithdrawNFT)11493",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:29"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:31"
+          },
+          {
+            "label": "totalWithdrawn",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:32"
+          },
+          {
+            "label": "bridgeBalance",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:33"
+          },
+          {
+            "label": "exchangeRate",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:34"
+          },
+          {
+            "label": "userDeposits",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:40"
+          },
+          {
+            "label": "userWithdrawals",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:41"
+          },
+          {
+            "label": "withdrawRequests",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:54"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_array(t_uint256)40_storage",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:397"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AccessControlStorage)36_storage": {
+            "label": "struct AccessControlUpgradeable.AccessControlStorage",
+            "members": [
+              {
+                "label": "_roles",
+                "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(InitializableStorage)147_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)826_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)890_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)26_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "hasRole",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_uint256)40_storage": {
+            "label": "uint256[40]",
+            "numberOfBytes": "1280"
+          },
+          "t_contract(IERC20)3609": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(WithdrawNFT)11493": {
+            "label": "contract WithdrawNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(mmUSDT)11721": {
+            "label": "contract mmUSDT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(WithdrawStatus)9913": {
+            "label": "enum VaultContract.WithdrawStatus",
+            "members": [
+              "PENDING",
+              "READY"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)": {
+            "label": "mapping(uint256 => struct VaultContract.WithdrawRequest)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(WithdrawRequest)9925_storage": {
+            "label": "struct VaultContract.WithdrawRequest",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "requestTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "readyTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(WithdrawStatus)9913",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "requester",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.AccessControl": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "71c08017825ce40fc2490b121b310ac31b6a78e9678e5e4598ac926a7b1a0741": {
+      "address": "0xFC429aDE036aB99858215c871a8E4aF1d335333A",
+      "txHash": "0x1feae0c2dc38b6566a44226f5aeb0b352d417c43aa0ef96dddd04c3c8a85a069",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "usdt",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IERC20)3609",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:27"
+          },
+          {
+            "label": "mmUSDTToken",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(mmUSDT)11805",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:28"
+          },
+          {
+            "label": "withdrawNFT",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(WithdrawNFT)11577",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:29"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:31"
+          },
+          {
+            "label": "totalWithdrawn",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:32"
+          },
+          {
+            "label": "bridgeBalance",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:33"
+          },
+          {
+            "label": "exchangeRate",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:34"
+          },
+          {
+            "label": "userDeposits",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:40"
+          },
+          {
+            "label": "userWithdrawals",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:41"
+          },
+          {
+            "label": "withdrawRequests",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:54"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_array(t_uint256)40_storage",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:415"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AccessControlStorage)36_storage": {
+            "label": "struct AccessControlUpgradeable.AccessControlStorage",
+            "members": [
+              {
+                "label": "_roles",
+                "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(InitializableStorage)147_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)826_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)890_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)26_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "hasRole",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_uint256)40_storage": {
+            "label": "uint256[40]",
+            "numberOfBytes": "1280"
+          },
+          "t_contract(IERC20)3609": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(WithdrawNFT)11577": {
+            "label": "contract WithdrawNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(mmUSDT)11805": {
+            "label": "contract mmUSDT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(WithdrawStatus)9913": {
+            "label": "enum VaultContract.WithdrawStatus",
+            "members": [
+              "PENDING",
+              "READY"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)": {
+            "label": "mapping(uint256 => struct VaultContract.WithdrawRequest)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(WithdrawRequest)9925_storage": {
+            "label": "struct VaultContract.WithdrawRequest",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "requestTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "readyTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(WithdrawStatus)9913",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "requester",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.AccessControl": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "bd05c878af0120129ebfcc3c1552d8e3ea4cdf07c620414a781576ef6916ca93": {
+      "address": "0x1fF8c0088ab09c8e17E96458DfB1B019f0F0E49b",
+      "txHash": "0x31dd7b7a64413ad13486c3ac42002bdc6c140a1a786544a582d7bb63d97644fb",
       "layout": {
         "solcVersion": "0.8.24",
         "storage": [
@@ -1143,23 +1590,31 @@
             "slot": "0",
             "type": "t_uint256",
             "contract": "WithdrawNFT",
-            "src": "contracts/WithdrawNFT.sol:37"
+            "src": "contracts/WithdrawNFT.sol:26"
           },
           {
-            "label": "withdrawRequests",
+            "label": "withdrawalAmounts",
             "offset": 0,
             "slot": "1",
-            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)11357_storage)",
+            "type": "t_mapping(t_uint256,t_uint256)",
             "contract": "WithdrawNFT",
-            "src": "contracts/WithdrawNFT.sol:38"
+            "src": "contracts/WithdrawNFT.sol:29"
+          },
+          {
+            "label": "vaultContract",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "WithdrawNFT",
+            "src": "contracts/WithdrawNFT.sol:32"
           },
           {
             "label": "__gap",
             "offset": 0,
-            "slot": "2",
-            "type": "t_array(t_uint256)47_storage",
+            "slot": "3",
+            "type": "t_array(t_uint256)48_storage",
             "contract": "WithdrawNFT",
-            "src": "contracts/WithdrawNFT.sol:226"
+            "src": "contracts/WithdrawNFT.sol:244"
           }
         ],
         "types": {
@@ -1309,58 +1764,13 @@
             "label": "uint64",
             "numberOfBytes": "8"
           },
-          "t_array(t_uint256)47_storage": {
-            "label": "uint256[47]",
-            "numberOfBytes": "1504"
+          "t_array(t_uint256)48_storage": {
+            "label": "uint256[48]",
+            "numberOfBytes": "1536"
           },
-          "t_enum(WithdrawStatus)11345": {
-            "label": "enum WithdrawNFT.WithdrawStatus",
-            "members": [
-              "PENDING",
-              "READY",
-              "CLAIMED"
-            ],
-            "numberOfBytes": "1"
-          },
-          "t_mapping(t_uint256,t_struct(WithdrawRequest)11357_storage)": {
-            "label": "mapping(uint256 => struct WithdrawNFT.WithdrawRequest)",
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
             "numberOfBytes": "32"
-          },
-          "t_struct(WithdrawRequest)11357_storage": {
-            "label": "struct WithdrawNFT.WithdrawRequest",
-            "members": [
-              {
-                "label": "amount",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "requestTime",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "1"
-              },
-              {
-                "label": "readyTime",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "2"
-              },
-              {
-                "label": "status",
-                "type": "t_enum(WithdrawStatus)11345",
-                "offset": 0,
-                "slot": "3"
-              },
-              {
-                "label": "requester",
-                "type": "t_address",
-                "offset": 1,
-                "slot": "3"
-              }
-            ],
-            "numberOfBytes": "128"
           }
         },
         "namespaces": {
@@ -1432,6 +1842,927 @@
               "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:38",
               "offset": 0,
               "slot": "5"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "bcad0f214cd3ac1851cbf4895aa3cfe91cc24d3650d33e630a8c49a892bf68f6": {
+      "address": "0x24A245dd205e9Bbc9F2A2fa0517C2dD57AB8CAC8",
+      "txHash": "0x6147bc9c38dc70fca2667434c7174219312f9706b4271b6bfbbfcd9e2a316f7c",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "_tokenIdCounter",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256",
+            "contract": "WithdrawNFT",
+            "src": "contracts/WithdrawNFT.sol:26"
+          },
+          {
+            "label": "withdrawalAmounts",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "WithdrawNFT",
+            "src": "contracts/WithdrawNFT.sol:29"
+          },
+          {
+            "label": "vaultContract",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address",
+            "contract": "WithdrawNFT",
+            "src": "contracts/WithdrawNFT.sol:32"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_array(t_uint256)48_storage",
+            "contract": "WithdrawNFT",
+            "src": "contracts/WithdrawNFT.sol:249"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+            "label": "mapping(address => mapping(address => bool))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AccessControlStorage)36_storage": {
+            "label": "struct AccessControlUpgradeable.AccessControlStorage",
+            "members": [
+              {
+                "label": "_roles",
+                "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ERC721Storage)507_storage": {
+            "label": "struct ERC721Upgradeable.ERC721Storage",
+            "members": [
+              {
+                "label": "_name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_symbol",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "_owners",
+                "type": "t_mapping(t_uint256,t_address)",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "_balances",
+                "type": "t_mapping(t_address,t_uint256)",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "_tokenApprovals",
+                "type": "t_mapping(t_uint256,t_address)",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "_operatorApprovals",
+                "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(InitializableStorage)147_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)826_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)26_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "hasRole",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_uint256)48_storage": {
+            "label": "uint256[48]",
+            "numberOfBytes": "1536"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.AccessControl": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.ERC721": [
+            {
+              "contract": "ERC721Upgradeable",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:27",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "ERC721Upgradeable",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:30",
+              "offset": 0,
+              "slot": "1"
+            },
+            {
+              "contract": "ERC721Upgradeable",
+              "label": "_owners",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:32",
+              "offset": 0,
+              "slot": "2"
+            },
+            {
+              "contract": "ERC721Upgradeable",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:34",
+              "offset": 0,
+              "slot": "3"
+            },
+            {
+              "contract": "ERC721Upgradeable",
+              "label": "_tokenApprovals",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:36",
+              "offset": 0,
+              "slot": "4"
+            },
+            {
+              "contract": "ERC721Upgradeable",
+              "label": "_operatorApprovals",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol:38",
+              "offset": 0,
+              "slot": "5"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "52b17dac8bfc9a4b29d28ede2e468860e8d72ae6bf9e16447a5aa04c57ea6e87": {
+      "address": "0x037895b353BDd139Fe2C44D3f4cC24DEC1d74689",
+      "txHash": "0x7c60c81f3f9917caf87ec12cc17fdb241503b879f76960acd87e2818790c7f5c",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "usdt",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IERC20)3609",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:27"
+          },
+          {
+            "label": "mmUSDTToken",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(mmUSDT)11914",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:28"
+          },
+          {
+            "label": "withdrawNFT",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(WithdrawNFT)11686",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:29"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:31"
+          },
+          {
+            "label": "totalWithdrawn",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:32"
+          },
+          {
+            "label": "bridgeBalance",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:33"
+          },
+          {
+            "label": "exchangeRate",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:34"
+          },
+          {
+            "label": "userDeposits",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:40"
+          },
+          {
+            "label": "userWithdrawals",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:41"
+          },
+          {
+            "label": "withdrawRequests",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:54"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_array(t_uint256)40_storage",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:455"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AccessControlStorage)36_storage": {
+            "label": "struct AccessControlUpgradeable.AccessControlStorage",
+            "members": [
+              {
+                "label": "_roles",
+                "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(InitializableStorage)147_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)826_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)890_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)26_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "hasRole",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_uint256)40_storage": {
+            "label": "uint256[40]",
+            "numberOfBytes": "1280"
+          },
+          "t_contract(IERC20)3609": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(WithdrawNFT)11686": {
+            "label": "contract WithdrawNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(mmUSDT)11914": {
+            "label": "contract mmUSDT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(WithdrawStatus)9913": {
+            "label": "enum VaultContract.WithdrawStatus",
+            "members": [
+              "PENDING",
+              "READY"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)": {
+            "label": "mapping(uint256 => struct VaultContract.WithdrawRequest)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(WithdrawRequest)9925_storage": {
+            "label": "struct VaultContract.WithdrawRequest",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "requestTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "readyTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(WithdrawStatus)9913",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "requester",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.AccessControl": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "cccf88b3b411338a84065eb0e615d51afe34f31e3d77c90cdbed27596e8b17d1": {
+      "address": "0x98A1954009AbC0a80C5F0401888884919CaD4F47",
+      "txHash": "0x4db5092dc4433dd8f1152979ab87ca69d9590053fdcee626fa42828f899a15c9",
+      "layout": {
+        "solcVersion": "0.8.24",
+        "storage": [
+          {
+            "label": "usdt",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_contract(IERC20)3609",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:27"
+          },
+          {
+            "label": "mmUSDTToken",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_contract(mmUSDT)11899",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:28"
+          },
+          {
+            "label": "withdrawNFT",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_contract(WithdrawNFT)11671",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:29"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:31"
+          },
+          {
+            "label": "totalWithdrawn",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:32"
+          },
+          {
+            "label": "bridgeBalance",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:33"
+          },
+          {
+            "label": "exchangeRate",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_uint256",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:34"
+          },
+          {
+            "label": "userDeposits",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:40"
+          },
+          {
+            "label": "userWithdrawals",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:41"
+          },
+          {
+            "label": "withdrawRequests",
+            "offset": 0,
+            "slot": "9",
+            "type": "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:54"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "10",
+            "type": "t_array(t_uint256)40_storage",
+            "contract": "VaultContract",
+            "src": "contracts/VaultContract.sol:455"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_struct(RoleData)26_storage)": {
+            "label": "mapping(bytes32 => struct AccessControlUpgradeable.RoleData)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AccessControlStorage)36_storage": {
+            "label": "struct AccessControlUpgradeable.AccessControlStorage",
+            "members": [
+              {
+                "label": "_roles",
+                "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(InitializableStorage)147_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)826_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(ReentrancyGuardStorage)890_storage": {
+            "label": "struct ReentrancyGuardUpgradeable.ReentrancyGuardStorage",
+            "members": [
+              {
+                "label": "_status",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(RoleData)26_storage": {
+            "label": "struct AccessControlUpgradeable.RoleData",
+            "members": [
+              {
+                "label": "hasRole",
+                "type": "t_mapping(t_address,t_bool)",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "adminRole",
+                "type": "t_bytes32",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_array(t_uint256)40_storage": {
+            "label": "uint256[40]",
+            "numberOfBytes": "1280"
+          },
+          "t_contract(IERC20)3609": {
+            "label": "contract IERC20",
+            "numberOfBytes": "20"
+          },
+          "t_contract(WithdrawNFT)11671": {
+            "label": "contract WithdrawNFT",
+            "numberOfBytes": "20"
+          },
+          "t_contract(mmUSDT)11899": {
+            "label": "contract mmUSDT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(WithdrawStatus)9913": {
+            "label": "enum VaultContract.WithdrawStatus",
+            "members": [
+              "PENDING",
+              "READY"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(WithdrawRequest)9925_storage)": {
+            "label": "mapping(uint256 => struct VaultContract.WithdrawRequest)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(WithdrawRequest)9925_storage": {
+            "label": "struct VaultContract.WithdrawRequest",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "requestTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "readyTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(WithdrawStatus)9913",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "requester",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.ReentrancyGuard": [
+            {
+              "contract": "ReentrancyGuardUpgradeable",
+              "label": "_status",
+              "type": "t_uint256",
+              "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:43",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.AccessControl": [
+            {
+              "contract": "AccessControlUpgradeable",
+              "label": "_roles",
+              "type": "t_mapping(t_bytes32,t_struct(RoleData)26_storage)",
+              "src": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol:62",
+              "offset": 0,
+              "slot": "0"
             }
           ],
           "erc7201:openzeppelin.storage.Initializable": [

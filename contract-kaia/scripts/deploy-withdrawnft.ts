@@ -15,16 +15,23 @@ async function main() {
   // Deploy WithdrawNFT as upgradeable proxy
   console.log("\nDeploying WithdrawNFT (Upgradeable)...");
   const WithdrawNFTFactory = await ethers.getContractFactory("WithdrawNFT");
+  const placeholderVaultAddress = process.env.VAULT_ADDRESS || "";
+
   const withdrawNFT = await upgrades.deployProxy(
     WithdrawNFTFactory,
-    ["Withdraw Request NFT", "wNFT", await deployer.getAddress()],
+    [
+      "Withdraw Request NFT",
+      "wNFT",
+      await deployer.getAddress(),
+      placeholderVaultAddress,
+    ],
     {
       initializer: "initialize",
       kind: "uups",
     }
   );
   await withdrawNFT.waitForDeployment();
-  
+
   const address = await withdrawNFT.getAddress();
   console.log("✅ WithdrawNFT proxy deployed to:", address);
 
@@ -34,7 +41,9 @@ async function main() {
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
   console.log("\n🔧 Next Steps:");
-  console.log("1. Grant MINTER_ROLE, BURNER_ROLE, and MANAGER_ROLE to VaultContract");
+  console.log(
+    "1. Grant MINTER_ROLE, BURNER_ROLE, and MANAGER_ROLE to VaultContract"
+  );
   console.log("2. Use this address in VaultContract deployment");
 }
 

@@ -13,7 +13,10 @@ async function main(): Promise<void> {
 
   // Connect to deployed contracts
   const testUSDT = await ethers.getContractAt("TestUSDT", TESTUUSDT_ADDRESS);
-  const vaultContract = await ethers.getContractAt("VaultContract", VAULT_ADDRESS);
+  const vaultContract = await ethers.getContractAt(
+    "VaultContract",
+    VAULT_ADDRESS
+  );
   const mmUSDTToken = await ethers.getContractAt("mmUSDT", MMUSDT_ADDRESS);
 
   console.log("🔍 Testing TestUSDT → mmUSDT deposit");
@@ -22,30 +25,44 @@ async function main(): Promise<void> {
   // Step 1: Check current balances
   console.log("\n1️⃣ Current balances:");
   const initialUsdtBalance = await (testUSDT as any).balanceOf(user.address);
-  const initialMmUSDTBalance = await (mmUSDTToken as any).balanceOf(user.address);
-  
-  console.log("TestUSDT balance:", ethers.formatUnits(initialUsdtBalance, 6), "USDT");
-  console.log("mmUSDT balance:", ethers.formatUnits(initialMmUSDTBalance, 6), "mmUSDT");
+  const initialMmUSDTBalance = await (mmUSDTToken as any).balanceOf(
+    user.address
+  );
+
+  console.log(
+    "TestUSDT balance:",
+    ethers.formatUnits(initialUsdtBalance, 6),
+    "USDT"
+  );
+  console.log(
+    "mmUSDT balance:",
+    ethers.formatUnits(initialMmUSDTBalance, 6),
+    "mmUSDT"
+  );
 
   // Step 2: Approve vault to spend TestUSDT
   console.log("\n2️⃣ Approving vault to spend TestUSDT...");
-  const depositAmount = ethers.parseUnits("100", 6); // 100 USDT
-  
-  const approveTx = await (testUSDT as any).connect(user).approve(VAULT_ADDRESS, depositAmount);
+  const depositAmount = ethers.parseUnits("10", 6); // 10 USDT
+
+  const approveTx = await (testUSDT as any)
+    .connect(user)
+    .approve(VAULT_ADDRESS, depositAmount);
   await approveTx.wait();
   console.log("Approved:", ethers.formatUnits(depositAmount, 6), "USDT");
 
   // Step 3: Deposit TestUSDT to get mmUSDT
   console.log("\n3️⃣ Depositing TestUSDT...");
-  
+
   // Manual gas estimation for reliability
-  const gasEstimate = await (vaultContract as any).connect(user).deposit.estimateGas(depositAmount);
+  const gasEstimate = await (vaultContract as any)
+    .connect(user)
+    .deposit.estimateGas(depositAmount);
   const gasLimit = (gasEstimate * 120n) / 100n; // 20% buffer
 
   const tx = await (vaultContract as any).connect(user).deposit(depositAmount, {
     gasLimit: gasLimit,
   });
-  
+
   console.log("Transaction sent:", tx.hash);
   const receipt = await tx.wait();
   console.log("✅ Confirmed in block:", receipt.blockNumber);
@@ -55,16 +72,28 @@ async function main(): Promise<void> {
   const finalUsdtBalance = await (testUSDT as any).balanceOf(user.address);
   const finalMmUSDTBalance = await (mmUSDTToken as any).balanceOf(user.address);
 
-  console.log("TestUSDT balance:", ethers.formatUnits(finalUsdtBalance, 6), "USDT");
-  console.log("mmUSDT balance:", ethers.formatUnits(finalMmUSDTBalance, 6), "mmUSDT");
+  console.log(
+    "TestUSDT balance:",
+    ethers.formatUnits(finalUsdtBalance, 6),
+    "USDT"
+  );
+  console.log(
+    "mmUSDT balance:",
+    ethers.formatUnits(finalMmUSDTBalance, 6),
+    "mmUSDT"
+  );
 
   // Step 5: Show transaction summary
   console.log("\n📊 Transaction Summary:");
   const usdtSpent = initialUsdtBalance - finalUsdtBalance;
   const mmUSDTGained = finalMmUSDTBalance - initialMmUSDTBalance;
-  
+
   console.log("TestUSDT spent:", ethers.formatUnits(usdtSpent, 6), "USDT");
-  console.log("mmUSDT received:", ethers.formatUnits(mmUSDTGained, 6), "mmUSDT");
+  console.log(
+    "mmUSDT received:",
+    ethers.formatUnits(mmUSDTGained, 6),
+    "mmUSDT"
+  );
   console.log("Exchange rate:", usdtSpent === mmUSDTGained ? "1:1 ✅" : "❌");
 
   // Step 6: Verify KIP compliance

@@ -12,16 +12,20 @@ async function main() {
     )
   );
 
-  // Required addresses - Update these with your deployed contract addresses
-  const USDT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with TestUSDT address
-  const MMUSDT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with mmUSDT address  
-  const WITHDRAWNFT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with WithdrawNFT address
+  // Required addresses
+  const USDT_ADDRESS = process.env.TESTUUSDT_ADDRESS;
+  const MMUSDT_ADDRESS = process.env.MMUSDT_ADDRESS;
+  const WITHDRAWNFT_ADDRESS = process.env.WITHDRAWNFT_ADDRESS;
 
   // Validate addresses
-  if (USDT_ADDRESS === "0x0000000000000000000000000000000000000000" ||
-      MMUSDT_ADDRESS === "0x0000000000000000000000000000000000000000" ||
-      WITHDRAWNFT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-    console.error("❌ Please update the contract addresses in this script first!");
+  if (
+    USDT_ADDRESS === "0x0000000000000000000000000000000000000000" ||
+    MMUSDT_ADDRESS === "0x0000000000000000000000000000000000000000" ||
+    WITHDRAWNFT_ADDRESS === "0x0000000000000000000000000000000000000000"
+  ) {
+    console.error(
+      "❌ Please update the contract addresses in this script first!"
+    );
     console.error("   - USDT_ADDRESS: Deploy TestUSDT first");
     console.error("   - MMUSDT_ADDRESS: Deploy mmUSDT first");
     console.error("   - WITHDRAWNFT_ADDRESS: Deploy WithdrawNFT first");
@@ -50,7 +54,7 @@ async function main() {
     }
   );
   await vaultContract.waitForDeployment();
-  
+
   const address = await vaultContract.getAddress();
   console.log("✅ VaultContract proxy deployed to:", address);
 

@@ -1,76 +1,64 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  console.log("Setting up roles and permissions...");
+  console.log("Setting up roles for VaultContract...");
 
   const [deployer] = await ethers.getSigners();
   console.log("Setting up with account:", await deployer.getAddress());
 
-  // Contract addresses - Update these with your deployed contract addresses
-  const MMUSDT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with mmUSDT address
-  const WITHDRAWNFT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with WithdrawNFT address
-  const VAULT_ADDRESS = "0x0000000000000000000000000000000000000000"; // Replace with VaultContract address
+  // Contract addresses from environment
+  const VAULT_ADDRESS = process.env.VAULT_ADDRESS;
+  const MMUSDT_ADDRESS = process.env.MMUSDT_ADDRESS;
+  const WITHDRAWNFT_ADDRESS = process.env.WITHDRAWNFT_ADDRESS;
 
-  // Validate addresses
-  if (MMUSDT_ADDRESS === "0x0000000000000000000000000000000000000000" ||
-      WITHDRAWNFT_ADDRESS === "0x0000000000000000000000000000000000000000" ||
-      VAULT_ADDRESS === "0x0000000000000000000000000000000000000000") {
-    console.error("❌ Please update the contract addresses in this script first!");
+  if (!VAULT_ADDRESS || !MMUSDT_ADDRESS || !WITHDRAWNFT_ADDRESS) {
+    console.error("❌ Missing contract addresses in environment variables");
     process.exit(1);
   }
 
   console.log("\nUsing contract addresses:");
-  console.log("mmUSDT:       ", MMUSDT_ADDRESS);
-  console.log("WithdrawNFT:  ", WITHDRAWNFT_ADDRESS);
-  console.log("VaultContract:", VAULT_ADDRESS);
+  console.log("VaultContract:  ", VAULT_ADDRESS);
+  console.log("mmUSDT:         ", MMUSDT_ADDRESS);
+  console.log("WithdrawNFT:    ", WITHDRAWNFT_ADDRESS);
 
-  // Get contract instances
-  const mmUSDTToken = await ethers.getContractAt("mmUSDT", MMUSDT_ADDRESS);
+  // Connect to contracts
+  const mmUSDT = await ethers.getContractAt("mmUSDT", MMUSDT_ADDRESS);
   const withdrawNFT = await ethers.getContractAt("WithdrawNFT", WITHDRAWNFT_ADDRESS);
 
-  console.log("\n🔧 Setting up mmUSDT roles...");
+  // Define role hashes
+  const MINTER_ROLE = ethers.keccak256(ethers.toUtf8Bytes("MINTER_ROLE"));
+  const BURNER_ROLE = ethers.keccak256(ethers.toUtf8Bytes("BURNER_ROLE"));
 
-  // Grant roles to VaultContract for mmUSDT
-  const MINTER_ROLE = await mmUSDTToken.MINTER_ROLE();
-  const BURNER_ROLE = await mmUSDTToken.BURNER_ROLE();
+  console.log("\n🔐 Granting roles...");
 
-  console.log("Granting MINTER_ROLE to VaultContract...");
-  await mmUSDTToken.grantRole(MINTER_ROLE, VAULT_ADDRESS);
+  // Grant MINTER_ROLE to VaultContract on mmUSDT
+  console.log("1. Granting MINTER_ROLE to VaultContract on mmUSDT...");
+  const tx1 = await mmUSDT.grantRole(MINTER_ROLE, VAULT_ADDRESS);
+  await tx1.wait();
+  console.log("✅ MINTER_ROLE granted");
 
-  console.log("Granting BURNER_ROLE to VaultContract...");
-  await mmUSDTToken.grantRole(BURNER_ROLE, VAULT_ADDRESS);
+  // Grant BURNER_ROLE to VaultContract on mmUSDT
+  console.log("2. Granting BURNER_ROLE to VaultContract on mmUSDT...");
+  const tx2 = await mmUSDT.grantRole(BURNER_ROLE, VAULT_ADDRESS);
+  await tx2.wait();
+  console.log("✅ BURNER_ROLE granted");
 
-  console.log("\n🔧 Setting up WithdrawNFT roles...");
+  // Grant MINTER_ROLE to VaultContract on WithdrawNFT
+  console.log("3. Granting MINTER_ROLE to VaultContract on WithdrawNFT...");
+  const tx3 = await withdrawNFT.grantRole(MINTER_ROLE, VAULT_ADDRESS);
+  await tx3.wait();
+  console.log("✅ MINTER_ROLE granted");
 
-  // Grant roles to VaultContract for WithdrawNFT
-  const NFT_MINTER_ROLE = await withdrawNFT.MINTER_ROLE();
-  const NFT_BURNER_ROLE = await withdrawNFT.BURNER_ROLE();
-  const NFT_MANAGER_ROLE = await withdrawNFT.MANAGER_ROLE();
+  // Grant BURNER_ROLE to VaultContract on WithdrawNFT
+  console.log("4. Granting BURNER_ROLE to VaultContract on WithdrawNFT...");
+  const tx4 = await withdrawNFT.grantRole(BURNER_ROLE, VAULT_ADDRESS);
+  await tx4.wait();
+  console.log("✅ BURNER_ROLE granted");
 
-  console.log("Granting NFT MINTER_ROLE to VaultContract...");
-  await withdrawNFT.grantRole(NFT_MINTER_ROLE, VAULT_ADDRESS);
-
-  console.log("Granting NFT BURNER_ROLE to VaultContract...");
-  await withdrawNFT.grantRole(NFT_BURNER_ROLE, VAULT_ADDRESS);
-
-  console.log("Granting NFT MANAGER_ROLE to VaultContract...");
-  await withdrawNFT.grantRole(NFT_MANAGER_ROLE, VAULT_ADDRESS);
-
-  console.log("\n✅ All roles configured successfully!");
-
-  console.log("\n📋 Role Summary:");
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("mmUSDT roles granted to VaultContract:");
-  console.log("  - MINTER_ROLE");
-  console.log("  - BURNER_ROLE");
-  console.log("");
-  console.log("WithdrawNFT roles granted to VaultContract:");
-  console.log("  - MINTER_ROLE");
-  console.log("  - BURNER_ROLE");
-  console.log("  - MANAGER_ROLE");
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-  console.log("\n🎉 Vault system is ready for testing!");
+  console.log("\n🎉 All roles granted successfully!");
+  console.log("VaultContract can now:");
+  console.log("- Mint and burn mmUSDT tokens");
+  console.log("- Mint and burn WithdrawNFT tokens");
 }
 
 main()
