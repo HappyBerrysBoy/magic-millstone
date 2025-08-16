@@ -20,35 +20,22 @@ contract WithdrawNFT is
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
-    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
-    enum WithdrawStatus { PENDING, READY, CLAIMED }
-
-    struct WithdrawRequest {
-        uint256 amount;
-        uint256 requestTime;
-        uint256 readyTime;
-        WithdrawStatus status;
-        address requester;
-    }
-
     uint256 private _tokenIdCounter;
-    mapping(uint256 => WithdrawRequest) public withdrawRequests;
+    
+    // Simple mapping: tokenId → amount (VaultContract manages all other logic)
+    mapping(uint256 => uint256) public withdrawalAmounts;
+    
+    // Reference to VaultContract to fetch status for display
+    address public vaultContract;
 
     event WithdrawNFTMinted(
         uint256 indexed tokenId,
         address indexed to,
         uint256 amount,
-        uint256 requestTime
-    );
-
-    event WithdrawStatusUpdated(
-        uint256 indexed tokenId,
-        WithdrawStatus oldStatus,
-        WithdrawStatus newStatus,
-        uint256 readyTime
+        uint256 timestamp
     );
 
     event WithdrawNFTBurned(
@@ -59,7 +46,8 @@ contract WithdrawNFT is
     function initialize(
         string memory name,
         string memory symbol,
-        address admin
+        address admin,
+        address _vaultContract
     ) public initializer {
         __ERC721_init(name, symbol);
         __AccessControl_init();
@@ -70,6 +58,7 @@ contract WithdrawNFT is
         _grantRole(PAUSER_ROLE, admin);
         _grantRole(UPGRADER_ROLE, admin);
         
+        vaultContract = _vaultContract;
         _tokenIdCounter = 1;
     }
 
@@ -79,13 +68,8 @@ contract WithdrawNFT is
     ) external onlyRole(MINTER_ROLE) whenNotPaused returns (uint256) {
         uint256 tokenId = _tokenIdCounter++;
         
-        withdrawRequests[tokenId] = WithdrawRequest({
-            amount: amount,
-            requestTime: block.timestamp,
-            readyTime: 0,
-            status: WithdrawStatus.PENDING,
-            requester: to
-        });
+        // Store only the amount - VaultContract handles all business logic
+        withdrawalAmounts[tokenId] = amount;
 
         _safeMint(to, tokenId);
         
@@ -97,86 +81,63 @@ contract WithdrawNFT is
     function burn(uint256 tokenId) external onlyRole(BURNER_ROLE) whenNotPaused {
         address owner = ownerOf(tokenId);
         _burn(tokenId);
-        delete withdrawRequests[tokenId];
+        delete withdrawalAmounts[tokenId];
         
         emit WithdrawNFTBurned(tokenId, owner);
     }
 
-    function markWithdrawReady(uint256[] calldata tokenIds) 
-        external 
-        onlyRole(MANAGER_ROLE) 
-        whenNotPaused 
-    {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            uint256 tokenId = tokenIds[i];
-            require(_exists(tokenId), "WithdrawNFT: Token does not exist");
-            
-            WithdrawRequest storage request = withdrawRequests[tokenId];
-            require(request.status == WithdrawStatus.PENDING, "WithdrawNFT: Invalid status");
-            
-            WithdrawStatus oldStatus = request.status;
-            request.status = WithdrawStatus.READY;
-            request.readyTime = block.timestamp;
-            
-            emit WithdrawStatusUpdated(tokenId, oldStatus, WithdrawStatus.READY, block.timestamp);
-        }
+    function getWithdrawalAmount(uint256 tokenId) external view returns (uint256) {
+        require(_exists(tokenId), "WithdrawNFT: Token does not exist");
+        return withdrawalAmounts[tokenId];
     }
 
-    function markWithdrawClaimed(uint256 tokenId) 
-        external 
-        onlyRole(MANAGER_ROLE) 
-        whenNotPaused 
-    {
-        require(_exists(tokenId), "WithdrawNFT: Token does not exist");
-        
-        WithdrawRequest storage request = withdrawRequests[tokenId];
-        require(request.status == WithdrawStatus.READY, "WithdrawNFT: Invalid status");
-        
-        WithdrawStatus oldStatus = request.status;
-        request.status = WithdrawStatus.CLAIMED;
-        
-        emit WithdrawStatusUpdated(tokenId, oldStatus, WithdrawStatus.CLAIMED, request.readyTime);
+    function getCurrentTokenId() external view returns (uint256) {
+        return _tokenIdCounter;
     }
 
-    function getWithdrawRequest(uint256 tokenId) 
-        external 
-        view 
-        returns (WithdrawRequest memory) 
-    {
-        require(_exists(tokenId), "WithdrawNFT: Token does not exist");
-        return withdrawRequests[tokenId];
+    function updateVaultContract(address _newVaultContract) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_newVaultContract != address(0), "WithdrawNFT: Invalid vault address");
+        vaultContract = _newVaultContract;
     }
 
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         require(_exists(tokenId), "WithdrawNFT: Token does not exist");
         
-        WithdrawRequest memory request = withdrawRequests[tokenId];
+        uint256 amount = withdrawalAmounts[tokenId];
         
-        string memory statusString;
-        if (request.status == WithdrawStatus.PENDING) {
-            statusString = "PENDING";
-        } else if (request.status == WithdrawStatus.READY) {
-            statusString = "READY";
-        } else {
-            statusString = "CLAIMED";
+        // Get status from VaultContract for display
+        string memory status = "UNKNOWN";
+        uint256 requestTime = 0;
+        uint256 readyTime = 0;
+        
+        try this.getWithdrawRequestFromVault(tokenId) returns (
+            uint256, uint256 _requestTime, uint256 _readyTime, uint8 _status, address
+        ) {
+            status = ["PENDING", "READY"][_status];
+            requestTime = _requestTime;
+            readyTime = _readyTime;
+        } catch {
+            status = "PENDING"; // fallback
         }
 
         string memory json = Base64.encode(
             bytes(
                 string(
                     abi.encodePacked(
-                        '{"name": "Withdraw Request #',
+                        '{"name": "Withdrawal Request #',
                         tokenId.toString(),
-                        '", "description": "USDT Withdraw Request", "status": "',
-                        statusString,
+                        '", "description": "USDT Withdrawal Request", "status": "',
+                        status,
                         '", "amount": "',
-                        (request.amount / 10**6).toString(),
-                        '.', 
-                        ((request.amount % 10**6) / 10**4).toString(),
+                        (amount / 10**6).toString(),
+                        '.',
+                        ((amount % 10**6) / 10**4).toString(),
                         '", "requestTime": "',
-                        request.requestTime.toString(),
+                        requestTime.toString(),
                         '", "readyTime": "',
-                        request.readyTime.toString(),
+                        readyTime.toString(),
+                        '", "image": "data:image/svg+xml;base64,',
+                        _generateSVG(tokenId, amount, status),
                         '"}'
                     )
                 )
@@ -184,6 +145,68 @@ contract WithdrawNFT is
         );
 
         return string(abi.encodePacked("data:application/json;base64,", json));
+    }
+
+    // Helper function to get withdraw request from vault (external call)
+    function getWithdrawRequestFromVault(uint256 tokenId) external view returns (
+        uint256 amount,
+        uint256 requestTime,
+        uint256 readyTime,
+        uint8 status,
+        address requester
+    ) {
+        // Make external call to VaultContract to get status
+        (bool success, bytes memory data) = vaultContract.staticcall(
+            abi.encodeWithSignature("getWithdrawRequest(uint256)", tokenId)
+        );
+        
+        if (success) {
+            (amount, requestTime, readyTime, status, requester) = abi.decode(
+                data, (uint256, uint256, uint256, uint8, address)
+            );
+        } else {
+            // Fallback values
+            amount = withdrawalAmounts[tokenId];
+            requestTime = 0;
+            readyTime = 0;
+            status = 0; // PENDING
+            requester = address(0);
+        }
+    }
+
+    function _generateSVG(uint256 tokenId, uint256 amount, string memory status) internal pure returns (string memory) {
+        // Determine status color
+        string memory statusColor = "#ffaa00"; // PENDING - orange
+        if (keccak256(bytes(status)) == keccak256(bytes("READY"))) {
+            statusColor = "#00ff00"; // READY - green
+        } else if (keccak256(bytes(status)) == keccak256(bytes("CLAIMED"))) {
+            statusColor = "#888888"; // CLAIMED - gray
+        }
+
+        string memory svg = string(
+            abi.encodePacked(
+                '<svg width="300" height="220" xmlns="http://www.w3.org/2000/svg">',
+                '<rect width="300" height="220" fill="#1e1e1e"/>',
+                '<text x="150" y="40" font-family="Arial" font-size="16" fill="white" text-anchor="middle">Withdrawal Request</text>',
+                '<text x="150" y="65" font-family="Arial" font-size="12" fill="#888" text-anchor="middle">NFT #',
+                tokenId.toString(),
+                '</text>',
+                '<text x="150" y="100" font-family="Arial" font-size="20" fill="white" text-anchor="middle">',
+                (amount / 10**6).toString(),
+                '.',
+                ((amount % 10**6) / 10**4).toString(),
+                ' USDT</text>',
+                '<text x="150" y="135" font-family="Arial" font-size="14" fill="',
+                statusColor,
+                '" text-anchor="middle">Status: ',
+                status,
+                '</text>',
+                '<text x="150" y="190" font-family="Arial" font-size="10" fill="#555" text-anchor="middle">Magic Millstone Protocol</text>',
+                '</svg>'
+            )
+        );
+        
+        return Base64.encode(bytes(svg));
     }
 
     function pause() external onlyRole(PAUSER_ROLE) {
@@ -223,5 +246,5 @@ contract WithdrawNFT is
         return _ownerOf(tokenId) != address(0);
     }
 
-    uint256[47] private __gap;
+    uint256[48] private __gap;
 }
