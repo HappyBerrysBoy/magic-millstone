@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useKaiaWalletSdk } from "../app/hooks/walletSdk.hooks";
+import Button from "./Common/Button";
 
 interface DepositFormProps {
   balance: number;
   onStake: (amount: number) => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const PERCENTS = [25, 50, 75, 100];
@@ -32,24 +33,27 @@ const DepositForm: React.FC<DepositFormProps> = ({
     setLoading(true);
     await onStake(Number(amount));
     setLoading(false);
-    onClose();
   };
 
   return (
     <div>
-      <div className="mb-4 text-center text-xl font-bold">USDT Deposit</div>
-      {/* 비율 버튼 */}
-      <div className="mb-2 flex justify-center gap-2">
-        {PERCENTS.map((p) => (
-          <button
-            key={p}
-            className="rounded bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-green-100"
-            onClick={() => handlePercent(p)}
-            type="button"
-          >
-            {p}%
-          </button>
-        ))}
+      <div className="flex items-center justify-between">
+        <div className="mb-4 text-center text-[16px] text-white">
+          USDT Deposit
+        </div>
+        {/* 비율 버튼 */}
+        <div className="mb-2 flex items-center justify-center gap-[8px]">
+          {PERCENTS.map((p) => (
+            <button
+              key={p}
+              className="bg-primary h-[18px] w-[40px] rounded-full text-xs text-black"
+              onClick={() => handlePercent(p)}
+              type="button"
+            >
+              {p}%
+            </button>
+          ))}
+        </div>
       </div>
       {/* 입력 필드 */}
       <div className="relative mb-2">
@@ -60,7 +64,7 @@ const DepositForm: React.FC<DepositFormProps> = ({
           type="number"
           min="0"
           step="0.01"
-          className="w-full rounded-lg border border-gray-300 py-2 pr-3 pl-8 text-lg focus:ring-2 focus:ring-green-200 focus:outline-none"
+          className="w-full py-2 pr-3 pl-8 text-lg focus:ring-2"
           placeholder="0.00"
           value={amount}
           onChange={handleInput}
@@ -70,25 +74,18 @@ const DepositForm: React.FC<DepositFormProps> = ({
         </span>
       </div>
       {/* 사용 가능 잔액 */}
-      <div className="mb-4 text-right text-xs text-gray-500">
-        available:{" "}
-        <span className="font-semibold text-gray-700">
-          {balance.toLocaleString()} USDT
-        </span>
+      <div className="flex justify-between text-[12px]">
+        <span className="text-gray">Available</span>
+        <div>
+          <span className="mr-[4px] text-white">
+            {balance.toLocaleString()}
+          </span>
+          <span>USDT</span>
+        </div>
       </div>
-      <button
-        className="w-full rounded-lg bg-green-600 py-2 font-semibold text-white disabled:bg-gray-300"
-        onClick={handleStake}
-        disabled={
-          loading ||
-          !amount ||
-          isNaN(Number(amount)) ||
-          Number(amount) <= 0 ||
-          Number(amount) > balance
-        }
-      >
-        {loading ? "처리중..." : "Stake"}
-      </button>
+      <Button className="w-full" onClick={handleStake}>
+        Stake
+      </Button>
     </div>
   );
 };

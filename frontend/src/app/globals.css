@@ -39,6 +39,7 @@
   --color-primary: #00e6f2;
   --color-white: #fafafa;
   --color-black: #151818;
+  --color-gray: #ABB4B4;
   --breakpoint-3xl: 120rem;
 
   --color-avocado-100: oklch(0.99 0 0);

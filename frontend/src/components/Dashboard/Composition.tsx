@@ -30,7 +30,7 @@ export default function Composition() {
         ))}
       </div>
       {/* 프로토콜 라벨 - flex wrap으로 2줄 */}
-      <div className="flex flex-wrap gap-[8px]">
+      <div className="flex flex-wrap gap-x-[16px] gap-y-[8px]">
         {COMPOSITION_DATA.map((item) => (
           <div
             key={item.protocol}

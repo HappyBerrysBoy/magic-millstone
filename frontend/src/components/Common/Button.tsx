@@ -22,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({
       case "primary":
         return "bg-primary text-black hover:bg-primary/90";
       case "outline":
-        return "bg-black border border-white text-white hover:bg-white hover:text-black";
+        return "bg-black border border-gray text-gray";
       default:
         return "bg-primary text-black hover:bg-primary/90";
     }
