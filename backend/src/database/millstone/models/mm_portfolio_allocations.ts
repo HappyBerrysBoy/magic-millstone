@@ -9,11 +9,13 @@ export interface mm_portfolio_allocationsAttributes {
   vaultTokenAddress: string;
   allocationAmount?: number;
   targetRate?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type mm_portfolio_allocationsPk = "name" | "platform";
 export type mm_portfolio_allocationsId = mm_portfolio_allocations[mm_portfolio_allocationsPk];
-export type mm_portfolio_allocationsOptionalAttributes = "allocationAmount" | "targetRate";
+export type mm_portfolio_allocationsOptionalAttributes = "allocationAmount" | "targetRate" | "createdAt" | "updatedAt";
 export type mm_portfolio_allocationsCreationAttributes = Optional<mm_portfolio_allocationsAttributes, mm_portfolio_allocationsOptionalAttributes>;
 
 export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttributes, mm_portfolio_allocationsCreationAttributes> implements mm_portfolio_allocationsAttributes {
@@ -24,6 +26,8 @@ export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttr
   vaultTokenAddress!: string;
   allocationAmount?: number;
   targetRate?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 
 
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_portfolio_allocations {
@@ -61,7 +65,7 @@ export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttr
   }, {
     sequelize,
     tableName: 'mm_portfolio_allocations',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",

@@ -5,17 +5,21 @@ export interface mm_tvl_hstsAttributes {
   portfolio_name: string;
   datetime: Date;
   value?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type mm_tvl_hstsPk = "portfolio_name" | "datetime";
 export type mm_tvl_hstsId = mm_tvl_hsts[mm_tvl_hstsPk];
-export type mm_tvl_hstsOptionalAttributes = "value";
+export type mm_tvl_hstsOptionalAttributes = "value" | "createdAt" | "updatedAt";
 export type mm_tvl_hstsCreationAttributes = Optional<mm_tvl_hstsAttributes, mm_tvl_hstsOptionalAttributes>;
 
 export class mm_tvl_hsts extends Model<mm_tvl_hstsAttributes, mm_tvl_hstsCreationAttributes> implements mm_tvl_hstsAttributes {
   portfolio_name!: string;
   datetime!: Date;
   value?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 
 
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_tvl_hsts {
@@ -37,7 +41,7 @@ export class mm_tvl_hsts extends Model<mm_tvl_hstsAttributes, mm_tvl_hstsCreatio
   }, {
     sequelize,
     tableName: 'mm_tvl_hsts',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",

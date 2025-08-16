@@ -9,11 +9,13 @@ export interface mm_tx_hstsAttributes {
   tokenId?: number;
   datetime: Date;
   blockNumber: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type mm_tx_hstsPk = "txId";
 export type mm_tx_hstsId = mm_tx_hsts[mm_tx_hstsPk];
-export type mm_tx_hstsOptionalAttributes = "amount" | "tokenId";
+export type mm_tx_hstsOptionalAttributes = "amount" | "tokenId" | "createdAt" | "updatedAt";
 export type mm_tx_hstsCreationAttributes = Optional<mm_tx_hstsAttributes, mm_tx_hstsOptionalAttributes>;
 
 export class mm_tx_hsts extends Model<mm_tx_hstsAttributes, mm_tx_hstsCreationAttributes> implements mm_tx_hstsAttributes {
@@ -24,6 +26,8 @@ export class mm_tx_hsts extends Model<mm_tx_hstsAttributes, mm_tx_hstsCreationAt
   tokenId?: number;
   datetime!: Date;
   blockNumber!: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 
 
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_tx_hsts {
@@ -61,7 +65,7 @@ export class mm_tx_hsts extends Model<mm_tx_hstsAttributes, mm_tx_hstsCreationAt
   }, {
     sequelize,
     tableName: 'mm_tx_hsts',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",

@@ -5,17 +5,21 @@ export interface mm_exchange_rate_hstsAttributes {
   tokenAddress: string;
   datetime: Date;
   rate?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type mm_exchange_rate_hstsPk = "tokenAddress" | "datetime";
 export type mm_exchange_rate_hstsId = mm_exchange_rate_hsts[mm_exchange_rate_hstsPk];
-export type mm_exchange_rate_hstsOptionalAttributes = "rate";
+export type mm_exchange_rate_hstsOptionalAttributes = "rate" | "createdAt" | "updatedAt";
 export type mm_exchange_rate_hstsCreationAttributes = Optional<mm_exchange_rate_hstsAttributes, mm_exchange_rate_hstsOptionalAttributes>;
 
 export class mm_exchange_rate_hsts extends Model<mm_exchange_rate_hstsAttributes, mm_exchange_rate_hstsCreationAttributes> implements mm_exchange_rate_hstsAttributes {
   tokenAddress!: string;
   datetime!: Date;
   rate?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 
 
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_exchange_rate_hsts {
@@ -37,7 +41,7 @@ export class mm_exchange_rate_hsts extends Model<mm_exchange_rate_hstsAttributes
   }, {
     sequelize,
     tableName: 'mm_exchange_rate_hsts',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",

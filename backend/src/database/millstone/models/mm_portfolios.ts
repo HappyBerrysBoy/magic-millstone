@@ -5,16 +5,21 @@ export interface mm_portfoliosAttributes {
   name: string;
   tokenAddress: string;
   chainId: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type mm_portfoliosPk = "name";
 export type mm_portfoliosId = mm_portfolios[mm_portfoliosPk];
-export type mm_portfoliosCreationAttributes = mm_portfoliosAttributes;
+export type mm_portfoliosOptionalAttributes = "createdAt" | "updatedAt";
+export type mm_portfoliosCreationAttributes = Optional<mm_portfoliosAttributes, mm_portfoliosOptionalAttributes>;
 
 export class mm_portfolios extends Model<mm_portfoliosAttributes, mm_portfoliosCreationAttributes> implements mm_portfoliosAttributes {
   name!: string;
   tokenAddress!: string;
   chainId!: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 
 
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_portfolios {
@@ -35,7 +40,7 @@ export class mm_portfolios extends Model<mm_portfoliosAttributes, mm_portfoliosC
   }, {
     sequelize,
     tableName: 'mm_portfolios',
-    timestamps: false,
+    timestamps: true,
     indexes: [
       {
         name: "PRIMARY",
