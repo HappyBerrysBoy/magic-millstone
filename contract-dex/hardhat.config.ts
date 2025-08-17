@@ -14,7 +14,7 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 1, // 최대 코드 크기 압축
       },
       viaIR: true, // Stack too deep 에러 해결
     },

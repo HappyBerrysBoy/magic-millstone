@@ -54,6 +54,8 @@ export type { Errors } from "./@openzeppelin/contracts/utils/Errors";
 export { Errors__factory } from "./factories/@openzeppelin/contracts/utils/Errors__factory";
 export type { IERC165 } from "./@openzeppelin/contracts/utils/introspection/IERC165";
 export { IERC165__factory } from "./factories/@openzeppelin/contracts/utils/introspection/IERC165__factory";
+export type { CompactMultiProtocolVault } from "./contracts/CompactMultiProtocolVault";
+export { CompactMultiProtocolVault__factory } from "./factories/contracts/CompactMultiProtocolVault__factory";
 export type { EIP1967Proxy } from "./contracts/EIP1967Proxy";
 export { EIP1967Proxy__factory } from "./factories/contracts/EIP1967Proxy__factory";
 export type { IAavePool } from "./contracts/interfaces/IAavePool.sol/IAavePool";

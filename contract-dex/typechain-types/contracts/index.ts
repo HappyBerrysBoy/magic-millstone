@@ -5,5 +5,6 @@ import type * as interfaces from "./interfaces";
 export type { interfaces };
 import type * as mocks from "./mocks";
 export type { mocks };
+export type { CompactMultiProtocolVault } from "./CompactMultiProtocolVault";
 export type { EIP1967Proxy } from "./EIP1967Proxy";
 export type { MillstoneAIVault } from "./MillstoneAIVault";

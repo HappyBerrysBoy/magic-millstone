@@ -3,5 +3,6 @@
 /* eslint-disable */
 export * as interfaces from "./interfaces";
 export * as mocks from "./mocks";
+export { CompactMultiProtocolVault__factory } from "./CompactMultiProtocolVault__factory";
 export { EIP1967Proxy__factory } from "./EIP1967Proxy__factory";
 export { MillstoneAIVault__factory } from "./MillstoneAIVault__factory";

@@ -74,6 +74,25 @@ contract MillstoneAIVault is
     // 수익률 계산을 위한 스냅샷
     mapping(address => uint256) public principalSnapshots;
     
+    // 프로토콜 분배 비율 관리 (token -> protocol -> allocation percentage)
+    mapping(address => mapping(uint8 => uint256)) public protocolAllocations; // 0: AAVE, 1: Morpho
+    mapping(address => uint256) public totalShares; // Yield-bearing token shares
+    mapping(address => uint256) public totalAssets; // Total underlying assets
+    
+    // 프로토콜 타입 열거형
+    enum ProtocolType { AAVE, MORPHO }
+    
+    // APY 추적을 위한 구조체
+    struct APYSnapshot {
+        uint256 timestamp;
+        uint256 totalValue;
+        uint256 principal;
+        uint256 apy; // basis points (10000 = 100%)
+    }
+    
+    mapping(address => APYSnapshot[]) public apyHistory;
+    mapping(address => uint256) public lastAPYUpdate;
+    
     // 이벤트들
     event BridgeAuthorized(address indexed bridge, bool authorized);
     event LendingProtocolAdded(address indexed token, address indexed protocol);
@@ -85,6 +104,10 @@ contract MillstoneAIVault is
     event WithdrawRequested(uint256 indexed requestId, address indexed token, uint256 amount, address indexed requester);
     event WithdrawClaimed(uint256 indexed requestId, address indexed token, uint256 amount, address indexed requester);
     event YieldCalculated(address indexed token, uint256 totalValue, uint256 principal, uint256 yield, uint256 yieldRate);
+    event ProtocolAllocationSet(address indexed token, uint8 protocol, uint256 allocation);
+    event SharesMinted(address indexed user, address indexed token, uint256 shares, uint256 assets);
+    event SharesBurned(address indexed user, address indexed token, uint256 shares, uint256 assets);
+    event APYUpdated(address indexed token, uint256 apy, uint256 timestamp);
     
     // AAVE 관련 이벤트들
     event AavePoolSet(address indexed aavePool);
@@ -349,13 +372,117 @@ contract MillstoneAIVault is
     function setSupportedToken(address token, bool supported) external onlyOwner {
         require(token != address(0), "Invalid token address");
         supportedTokens[token] = supported;
+        
+        if (supported) {
+            // 토큰 추가 시 기본 분배 비율 설정 (50:50)
+            protocolAllocations[token][uint8(ProtocolType.AAVE)] = 5000; // 50%
+            protocolAllocations[token][uint8(ProtocolType.MORPHO)] = 5000; // 50%
+        }
+        
         emit TokenSupported(token, supported);
+    }
+    
+    /**
+     * @dev 프로토콜 분배 비율 설정
+     * @param token 토큰 주소
+     * @param aavePercentage AAVE 분배 비율 (basis points, 10000 = 100%)
+     * @param morphoPercentage Morpho 분배 비율 (basis points, 10000 = 100%)
+     */
+    function setProtocolAllocations(
+        address token,
+        uint256 aavePercentage,
+        uint256 morphoPercentage
+    ) external onlyOwner {
+        require(token != address(0), "Invalid token address");
+        require(supportedTokens[token], "Token not supported");
+        require(aavePercentage + morphoPercentage == 10000, "Percentages must sum to 100%");
+        
+        protocolAllocations[token][uint8(ProtocolType.AAVE)] = aavePercentage;
+        protocolAllocations[token][uint8(ProtocolType.MORPHO)] = morphoPercentage;
+        
+        emit ProtocolAllocationSet(token, uint8(ProtocolType.AAVE), aavePercentage);
+        emit ProtocolAllocationSet(token, uint8(ProtocolType.MORPHO), morphoPercentage);
+    }
+    
+    /**
+     * @dev 프로토콜 분배 비율 조회
+     * @param token 토큰 주소
+     * @return aavePercentage AAVE 분배 비율
+     * @return morphoPercentage Morpho 분배 비율
+     */
+    function getProtocolAllocations(address token) external view returns (
+        uint256 aavePercentage,
+        uint256 morphoPercentage
+    ) {
+        aavePercentage = protocolAllocations[token][uint8(ProtocolType.AAVE)];
+        morphoPercentage = protocolAllocations[token][uint8(ProtocolType.MORPHO)];
     }
 
     /**
-     * @dev 브릿지로부터 토큰 받기
+     * @dev Yield-bearing token 예치 (사용자가 vault shares 받기)
      * @param token 토큰 주소
-     * @param amount 수량
+     * @param assets 예치할 자산 수량
+     * @return shares 발행된 shares 수량
+     */
+    function deposit(address token, uint256 assets) external whenNotPaused nonReentrant returns (uint256 shares) {
+        require(supportedTokens[token], "Token not supported");
+        require(assets > 0, "Assets must be greater than 0");
+        
+        // 사용자로부터 토큰 전송 받기
+        IERC20(token).safeTransferFrom(msg.sender, address(this), assets);
+        
+        // shares 계산
+        shares = _convertToShares(token, assets);
+        require(shares > 0, "Invalid shares amount");
+        
+        // shares 발행
+        totalShares[token] += shares;
+        totalAssets[token] += assets;
+        totalDeposited[token] += assets;
+        
+        emit SharesMinted(msg.sender, token, shares, assets);
+        emit TokenReceived(token, assets, msg.sender);
+        
+        // 자동으로 렌딩 프로토콜에 예치
+        _depositToLendingProtocol(token, assets);
+        
+        return shares;
+    }
+    
+    /**
+     * @dev Yield-bearing token 출금 (shares로 출금)
+     * @param token 토큰 주소
+     * @param shares 출금할 shares 수량
+     * @return assets 받은 자산 수량
+     */
+    function redeem(address token, uint256 shares) external whenNotPaused nonReentrant returns (uint256 assets) {
+        require(supportedTokens[token], "Token not supported");
+        require(shares > 0, "Shares must be greater than 0");
+        require(totalShares[token] >= shares, "Insufficient total shares");
+        
+        // assets 계산
+        assets = _convertToAssets(token, shares);
+        require(assets > 0, "Invalid assets amount");
+        
+        // 프로토콜에서 출금
+        uint256 actualWithdrawn = _withdrawFromProtocols(token, assets);
+        require(actualWithdrawn > 0, "Withdrawal failed");
+        
+        // shares 소각
+        totalShares[token] -= shares;
+        totalAssets[token] -= actualWithdrawn;
+        totalWithdrawn[token] += actualWithdrawn;
+        
+        // 사용자에게 전송
+        IERC20(token).safeTransfer(msg.sender, actualWithdrawn);
+        
+        emit SharesBurned(msg.sender, token, shares, actualWithdrawn);
+        
+        return actualWithdrawn;
+    }
+    
+    /**
+     * @dev 기존 브릿지 방식 (하위 호환성)
      */
     function receiveFromBridge(address token, uint256 amount) external whenNotPaused {
         require(authorizedBridges[msg.sender], "Unauthorized bridge");
@@ -367,8 +494,76 @@ contract MillstoneAIVault is
 
         emit TokenReceived(token, amount, msg.sender);
 
-        // Automatically deposit to lending protocol
+        // 자동으로 렌딩 프로토콜에 예치
         _depositToLendingProtocol(token, amount);
+    }
+    
+    /**
+     * @dev Assets를 shares로 변환
+     */
+    function _convertToShares(address token, uint256 assets) internal view returns (uint256) {
+        uint256 totalSharesSupply = totalShares[token];
+        uint256 totalAssetsSupply = totalAssets[token];
+        
+        if (totalSharesSupply == 0 || totalAssetsSupply == 0) {
+            // 초기 비율 1:1
+            return assets;
+        }
+        
+        // 현재 가치 기반 변환
+        (, uint256 currentProtocolBalance, ) = this.getTokenBalance(token);
+        uint256 currentTotalValue = currentProtocolBalance;
+        
+        if (currentTotalValue == 0) {
+            return assets;
+        }
+        
+        return (assets * totalSharesSupply) / currentTotalValue;
+    }
+    
+    /**
+     * @dev Shares를 assets로 변환
+     */
+    function _convertToAssets(address token, uint256 shares) internal view returns (uint256) {
+        uint256 totalSharesSupply = totalShares[token];
+        
+        if (totalSharesSupply == 0) {
+            return 0;
+        }
+        
+        (, uint256 currentProtocolBalance, ) = this.getTokenBalance(token);
+        uint256 currentTotalValue = currentProtocolBalance;
+        
+        return (shares * currentTotalValue) / totalSharesSupply;
+    }
+    
+    /**
+     * @dev 사용자의 shares 잔액 조회
+     */
+    function balanceOf(address user, address token) external view returns (uint256) {
+        // 실제 구현에서는 ERC20 또는 별도의 매핑을 사용
+        // 여기서는 단순화를 위해 0 반환
+        return 0;
+    }
+    
+    /**
+     * @dev 토큰의 총 shares 공급량
+     */
+    function totalSupply(address token) external view returns (uint256) {
+        return totalShares[token];
+    }
+    
+    /**
+     * @dev 토큰의 shares 가치 (현재 자산 기준)
+     */
+    function shareValue(address token) external view returns (uint256) {
+        uint256 totalSharesSupply = totalShares[token];
+        if (totalSharesSupply == 0) {
+            return 1e18; // 1:1 비율
+        }
+        
+        (, uint256 currentProtocolBalance, ) = this.getTokenBalance(token);
+        return (currentProtocolBalance * 1e18) / totalSharesSupply;
     }
 
     /**
@@ -385,11 +580,56 @@ contract MillstoneAIVault is
     }
 
     /**
-     * @dev 렌딩 프로토콜에 토큰 예치 (내부 함수) - 다중 프로토콜 지원
+     * @dev 렌딩 프로토콜에 토큰 예치 (내부 함수) - 비율에 따른 자동 분배
      * @param token 토큰 주소
      * @param amount 예치할 수량
      */
     function _depositToLendingProtocol(address token, uint256 amount) internal {
+        // 비율 기반 분배 로직
+        uint256 aaveAllocation = protocolAllocations[token][uint8(ProtocolType.AAVE)];
+        uint256 morphoAllocation = protocolAllocations[token][uint8(ProtocolType.MORPHO)];
+        
+        if (aaveAllocation > 0 && morphoAllocation > 0) {
+            // 두 프로토콜에 분배
+            uint256 aaveAmount = (amount * aaveAllocation) / 10000;
+            uint256 morphoAmount = amount - aaveAmount; // 나머지 전부 Morpho에
+            
+            if (aaveAmount > 0) {
+                _depositToAave(token, aaveAmount);
+            }
+            if (morphoAmount > 0) {
+                _depositToMorpho(token, morphoAmount);
+            }
+        } else if (aaveAllocation == 10000) {
+            // 100% AAVE
+            _depositToAave(token, amount);
+        } else if (morphoAllocation == 10000) {
+            // 100% Morpho
+            _depositToMorpho(token, amount);
+        } else {
+            // 기본 로직 (기존 코드)
+            _depositWithFallback(token, amount);
+        }
+    }
+    
+    /**
+     * @dev AAVE에 예치
+     */
+    function _depositToAave(address token, uint256 amount) internal {
+        if (useRealAave && address(aavePool) != address(0)) {
+            IERC20(token).forceApprove(address(aavePool), amount);
+            aavePool.supply(token, amount, address(this), 0);
+            principalSnapshots[token] += amount;
+            emit TokenDeposited(token, amount, address(aavePool));
+        } else {
+            revert("AAVE not configured");
+        }
+    }
+    
+    /**
+     * @dev Morpho에 예치
+     */
+    function _depositToMorpho(address token, uint256 amount) internal {
         if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
             // 직접 Morpho vault 사용 (Steakhouse USDT vault 방식)
             address vault = morphoVaults[token];
@@ -402,14 +642,7 @@ contract MillstoneAIVault is
             } catch {
                 revert("Morpho vault deposit failed");
             }
-        } else if (useRealAave && address(aavePool) != address(0)) {
-            // 실제 AAVE Pool 사용
-            IERC20(token).forceApprove(address(aavePool), amount);
-            aavePool.supply(token, amount, address(this), 0);
-            principalSnapshots[token] += amount;
-            emit TokenDeposited(token, amount, address(aavePool));
         } else if (useMorphoBlue && address(morphoBlue) != address(0)) {
-            // Morpho Blue 사용
             IMorphoBlue.MarketParams memory marketParams = morphoBlueMarkets[token];
             require(marketParams.loanToken != address(0), "Morpho Blue market not configured");
             
@@ -418,7 +651,7 @@ contract MillstoneAIVault is
             try morphoBlue.supply(
                 marketParams,
                 amount,
-                0, // shares = 0, assets 기반으로 공급
+                0,
                 address(this),
                 ""
             ) returns (uint256 actualSupplied, uint256) {
@@ -426,11 +659,9 @@ contract MillstoneAIVault is
                 principalSnapshots[token] += actualSupplied;
                 emit TokenDeposited(token, actualSupplied, address(morphoBlue));
             } catch {
-                // Morpho Blue supply 실패 시 fallback 처리
                 revert("Morpho Blue market not available or supply failed");
             }
         } else if (useRealMorpho && address(morphoPool) != address(0)) {
-            // 실제 Morpho Pool 사용 (구버전)
             IERC20(token).forceApprove(address(morphoPool), amount);
             
             uint256 actualSupplied = morphoPool.supply(
@@ -444,7 +675,31 @@ contract MillstoneAIVault is
             principalSnapshots[token] += actualSupplied;
             emit TokenDeposited(token, actualSupplied, address(morphoPool));
         } else {
-            // 기존 Mock 프로토콜 사용
+            revert("Morpho not configured");
+        }
+    }
+    
+    /**
+     * @dev 기존 방식의 fallback 로직
+     */
+    function _depositWithFallback(address token, uint256 amount) internal {
+        if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
+            address vault = morphoVaults[token];
+            IERC20(token).forceApprove(vault, amount);
+            
+            try IERC4626(vault).deposit(amount, address(this)) returns (uint256 shares) {
+                require(shares > 0, "Morpho vault deposit failed");
+                principalSnapshots[token] += amount;
+                emit TokenDeposited(token, amount, vault);
+            } catch {
+                revert("Morpho vault deposit failed");
+            }
+        } else if (useRealAave && address(aavePool) != address(0)) {
+            IERC20(token).forceApprove(address(aavePool), amount);
+            aavePool.supply(token, amount, address(this), 0);
+            principalSnapshots[token] += amount;
+            emit TokenDeposited(token, amount, address(aavePool));
+        } else {
             ILendingProtocol[] memory protocols = lendingProtocols[token];
             require(protocols.length > 0, "No lending protocol set for token");
 
@@ -483,6 +738,100 @@ contract MillstoneAIVault is
     }
 
     /**
+     * @dev 비율에 따른 출금 로직
+     */
+    function _withdrawFromProtocols(address token, uint256 amount) internal returns (uint256 withdrawnAmount) {
+        uint256 aaveAllocation = protocolAllocations[token][uint8(ProtocolType.AAVE)];
+        uint256 morphoAllocation = protocolAllocations[token][uint8(ProtocolType.MORPHO)];
+        
+        if (aaveAllocation > 0 && morphoAllocation > 0) {
+            // 두 프로토콜에서 비율에 따라 출금
+            uint256 aaveAmount = (amount * aaveAllocation) / 10000;
+            uint256 morphoAmount = amount - aaveAmount;
+            
+            uint256 aaveWithdrawn = 0;
+            uint256 morphoWithdrawn = 0;
+            
+            if (aaveAmount > 0) {
+                aaveWithdrawn = _withdrawFromAave(token, aaveAmount);
+            }
+            if (morphoAmount > 0) {
+                morphoWithdrawn = _withdrawFromMorpho(token, morphoAmount);
+            }
+            
+            withdrawnAmount = aaveWithdrawn + morphoWithdrawn;
+        } else if (aaveAllocation == 10000) {
+            // 100% AAVE에서 출금
+            withdrawnAmount = _withdrawFromAave(token, amount);
+        } else if (morphoAllocation == 10000) {
+            // 100% Morpho에서 출금
+            withdrawnAmount = _withdrawFromMorpho(token, amount);
+        } else {
+            // 기본 fallback
+            withdrawnAmount = _withdrawWithFallback(token, amount);
+        }
+    }
+    
+    /**
+     * @dev AAVE에서 출금
+     */
+    function _withdrawFromAave(address token, uint256 amount) internal returns (uint256) {
+        if (useRealAave && address(aavePool) != address(0)) {
+            return aavePool.withdraw(token, amount, address(this));
+        }
+        return 0;
+    }
+    
+    /**
+     * @dev Morpho에서 출금
+     */
+    function _withdrawFromMorpho(address token, uint256 amount) internal returns (uint256) {
+        if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
+            address vault = morphoVaults[token];
+            try IERC4626(vault).withdraw(amount, address(this), address(this)) returns (uint256 shares) {
+                return amount;
+            } catch {
+                return 0;
+            }
+        } else if (useMorphoBlue && address(morphoBlue) != address(0)) {
+            IMorphoBlue.MarketParams memory marketParams = morphoBlueMarkets[token];
+            if (marketParams.loanToken != address(0)) {
+                try morphoBlue.withdraw(
+                    marketParams,
+                    amount,
+                    0,
+                    address(this),
+                    address(this)
+                ) returns (uint256 withdrawnAmount, uint256) {
+                    return withdrawnAmount;
+                } catch {
+                    return 0;
+                }
+            }
+        } else if (useRealMorpho && address(morphoPool) != address(0)) {
+            return morphoPool.withdraw(token, amount, address(this), morphoMaxIterations);
+        }
+        return 0;
+    }
+    
+    /**
+     * @dev 기존 방식의 fallback 출금
+     */
+    function _withdrawWithFallback(address token, uint256 amount) internal returns (uint256) {
+        if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
+            address vault = morphoVaults[token];
+            try IERC4626(vault).withdraw(amount, address(this), address(this)) returns (uint256 shares) {
+                return amount;
+            } catch {
+                return 0;
+            }
+        } else if (useRealAave && address(aavePool) != address(0)) {
+            return aavePool.withdraw(token, amount, address(this));
+        }
+        return 0;
+    }
+    
+    /**
      * @dev 렌딩 프로토콜에서 출금 요청
      * @param token 토큰 주소
      * @param amount 출금할 수량
@@ -493,124 +842,34 @@ contract MillstoneAIVault is
         require(amount > 0, "Amount must be greater than 0");
 
         uint256 requestId = nextRequestId++;
-        uint256 protocolRequestId = 0;
-
-        if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
-            // 직접 Morpho vault에서 출금 (Steakhouse USDT vault 방식)
-            address vault = morphoVaults[token];
-            
-            try IERC4626(vault).withdraw(amount, address(this), address(this)) returns (uint256 shares) {
-                require(amount > 0, "Morpho vault withdraw failed");
-                
-                IERC20(token).safeTransfer(msg.sender, amount);
-                
-                withdrawRequests[requestId] = WithdrawRequest({
-                    token: token,
-                    amount: amount,
-                    requestTime: block.timestamp,
-                    protocolRequestId: 0,
-                    claimed: true,
-                    requester: msg.sender
-                });
-
-                totalWithdrawn[token] += amount;
-                emit WithdrawClaimed(requestId, token, amount, msg.sender);
-            } catch {
-                revert("Morpho vault withdraw failed");
-            }
-        } else if (useRealAave && address(aavePool) != address(0)) {
-            // AAVE에서는 즉시 출금 가능 (pending 기간 없음)
-            uint256 withdrawnAmount = aavePool.withdraw(token, amount, address(this));
-            require(withdrawnAmount > 0, "AAVE withdraw failed");
-            
-            IERC20(token).safeTransfer(msg.sender, withdrawnAmount);
-            
-            withdrawRequests[requestId] = WithdrawRequest({
-                token: token,
-                amount: withdrawnAmount,
-                requestTime: block.timestamp,
-                protocolRequestId: 0,
-                claimed: true,
-                requester: msg.sender
-            });
-
-            totalWithdrawn[token] += withdrawnAmount;
-            emit WithdrawClaimed(requestId, token, withdrawnAmount, msg.sender);
-        } else if (useMorphoBlue && address(morphoBlue) != address(0)) {
-            // Morpho Blue에서 즉시 출금 가능
-            IMorphoBlue.MarketParams memory marketParams = morphoBlueMarkets[token];
-            require(marketParams.loanToken != address(0), "Morpho Blue market not configured");
-            
-            try morphoBlue.withdraw(
-                marketParams,
-                amount,
-                0, // shares = 0, assets 기반으로 출금
-                address(this),
-                address(this)
-            ) returns (uint256 withdrawnAmount, uint256) {
-                require(withdrawnAmount > 0, "Morpho Blue withdraw failed");
-                
-                IERC20(token).safeTransfer(msg.sender, withdrawnAmount);
-                
-                withdrawRequests[requestId] = WithdrawRequest({
-                    token: token,
-                    amount: withdrawnAmount,
-                    requestTime: block.timestamp,
-                    protocolRequestId: 0,
-                    claimed: true,
-                    requester: msg.sender
-                });
-
-                totalWithdrawn[token] += withdrawnAmount;
-                emit WithdrawClaimed(requestId, token, withdrawnAmount, msg.sender);
-            } catch {
-                revert("Morpho Blue market not available or withdraw failed");
-            }
-        } else if (useRealMorpho && address(morphoPool) != address(0)) {
-            // Morpho에서도 즉시 출금 가능 (pending 기간 없음)
-            uint256 withdrawnAmount = morphoPool.withdraw(
-                token,
-                amount,
-                address(this),
-                morphoMaxIterations
-            );
-            require(withdrawnAmount > 0, "Morpho withdraw failed");
-            
-            IERC20(token).safeTransfer(msg.sender, withdrawnAmount);
-            
-            withdrawRequests[requestId] = WithdrawRequest({
-                token: token,
-                amount: withdrawnAmount,
-                requestTime: block.timestamp,
-                protocolRequestId: 0,
-                claimed: true,
-                requester: msg.sender
-            });
-
-            totalWithdrawn[token] += withdrawnAmount;
-            emit WithdrawClaimed(requestId, token, withdrawnAmount, msg.sender);
-        } else {
-            // 기존 Mock 프로토콜 사용 (pending 기간 있음)
-            ILendingProtocol[] memory protocols = lendingProtocols[token];
-            require(protocols.length > 0, "No lending protocol set for token");
-
-            // 첫 번째 프로토콜에서 출금 요청 (향후 분산 로직 추가 가능)
-            ILendingProtocol protocol = protocols[0];
-            protocolRequestId = protocol.withdraw(token, amount);
-
-            withdrawRequests[requestId] = WithdrawRequest({
-                token: token,
-                amount: amount,
-                requestTime: block.timestamp,
-                protocolRequestId: protocolRequestId,
-                claimed: false,
-                requester: msg.sender
-            });
-        }
-
+        
+        // 비율 기반 출금 시도
+        uint256 actualWithdrawn = _withdrawFromProtocols(token, amount);
+        require(actualWithdrawn > 0, "Withdrawal failed");
+        
+        // 사용자에게 전송
+        IERC20(token).safeTransfer(msg.sender, actualWithdrawn);
+        
+        withdrawRequests[requestId] = WithdrawRequest({
+            token: token,
+            amount: actualWithdrawn,
+            requestTime: block.timestamp,
+            protocolRequestId: 0,
+            claimed: true,
+            requester: msg.sender
+        });
+        
+        totalWithdrawn[token] += actualWithdrawn;
         userWithdrawRequests[msg.sender].push(requestId);
-        emit WithdrawRequested(requestId, token, amount, msg.sender);
+        
+        emit WithdrawRequested(requestId, token, actualWithdrawn, msg.sender);
+        emit WithdrawClaimed(requestId, token, actualWithdrawn, msg.sender);
+        
         return requestId;
+        
+        /* 기존 코드 - 예비용
+        if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
+        */
     }
 
     /**
@@ -761,6 +1020,137 @@ contract MillstoneAIVault is
             yieldRate = (yieldAmount * 10000) / principal; // basis points
         }
     }
+    
+    /**
+     * @dev APY 계산 및 업데이트
+     * @param token 토큰 주소
+     * @return currentAPY 현재 연간 수익률 (basis points)
+     */
+    function calculateAndUpdateAPY(address token) external returns (uint256 currentAPY) {
+        require(supportedTokens[token], "Token not supported");
+        
+        (uint256 totalValue, uint256 principal, uint256 yieldAmount, ) = this.calculateYield(token);
+        
+        if (principal == 0) {
+            return 0;
+        }
+        
+        uint256 lastUpdate = lastAPYUpdate[token];
+        uint256 currentTime = block.timestamp;
+        
+        if (lastUpdate > 0 && currentTime > lastUpdate) {
+            uint256 timeElapsed = currentTime - lastUpdate;
+            
+            // 연간 수익률 계산 (365일 기준)
+            if (timeElapsed > 0 && yieldAmount > 0) {
+                uint256 secondsInYear = 365 * 24 * 60 * 60;
+                currentAPY = (yieldAmount * secondsInYear * 10000) / (principal * timeElapsed);
+            }
+        }
+        
+        // APY 히스토리 저장
+        apyHistory[token].push(APYSnapshot({
+            timestamp: currentTime,
+            totalValue: totalValue,
+            principal: principal,
+            apy: currentAPY
+        }));
+        
+        lastAPYUpdate[token] = currentTime;
+        
+        emit APYUpdated(token, currentAPY, currentTime);
+        
+        return currentAPY;
+    }
+    
+    /**
+     * @dev 토큰의 최근 APY 조회
+     * @param token 토큰 주소
+     * @return latestAPY 최근 APY
+     * @return timestamp 마지막 업데이트 시간
+     */
+    function getLatestAPY(address token) external view returns (uint256 latestAPY, uint256 timestamp) {
+        APYSnapshot[] memory history = apyHistory[token];
+        if (history.length > 0) {
+            APYSnapshot memory latest = history[history.length - 1];
+            return (latest.apy, latest.timestamp);
+        }
+        return (0, 0);
+    }
+    
+    /**
+     * @dev 토큰의 APY 히스토리 조회
+     * @param token 토큰 주소
+     * @param limit 최대 반환 개수
+     * @return 최근 APY 히스토리 배열
+     */
+    function getAPYHistory(address token, uint256 limit) external view returns (APYSnapshot[] memory) {
+        APYSnapshot[] memory history = apyHistory[token];
+        uint256 length = history.length;
+        
+        if (length == 0) {
+            return new APYSnapshot[](0);
+        }
+        
+        uint256 returnLength = length > limit ? limit : length;
+        APYSnapshot[] memory result = new APYSnapshot[](returnLength);
+        
+        for (uint256 i = 0; i < returnLength; i++) {
+            result[i] = history[length - returnLength + i];
+        }
+        
+        return result;
+    }
+    
+    /**
+     * @dev 프로토콜별 예치 잔액 조회
+     * @param token 토큰 주소
+     * @return aaveBalance AAVE 예치 잔액
+     * @return morphoBalance Morpho 예치 잔액
+     * @return totalProtocolBalance 전체 프로토콜 예치 잔액
+     */
+    function getProtocolBalances(address token) external view returns (
+        uint256 aaveBalance,
+        uint256 morphoBalance,
+        uint256 totalProtocolBalance
+    ) {
+        // AAVE 잔액
+        if (useRealAave && aTokens[token] != address(0)) {
+            aaveBalance = IAToken(aTokens[token]).balanceOf(address(this));
+        }
+        
+        // Morpho 잔액
+        if (useDirectMorphoVault && morphoVaults[token] != address(0)) {
+            address vault = morphoVaults[token];
+            try IERC4626(vault).balanceOf(address(this)) returns (uint256 shares) {
+                if (shares > 0) {
+                    try IERC4626(vault).convertToAssets(shares) returns (uint256 assets) {
+                        morphoBalance = assets;
+                    } catch {
+                        morphoBalance = 0;
+                    }
+                }
+            } catch {
+                morphoBalance = 0;
+            }
+        } else if (useMorphoBlue && address(morphoBlue) != address(0)) {
+            // Morpho Blue 잔액 조회 로직
+            IMorphoBlue.MarketParams memory marketParams = morphoBlueMarkets[token];
+            if (marketParams.loanToken != address(0)) {
+                try morphoBlue.id(marketParams) returns (bytes32 marketId) {
+                    try morphoBlue.position(marketId, address(this)) returns (IMorphoBlue.Position memory position) {
+                        try morphoBlue.market(marketId) returns (IMorphoBlue.Market memory market) {
+                            if (market.totalSupplyShares > 0) {
+                                morphoBalance = (position.supplyShares * market.totalSupplyAssets) / market.totalSupplyShares;
+                            }
+                        } catch {}
+                    } catch {}
+                } catch {}
+            }
+        }
+        
+        totalProtocolBalance = aaveBalance + morphoBalance;
+    }
 
     /**
      * @dev 사용자의 출금 요청 목록 조회
@@ -799,13 +1189,22 @@ contract MillstoneAIVault is
      * @param token 토큰 주소
      * @return deposited 총 예치 수량
      * @return withdrawn 총 출금 수량
+     * @return netDeposited 순 예치 수량
+     * @return totalSharesSupply 총 shares 공급량
+     * @return currentShareValue 현재 share 가치
      */
     function getTokenStats(address token) external view returns (
         uint256 deposited,
-        uint256 withdrawn
+        uint256 withdrawn,
+        uint256 netDeposited,
+        uint256 totalSharesSupply,
+        uint256 currentShareValue
     ) {
         deposited = totalDeposited[token];
         withdrawn = totalWithdrawn[token];
+        netDeposited = deposited > withdrawn ? deposited - withdrawn : 0;
+        totalSharesSupply = totalShares[token];
+        currentShareValue = this.shareValue(token);
     }
 
     /**
@@ -926,8 +1325,100 @@ contract MillstoneAIVault is
     function updateYieldSnapshot(address token) external {
         (uint256 totalValue, uint256 principal, uint256 yieldAmount, uint256 yieldRate) = this.calculateYield(token);
         emit YieldCalculated(token, totalValue, principal, yieldAmount, yieldRate);
+        
+        // APY도 동시에 업데이트
+        this.calculateAndUpdateAPY(token);
+    }
+    
+    /**
+     * @dev 토큰의 현재 예치 비율 획득
+     * @param token 토큰 주소
+     * @return aavePercentage AAVE 비율 (basis points)
+     * @return morphoPercentage Morpho 비율 (basis points)
+     */
+    function getCurrentAllocationRatio(address token) external view returns (
+        uint256 aavePercentage,
+        uint256 morphoPercentage
+    ) {
+        (uint256 aaveBalance, uint256 morphoBalance, uint256 totalBalance) = this.getProtocolBalances(token);
+        
+        if (totalBalance == 0) {
+            return (0, 0);
+        }
+        
+        aavePercentage = (aaveBalance * 10000) / totalBalance;
+        morphoPercentage = (morphoBalance * 10000) / totalBalance;
+    }
+    
+    /**
+     * @dev Rebalance 프로토콜 간 자산 (목표 비율로 조정)
+     * @param token 토큰 주소
+     */
+    function rebalanceProtocols(address token) external onlyOwner {
+        require(supportedTokens[token], "Token not supported");
+        
+        (uint256 aaveBalance, uint256 morphoBalance, uint256 totalBalance) = this.getProtocolBalances(token);
+        
+        if (totalBalance == 0) {
+            return;
+        }
+        
+        uint256 targetAaveBalance = (totalBalance * protocolAllocations[token][uint8(ProtocolType.AAVE)]) / 10000;
+        uint256 targetMorphoBalance = totalBalance - targetAaveBalance;
+        
+        // AAVE에서 Morpho로 이동
+        if (aaveBalance > targetAaveBalance) {
+            uint256 moveAmount = aaveBalance - targetAaveBalance;
+            _moveFromAaveToMorpho(token, moveAmount);
+        }
+        // Morpho에서 AAVE로 이동
+        else if (morphoBalance > targetMorphoBalance) {
+            uint256 moveAmount = morphoBalance - targetMorphoBalance;
+            _moveFromMorphoToAave(token, moveAmount);
+        }
+    }
+    
+    /**
+     * @dev AAVE에서 Morpho로 자산 이동
+     */
+    function _moveFromAaveToMorpho(address token, uint256 amount) internal {
+        // AAVE에서 출금
+        uint256 withdrawn = _withdrawFromAave(token, amount);
+        if (withdrawn > 0) {
+            // Morpho에 예치
+            _depositToMorpho(token, withdrawn);
+        }
+    }
+    
+    /**
+     * @dev Morpho에서 AAVE로 자산 이동
+     */
+    function _moveFromMorphoToAave(address token, uint256 amount) internal {
+        // Morpho에서 출금
+        uint256 withdrawn = _withdrawFromMorpho(token, amount);
+        if (withdrawn > 0) {
+            // AAVE에 예치
+            _depositToAave(token, withdrawn);
+        }
     }
 
+    /**
+     * @dev 전체 vault 통계 조회
+     * @return totalValueLocked 전체 예치된 가치
+     * @return totalYieldGenerated 전체 수익 발생량
+     * @return averageAPY 평균 APY
+     */
+    function getVaultStats() external view returns (
+        uint256 totalValueLocked,
+        uint256 totalYieldGenerated,
+        uint256 averageAPY
+    ) {
+        // 예시 데이터 - 실제 구현에서는 모든 지원 토큰 순회
+        totalValueLocked = 0;
+        totalYieldGenerated = 0;
+        averageAPY = 0;
+    }
+    
     /**
      * @dev UUPS 업그레이드를 위한 인증 함수 (owner만 업그레이드 가능)
      */

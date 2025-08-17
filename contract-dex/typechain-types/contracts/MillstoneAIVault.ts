@@ -48,6 +48,20 @@ export declare namespace IMorphoBlue {
 }
 
 export declare namespace MillstoneAIVault {
+  export type APYSnapshotStruct = {
+    timestamp: BigNumberish;
+    totalValue: BigNumberish;
+    principal: BigNumberish;
+    apy: BigNumberish;
+  };
+
+  export type APYSnapshotStructOutput = [
+    timestamp: bigint,
+    totalValue: bigint,
+    principal: bigint,
+    apy: bigint
+  ] & { timestamp: bigint; totalValue: bigint; principal: bigint; apy: bigint };
+
   export type WithdrawRequestStruct = {
     token: AddressLike;
     amount: BigNumberish;
@@ -81,25 +95,36 @@ export interface MillstoneAIVaultInterface extends Interface {
       | "aTokens"
       | "aavePool"
       | "addLendingProtocol"
+      | "apyHistory"
       | "authorizedBridges"
+      | "balanceOf"
+      | "calculateAndUpdateAPY"
       | "calculateYield"
       | "claimWithdraw"
       | "compareRates"
+      | "deposit"
       | "depositToLendingProtocol"
       | "depositToSpecificProtocol"
       | "emergencyWithdraw"
+      | "getAPYHistory"
       | "getAavePoolAddress"
+      | "getCurrentAllocationRatio"
+      | "getLatestAPY"
       | "getLendingProtocols"
       | "getMorphoBorrowRate"
       | "getMorphoLensAddress"
       | "getMorphoPoolAddress"
       | "getMorphoSupplyRate"
+      | "getProtocolAllocations"
+      | "getProtocolBalances"
       | "getTokenBalance"
       | "getTokenBalanceInProtocol"
       | "getTokenStats"
       | "getUserWithdrawRequests"
+      | "getVaultStats"
       | "getWithdrawRequestInfo"
       | "initialize"
+      | "lastAPYUpdate"
       | "lendingProtocols"
       | "morphoBlue"
       | "morphoBlueMarkets"
@@ -112,9 +137,12 @@ export interface MillstoneAIVaultInterface extends Interface {
       | "pause"
       | "paused"
       | "principalSnapshots"
+      | "protocolAllocations"
       | "protocolEnabled"
       | "proxiableUUID"
+      | "rebalanceProtocols"
       | "receiveFromBridge"
+      | "redeem"
       | "removeLendingProtocol"
       | "renounceOwnership"
       | "requestWithdraw"
@@ -127,13 +155,18 @@ export interface MillstoneAIVaultInterface extends Interface {
       | "setMorphoMaxIterations"
       | "setMorphoPool"
       | "setMorphoVault"
+      | "setProtocolAllocations"
       | "setSupportedToken"
+      | "shareValue"
       | "supportedTokens"
       | "toggleAaveMode"
       | "toggleDirectMorphoVaultMode"
       | "toggleMorphoBlueMode"
       | "toggleMorphoMode"
+      | "totalAssets"
       | "totalDeposited"
+      | "totalShares"
+      | "totalSupply"
       | "totalWithdrawn"
       | "transferOwnership"
       | "unpause"
@@ -149,6 +182,7 @@ export interface MillstoneAIVaultInterface extends Interface {
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "APYUpdated"
       | "AaveModeToggled"
       | "AavePoolSet"
       | "AaveTokenMapped"
@@ -168,6 +202,9 @@ export interface MillstoneAIVaultInterface extends Interface {
       | "MorphoVaultSet"
       | "OwnershipTransferred"
       | "Paused"
+      | "ProtocolAllocationSet"
+      | "SharesBurned"
+      | "SharesMinted"
       | "TokenDeposited"
       | "TokenReceived"
       | "TokenSupported"
@@ -192,7 +229,19 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "apyHistory",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "authorizedBridges",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "balanceOf",
+    values: [AddressLike, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "calculateAndUpdateAPY",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -208,6 +257,10 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "deposit",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "depositToLendingProtocol",
     values: [AddressLike, BigNumberish]
   ): string;
@@ -220,8 +273,20 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getAPYHistory",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getAavePoolAddress",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getCurrentAllocationRatio",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getLatestAPY",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getLendingProtocols",
@@ -244,6 +309,14 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getProtocolAllocations",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getProtocolBalances",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getTokenBalance",
     values: [AddressLike]
   ): string;
@@ -260,11 +333,19 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getVaultStats",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getWithdrawRequestInfo",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "initialize",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "lastAPYUpdate",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -307,6 +388,10 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "protocolAllocations",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "protocolEnabled",
     values: [AddressLike, AddressLike]
   ): string;
@@ -315,7 +400,15 @@ export interface MillstoneAIVaultInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "rebalanceProtocols",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "receiveFromBridge",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "redeem",
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -367,8 +460,16 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "setProtocolAllocations",
+    values: [AddressLike, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setSupportedToken",
     values: [AddressLike, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "shareValue",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "supportedTokens",
@@ -391,7 +492,19 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "totalAssets",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "totalDeposited",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalShares",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -446,8 +559,14 @@ export interface MillstoneAIVaultInterface extends Interface {
     functionFragment: "addLendingProtocol",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "apyHistory", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "authorizedBridges",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "calculateAndUpdateAPY",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -462,6 +581,7 @@ export interface MillstoneAIVaultInterface extends Interface {
     functionFragment: "compareRates",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "depositToLendingProtocol",
     data: BytesLike
@@ -475,7 +595,19 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getAPYHistory",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getAavePoolAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getCurrentAllocationRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getLatestAPY",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -499,6 +631,14 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getProtocolAllocations",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getProtocolBalances",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getTokenBalance",
     data: BytesLike
   ): Result;
@@ -515,10 +655,18 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getVaultStats",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getWithdrawRequestInfo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "lastAPYUpdate",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "lendingProtocols",
     data: BytesLike
@@ -550,6 +698,10 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "protocolAllocations",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "protocolEnabled",
     data: BytesLike
   ): Result;
@@ -558,9 +710,14 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "rebalanceProtocols",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "receiveFromBridge",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "removeLendingProtocol",
     data: BytesLike
@@ -610,9 +767,14 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setProtocolAllocations",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setSupportedToken",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "shareValue", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
     data: BytesLike
@@ -634,7 +796,19 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "totalAssets",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "totalDeposited",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalShares",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -678,6 +852,24 @@ export interface MillstoneAIVaultInterface extends Interface {
     functionFragment: "withdrawRequests",
     data: BytesLike
   ): Result;
+}
+
+export namespace APYUpdatedEvent {
+  export type InputTuple = [
+    token: AddressLike,
+    apy: BigNumberish,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [token: string, apy: bigint, timestamp: bigint];
+  export interface OutputObject {
+    token: string;
+    apy: bigint;
+    timestamp: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace AaveModeToggledEvent {
@@ -927,6 +1119,78 @@ export namespace PausedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace ProtocolAllocationSetEvent {
+  export type InputTuple = [
+    token: AddressLike,
+    protocol: BigNumberish,
+    allocation: BigNumberish
+  ];
+  export type OutputTuple = [
+    token: string,
+    protocol: bigint,
+    allocation: bigint
+  ];
+  export interface OutputObject {
+    token: string;
+    protocol: bigint;
+    allocation: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace SharesBurnedEvent {
+  export type InputTuple = [
+    user: AddressLike,
+    token: AddressLike,
+    shares: BigNumberish,
+    assets: BigNumberish
+  ];
+  export type OutputTuple = [
+    user: string,
+    token: string,
+    shares: bigint,
+    assets: bigint
+  ];
+  export interface OutputObject {
+    user: string;
+    token: string;
+    shares: bigint;
+    assets: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace SharesMintedEvent {
+  export type InputTuple = [
+    user: AddressLike,
+    token: AddressLike,
+    shares: BigNumberish,
+    assets: BigNumberish
+  ];
+  export type OutputTuple = [
+    user: string,
+    token: string,
+    shares: bigint,
+    assets: bigint
+  ];
+  export interface OutputObject {
+    user: string;
+    token: string;
+    shares: bigint;
+    assets: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace TokenDepositedEvent {
   export type InputTuple = [
     token: AddressLike,
@@ -1133,10 +1397,35 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
 
+  apyHistory: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        timestamp: bigint;
+        totalValue: bigint;
+        principal: bigint;
+        apy: bigint;
+      }
+    ],
+    "view"
+  >;
+
   authorizedBridges: TypedContractMethod<
     [arg0: AddressLike],
     [boolean],
     "view"
+  >;
+
+  balanceOf: TypedContractMethod<
+    [user: AddressLike, token: AddressLike],
+    [bigint],
+    "view"
+  >;
+
+  calculateAndUpdateAPY: TypedContractMethod<
+    [token: AddressLike],
+    [bigint],
+    "nonpayable"
   >;
 
   calculateYield: TypedContractMethod<
@@ -1170,6 +1459,12 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  deposit: TypedContractMethod<
+    [token: AddressLike, assets: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+
   depositToLendingProtocol: TypedContractMethod<
     [token: AddressLike, amount: BigNumberish],
     [void],
@@ -1188,7 +1483,25 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
 
+  getAPYHistory: TypedContractMethod<
+    [token: AddressLike, limit: BigNumberish],
+    [MillstoneAIVault.APYSnapshotStructOutput[]],
+    "view"
+  >;
+
   getAavePoolAddress: TypedContractMethod<[], [string], "view">;
+
+  getCurrentAllocationRatio: TypedContractMethod<
+    [token: AddressLike],
+    [[bigint, bigint] & { aavePercentage: bigint; morphoPercentage: bigint }],
+    "view"
+  >;
+
+  getLatestAPY: TypedContractMethod<
+    [token: AddressLike],
+    [[bigint, bigint] & { latestAPY: bigint; timestamp: bigint }],
+    "view"
+  >;
 
   getLendingProtocols: TypedContractMethod<
     [token: AddressLike],
@@ -1212,6 +1525,24 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  getProtocolAllocations: TypedContractMethod<
+    [token: AddressLike],
+    [[bigint, bigint] & { aavePercentage: bigint; morphoPercentage: bigint }],
+    "view"
+  >;
+
+  getProtocolBalances: TypedContractMethod<
+    [token: AddressLike],
+    [
+      [bigint, bigint, bigint] & {
+        aaveBalance: bigint;
+        morphoBalance: bigint;
+        totalProtocolBalance: bigint;
+      }
+    ],
+    "view"
+  >;
+
   getTokenBalance: TypedContractMethod<
     [token: AddressLike],
     [
@@ -1232,13 +1563,33 @@ export interface MillstoneAIVault extends BaseContract {
 
   getTokenStats: TypedContractMethod<
     [token: AddressLike],
-    [[bigint, bigint] & { deposited: bigint; withdrawn: bigint }],
+    [
+      [bigint, bigint, bigint, bigint, bigint] & {
+        deposited: bigint;
+        withdrawn: bigint;
+        netDeposited: bigint;
+        totalSharesSupply: bigint;
+        currentShareValue: bigint;
+      }
+    ],
     "view"
   >;
 
   getUserWithdrawRequests: TypedContractMethod<
     [user: AddressLike],
     [bigint[]],
+    "view"
+  >;
+
+  getVaultStats: TypedContractMethod<
+    [],
+    [
+      [bigint, bigint, bigint] & {
+        totalValueLocked: bigint;
+        totalYieldGenerated: bigint;
+        averageAPY: bigint;
+      }
+    ],
     "view"
   >;
 
@@ -1255,6 +1606,8 @@ export interface MillstoneAIVault extends BaseContract {
   >;
 
   initialize: TypedContractMethod<[_owner: AddressLike], [void], "nonpayable">;
+
+  lastAPYUpdate: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
   lendingProtocols: TypedContractMethod<
     [arg0: AddressLike, arg1: BigNumberish],
@@ -1300,6 +1653,12 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  protocolAllocations: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+
   protocolEnabled: TypedContractMethod<
     [arg0: AddressLike, arg1: AddressLike],
     [boolean],
@@ -1308,9 +1667,21 @@ export interface MillstoneAIVault extends BaseContract {
 
   proxiableUUID: TypedContractMethod<[], [string], "view">;
 
+  rebalanceProtocols: TypedContractMethod<
+    [token: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   receiveFromBridge: TypedContractMethod<
     [token: AddressLike, amount: BigNumberish],
     [void],
+    "nonpayable"
+  >;
+
+  redeem: TypedContractMethod<
+    [token: AddressLike, shares: BigNumberish],
+    [bigint],
     "nonpayable"
   >;
 
@@ -1382,11 +1753,23 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
 
+  setProtocolAllocations: TypedContractMethod<
+    [
+      token: AddressLike,
+      aavePercentage: BigNumberish,
+      morphoPercentage: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+
   setSupportedToken: TypedContractMethod<
     [token: AddressLike, supported: boolean],
     [void],
     "nonpayable"
   >;
+
+  shareValue: TypedContractMethod<[token: AddressLike], [bigint], "view">;
 
   supportedTokens: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
@@ -1414,7 +1797,13 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
 
+  totalAssets: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
   totalDeposited: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  totalShares: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  totalSupply: TypedContractMethod<[token: AddressLike], [bigint], "view">;
 
   totalWithdrawn: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
@@ -1488,8 +1877,32 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "apyHistory"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [
+      [bigint, bigint, bigint, bigint] & {
+        timestamp: bigint;
+        totalValue: bigint;
+        principal: bigint;
+        apy: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "authorizedBridges"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "balanceOf"
+  ): TypedContractMethod<
+    [user: AddressLike, token: AddressLike],
+    [bigint],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "calculateAndUpdateAPY"
+  ): TypedContractMethod<[token: AddressLike], [bigint], "nonpayable">;
   getFunction(
     nameOrSignature: "calculateYield"
   ): TypedContractMethod<
@@ -1521,6 +1934,13 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "deposit"
+  ): TypedContractMethod<
+    [token: AddressLike, assets: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "depositToLendingProtocol"
   ): TypedContractMethod<
     [token: AddressLike, amount: BigNumberish],
@@ -1542,8 +1962,29 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "getAPYHistory"
+  ): TypedContractMethod<
+    [token: AddressLike, limit: BigNumberish],
+    [MillstoneAIVault.APYSnapshotStructOutput[]],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "getAavePoolAddress"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "getCurrentAllocationRatio"
+  ): TypedContractMethod<
+    [token: AddressLike],
+    [[bigint, bigint] & { aavePercentage: bigint; morphoPercentage: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getLatestAPY"
+  ): TypedContractMethod<
+    [token: AddressLike],
+    [[bigint, bigint] & { latestAPY: bigint; timestamp: bigint }],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "getLendingProtocols"
   ): TypedContractMethod<[token: AddressLike], [string[]], "view">;
@@ -1559,6 +2000,26 @@ export interface MillstoneAIVault extends BaseContract {
   getFunction(
     nameOrSignature: "getMorphoSupplyRate"
   ): TypedContractMethod<[token: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getProtocolAllocations"
+  ): TypedContractMethod<
+    [token: AddressLike],
+    [[bigint, bigint] & { aavePercentage: bigint; morphoPercentage: bigint }],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getProtocolBalances"
+  ): TypedContractMethod<
+    [token: AddressLike],
+    [
+      [bigint, bigint, bigint] & {
+        aaveBalance: bigint;
+        morphoBalance: bigint;
+        totalProtocolBalance: bigint;
+      }
+    ],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "getTokenBalance"
   ): TypedContractMethod<
@@ -1583,12 +2044,33 @@ export interface MillstoneAIVault extends BaseContract {
     nameOrSignature: "getTokenStats"
   ): TypedContractMethod<
     [token: AddressLike],
-    [[bigint, bigint] & { deposited: bigint; withdrawn: bigint }],
+    [
+      [bigint, bigint, bigint, bigint, bigint] & {
+        deposited: bigint;
+        withdrawn: bigint;
+        netDeposited: bigint;
+        totalSharesSupply: bigint;
+        currentShareValue: bigint;
+      }
+    ],
     "view"
   >;
   getFunction(
     nameOrSignature: "getUserWithdrawRequests"
   ): TypedContractMethod<[user: AddressLike], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getVaultStats"
+  ): TypedContractMethod<
+    [],
+    [
+      [bigint, bigint, bigint] & {
+        totalValueLocked: bigint;
+        totalYieldGenerated: bigint;
+        averageAPY: bigint;
+      }
+    ],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "getWithdrawRequestInfo"
   ): TypedContractMethod<
@@ -1605,6 +2087,9 @@ export interface MillstoneAIVault extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<[_owner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "lastAPYUpdate"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "lendingProtocols"
   ): TypedContractMethod<
@@ -1658,6 +2143,13 @@ export interface MillstoneAIVault extends BaseContract {
     nameOrSignature: "principalSnapshots"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "protocolAllocations"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "protocolEnabled"
   ): TypedContractMethod<
     [arg0: AddressLike, arg1: AddressLike],
@@ -1668,10 +2160,20 @@ export interface MillstoneAIVault extends BaseContract {
     nameOrSignature: "proxiableUUID"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "rebalanceProtocols"
+  ): TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "receiveFromBridge"
   ): TypedContractMethod<
     [token: AddressLike, amount: BigNumberish],
     [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "redeem"
+  ): TypedContractMethod<
+    [token: AddressLike, shares: BigNumberish],
+    [bigint],
     "nonpayable"
   >;
   getFunction(
@@ -1735,12 +2237,26 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setProtocolAllocations"
+  ): TypedContractMethod<
+    [
+      token: AddressLike,
+      aavePercentage: BigNumberish,
+      morphoPercentage: BigNumberish
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "setSupportedToken"
   ): TypedContractMethod<
     [token: AddressLike, supported: boolean],
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "shareValue"
+  ): TypedContractMethod<[token: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "supportedTokens"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
@@ -1761,8 +2277,17 @@ export interface MillstoneAIVault extends BaseContract {
     nameOrSignature: "toggleMorphoMode"
   ): TypedContractMethod<[_useRealMorpho: boolean], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "totalAssets"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "totalDeposited"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "totalShares"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "totalSupply"
+  ): TypedContractMethod<[token: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "totalWithdrawn"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
@@ -1818,6 +2343,13 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  getEvent(
+    key: "APYUpdated"
+  ): TypedContractEvent<
+    APYUpdatedEvent.InputTuple,
+    APYUpdatedEvent.OutputTuple,
+    APYUpdatedEvent.OutputObject
+  >;
   getEvent(
     key: "AaveModeToggled"
   ): TypedContractEvent<
@@ -1952,6 +2484,27 @@ export interface MillstoneAIVault extends BaseContract {
     PausedEvent.OutputObject
   >;
   getEvent(
+    key: "ProtocolAllocationSet"
+  ): TypedContractEvent<
+    ProtocolAllocationSetEvent.InputTuple,
+    ProtocolAllocationSetEvent.OutputTuple,
+    ProtocolAllocationSetEvent.OutputObject
+  >;
+  getEvent(
+    key: "SharesBurned"
+  ): TypedContractEvent<
+    SharesBurnedEvent.InputTuple,
+    SharesBurnedEvent.OutputTuple,
+    SharesBurnedEvent.OutputObject
+  >;
+  getEvent(
+    key: "SharesMinted"
+  ): TypedContractEvent<
+    SharesMintedEvent.InputTuple,
+    SharesMintedEvent.OutputTuple,
+    SharesMintedEvent.OutputObject
+  >;
+  getEvent(
     key: "TokenDeposited"
   ): TypedContractEvent<
     TokenDepositedEvent.InputTuple,
@@ -2009,6 +2562,17 @@ export interface MillstoneAIVault extends BaseContract {
   >;
 
   filters: {
+    "APYUpdated(address,uint256,uint256)": TypedContractEvent<
+      APYUpdatedEvent.InputTuple,
+      APYUpdatedEvent.OutputTuple,
+      APYUpdatedEvent.OutputObject
+    >;
+    APYUpdated: TypedContractEvent<
+      APYUpdatedEvent.InputTuple,
+      APYUpdatedEvent.OutputTuple,
+      APYUpdatedEvent.OutputObject
+    >;
+
     "AaveModeToggled(bool)": TypedContractEvent<
       AaveModeToggledEvent.InputTuple,
       AaveModeToggledEvent.OutputTuple,
@@ -2216,6 +2780,39 @@ export interface MillstoneAIVault extends BaseContract {
       PausedEvent.InputTuple,
       PausedEvent.OutputTuple,
       PausedEvent.OutputObject
+    >;
+
+    "ProtocolAllocationSet(address,uint8,uint256)": TypedContractEvent<
+      ProtocolAllocationSetEvent.InputTuple,
+      ProtocolAllocationSetEvent.OutputTuple,
+      ProtocolAllocationSetEvent.OutputObject
+    >;
+    ProtocolAllocationSet: TypedContractEvent<
+      ProtocolAllocationSetEvent.InputTuple,
+      ProtocolAllocationSetEvent.OutputTuple,
+      ProtocolAllocationSetEvent.OutputObject
+    >;
+
+    "SharesBurned(address,address,uint256,uint256)": TypedContractEvent<
+      SharesBurnedEvent.InputTuple,
+      SharesBurnedEvent.OutputTuple,
+      SharesBurnedEvent.OutputObject
+    >;
+    SharesBurned: TypedContractEvent<
+      SharesBurnedEvent.InputTuple,
+      SharesBurnedEvent.OutputTuple,
+      SharesBurnedEvent.OutputObject
+    >;
+
+    "SharesMinted(address,address,uint256,uint256)": TypedContractEvent<
+      SharesMintedEvent.InputTuple,
+      SharesMintedEvent.OutputTuple,
+      SharesMintedEvent.OutputObject
+    >;
+    SharesMinted: TypedContractEvent<
+      SharesMintedEvent.InputTuple,
+      SharesMintedEvent.OutputTuple,
+      SharesMintedEvent.OutputObject
     >;
 
     "TokenDeposited(address,uint256,address)": TypedContractEvent<
