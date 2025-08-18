@@ -4,6 +4,7 @@ import { Bootstrap } from "@/components/Bootstrap";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/app/hooks/QueryClient.hooks";
 import BottomNavbar from "@/components/BottomNavbar";
+import BottomToast from "@/components/Common/BottomToast";
 
 export const metadata: Metadata = {
   title: "Magic Millstone",
@@ -24,6 +25,7 @@ export default function RootLayout({
               {children}
             </div>
             <BottomNavbar />
+            <BottomToast />
           </Bootstrap>
         </QueryClientProvider>
       </body>

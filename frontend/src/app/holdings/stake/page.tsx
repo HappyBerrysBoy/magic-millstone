@@ -57,7 +57,7 @@ export default function StakePage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-148px)] flex-col gap-[26px]">
+    <div className="flex min-h-[calc(100vh-148px)] flex-col gap-[20px]">
       <ButtonBack onClick={() => router.back()} />
       <div className="flex flex-col gap-16">
         <Stake setStakeAmount={setStakeAmount} />

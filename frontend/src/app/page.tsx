@@ -6,12 +6,12 @@ import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import Modal from "@/components/Common/Modal";
 import DepositForm from "@/components/DepositForm";
 import { keiHexToKaiaDecimal, microUSDTHexToUSDTDecimal } from "@/utils/format";
-import MillstoneIcon from "public/svgs/MillstoneIcon";
+import Image from "next/image";
 import VaultStats from "@/components/Dashboard/VaultStats";
 import HomeStats from "@/components/HomeStats";
 import NextMagicTime from "@/components/NextMagicTime";
 import { time } from "console";
-import Button from "@/components/Common/Button";
+import ButtonDefault from "@/app/_components/ButtonDefault";
 import { useRouter } from "next/navigation";
 
 const USDTContractAddress = "0xf6A77faA9d860a9218E0ab02Ac77AEe03c027372";
@@ -61,24 +61,21 @@ export default function Home() {
   };
 
   return (
-    <div className="relative h-full w-full flex-col">
-      <header className="mb-[8px] flex justify-center">
-        <MillstoneIcon className="text-primary" />
+    <div className="flex min-h-[calc(100vh-124px)] flex-col gap-[20px]">
+      <header className=" flex justify-center">
+        <Image src="/images/MillstoneIcon.png" alt="Magic Millstone" width={20} height={20} />
         {/* <span className="text-primary">MagicMillstone</span> */}
       </header>
-      <main className="mx-auto w-full max-w-md flex-1 justify-between">
+      <main className="mx-auto w-full max-w-md flex flex-1 flex-col">
         <HomeStats tvl={tvl} apy={apy} />
         <div className="mt-[60px]">
           <NextMagicTime timeLeft={timeLeft} />
         </div>
-        <div className="">
+        <div className="mt-auto">
           {account ? (
-            <Button
-              className="mx-4 mb-4"
-              onClick={() => router.push("/holdings/stake")}
-            >
-              Stake USDT
-            </Button>
+            <div className="mx-4 mb-4">
+              <ButtonDefault theme="primary" onClick={() => router.push("/holdings/stake")}>Stake USDT</ButtonDefault>
+            </div>
           ) : (
             <WalletButton />
           )}

@@ -1,55 +1,62 @@
 "use client";
-import Header from "@/components/Common/Header";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import StarIcon from "public/svgs/StarIcon";
+import CopyIcon from "public/svgs/CopyIcon";
+import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 
 export default function ProfilePage() {
-  const { account } = useWalletAccountStore();
+  const { account, setAccount } = useWalletAccountStore();
   const { disconnectWallet } = useKaiaWalletSdk();
   const router = useRouter();
+  const showToast = useBottomToastStore((s) => s.show);
+
   useEffect(() => {
-    if (!account) {
-      router.replace("/");
-    }
+    if (!account) router.replace("/");
   }, [account, router]);
 
-  // TODO: DB 연동 전 더미 데이터
-  const nickname = "라인유저";
-  const email = "user@line.me";
-  const joinedAt = "2024-05-01";
+  const handleCopy = async () => {
+    if (!account) return;
+    try {
+      await navigator.clipboard.writeText(account);
+      showToast("Copied to clipboard.", "success");
+      
+    } catch (_) {
+      // noop
+    }
+  };
 
-  const handleDisconnectWallet = async () => {
+  const handleDisconnect = async () => {
     await disconnectWallet();
+    setAccount(null);
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <Header />
-      <main className="mx-auto w-full max-w-md flex-1 p-4">
-        <div className="mt-8 flex flex-col items-center">
-          {/* 프로필 이미지 더미 */}
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-3xl text-gray-400">
-            <span>👤</span>
-          </div>
-          <div className="mb-1 text-xl font-bold">{nickname}</div>
-          <div className="mb-2 text-sm text-gray-500">{email}</div>
-          <div className="mb-4 text-xs text-gray-400">가입일: {joinedAt}</div>
-          <div className="mb-4 w-full rounded-lg bg-white p-4 shadow">
-            <div className="mb-1 text-xs text-gray-500">지갑 주소</div>
-            <div className="text-sm break-all text-gray-700 select-all">
-              {account || "-"}
-            </div>
-          </div>
-          <button
-            className="mt-2 w-full rounded-lg bg-red-500 py-2 font-semibold text-white"
-            onClick={handleDisconnectWallet}
-          >
-            로그아웃
-          </button>
+    <div className="flex min-h-[calc(100vh-124px)] flex-col items-center">
+      <div className="mt-4 flex items-center justify-center">
+        <div className="border-mm-gray-light flex h-[72px] w-[72px] items-center justify-center rounded-full border">
+          <StarIcon className="h-[40px] w-[40px]" />
         </div>
-      </main>
+      </div>
+      <div className="flex w-full justify-baseline">
+        <div className="mt-[70px] text-left text-[16px] text-white">Wallet</div>
+      </div>
+
+      <div className="mt-4 flex w-full max-w-md items-center justify-between">
+        <div className="text-[12px] break-all text-white">{account || "-"}</div>
+        <button className="text-[12px] text-white" onClick={handleCopy}>
+          <CopyIcon />
+        </button>
+      </div>
+
+      <button
+        className="mt-auto h-[26px] w-full max-w-md rounded-[4px] bg-[#808787] text-[10px] text-white"
+        onClick={handleDisconnect}
+      >
+        Disconnect
+      </button>
     </div>
   );
 }

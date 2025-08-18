@@ -4,11 +4,12 @@
   align-items: center;
   justify-content: center;
   min-width: 280px;
+  width: 100%;
   height: 48px;
   color: #ffffff;
   background-color: #06c755;
   border-radius: 12px;
-  border:none;
+  border: none;
   font-size: 18px;
   font-weight: 700;
 }
