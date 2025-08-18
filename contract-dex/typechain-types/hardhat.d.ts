@@ -154,6 +154,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MillstoneAIVault__factory>;
     getContractFactory(
+      name: "MillstoneAIVault",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MillstoneAIVault__factory>;
+    getContractFactory(
       name: "MockERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MockERC20__factory>;
@@ -338,6 +342,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.MillstoneAIVault>;
     getContractAt(
+      name: "MillstoneAIVault",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MillstoneAIVault>;
+    getContractAt(
       name: "MockERC20",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -484,6 +493,10 @@ declare module "hardhat/types/runtime" {
       name: "IMorphoBlue",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IMorphoBlue>;
+    deployContract(
+      name: "MillstoneAIVault",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MillstoneAIVault>;
     deployContract(
       name: "MillstoneAIVault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -667,6 +680,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IMorphoBlue>;
+    deployContract(
+      name: "MillstoneAIVault",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MillstoneAIVault>;
     deployContract(
       name: "MillstoneAIVault",
       args: any[],

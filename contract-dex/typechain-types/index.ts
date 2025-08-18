@@ -74,8 +74,8 @@ export type { IMorphoToken } from "./contracts/interfaces/IMorpho.sol/IMorphoTok
 export { IMorphoToken__factory } from "./factories/contracts/interfaces/IMorpho.sol/IMorphoToken__factory";
 export type { IMorphoBlue } from "./contracts/interfaces/IMorphoBlue";
 export { IMorphoBlue__factory } from "./factories/contracts/interfaces/IMorphoBlue__factory";
-export type { MillstoneAIVault } from "./contracts/MillstoneAIVault";
-export { MillstoneAIVault__factory } from "./factories/contracts/MillstoneAIVault__factory";
+export type { MillstoneAIVault } from "./contracts/MillstoneAIVault_old.sol/MillstoneAIVault";
+export { MillstoneAIVault__factory } from "./factories/contracts/MillstoneAIVault_old.sol/MillstoneAIVault__factory";
 export type { MockERC20 } from "./contracts/mocks/MockERC20";
 export { MockERC20__factory } from "./factories/contracts/mocks/MockERC20__factory";
 export type { MockLendingProtocol } from "./contracts/mocks/MockLendingProtocol";
