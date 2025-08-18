@@ -20,7 +20,7 @@ export default function RootLayout({
       <body>
         <QueryClientProvider client={queryClient}>
           <Bootstrap className="">
-            <div className="relative mx-auto min-h-screen max-w-sm overflow-x-hidden border-2 px-[24px] pt-[24px] pb-[100px]">
+            <div className="relative mx-auto min-h-screen max-w-sm overflow-x-hidden  px-[24px] pt-[24px] pb-[100px]">
               {children}
             </div>
             <BottomNavbar />
