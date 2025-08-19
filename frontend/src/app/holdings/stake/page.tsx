@@ -36,11 +36,11 @@ export default function StakePage() {
         setKaiaBalance(formattedKaiaBalance);
       });
       getErc20TokenBalance(USDTContractAddress, account).then((balance) => {
-        console.log(balance);
         const formattedUSDTBalance = Number(
           microUSDTHexToUSDTDecimal(balance as string),
         ).toFixed(2);
         setUsdtBalance(formattedUSDTBalance);
+
       });
     }
   };
@@ -60,7 +60,7 @@ export default function StakePage() {
     <div className="flex min-h-[calc(100vh-148px)] flex-col gap-[20px]">
       <ButtonBack onClick={() => router.back()} />
       <div className="flex flex-col gap-16">
-        <Stake setStakeAmount={setStakeAmount} />
+        <Stake usdtAmount={usdtBalance} setStakeAmount={setStakeAmount} />
         <div className="flex flex-col items-center">
           <div className="text-mm-gray-default text-[10px]">
             Next vault settlement in approx.

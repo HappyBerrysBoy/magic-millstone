@@ -29,11 +29,11 @@ function PercentageButton({
 }
 
 interface StakeProps {
+  usdtAmount: number | string;
   setStakeAmount: (amount: number) => void;
 }
 
-export default function Stake({ setStakeAmount }: StakeProps) {
-  const balance = 19867.4623;
+export default function Stake({ usdtAmount, setStakeAmount }: StakeProps) {
   const [selectedPercentage, setSelectedPercentage] = useState<number | null>(
     null,
   );
@@ -55,7 +55,7 @@ export default function Stake({ setStakeAmount }: StakeProps) {
   };
 
   const handlePercentageClick = (percentage: number) => {
-    const amount = (balance * percentage) / 100;
+    const amount = (Number(usdtAmount) * percentage) / 100;
     setStakeAmount(amount);
     setSelectedPercentage(percentage);
     setInputValue(formatDisplayValue(amount.toFixed(2)));
@@ -104,14 +104,14 @@ export default function Stake({ setStakeAmount }: StakeProps) {
             value={inputValue}
             onChange={handleInputChange}
             placeholder="0"
-            className="w-full border-none bg-taransparent text-[28px] font-normal text-white outline-none"
+            className="bg-taransparent w-full border-none text-[28px] font-normal text-white outline-none"
           />
         </div>
         <div className="flex items-center justify-between">
           <p className="text-mm-gray-default text-xs font-normal">Available</p>
           <div className="flex items-baseline gap-1">
             <p className="text-xs font-normal text-white">
-              {formatNumberWithCommas(balance)}
+              {formatNumberWithCommas(usdtAmount)}
             </p>
             <p className="text-mm-gray-default text-xs font-normal">USDT</p>
           </div>

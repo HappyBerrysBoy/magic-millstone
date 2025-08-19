@@ -16,8 +16,10 @@ export default function Composition({ data }: CompositionProps) {
     <div className="w-full">
       <div className="mb-[6px] text-left text-base">Composition</div>
 
-      <div className="mb-4 text-left text-[10px] text-[#C7D2D3]">By Protocol</div>
-      <div className="mb-6 flex h-4 w-full overflow-hidden rounded-[4p] bg-[#232828]">
+      <div className="mb-[12px] text-left text-[10px] text-[#C7D2D3]">
+        By Protocol
+      </div>
+      <div className="mb-[12px] flex h-4 w-full overflow-hidden rounded-[4px] bg-[#232828]">
         {(data || []).map((item) => (
           <div
             key={item.protocol}
@@ -29,12 +31,17 @@ export default function Composition({ data }: CompositionProps) {
           />
         ))}
       </div>
-      <div className="flex flex-wrap gap-x-[16px] gap-y-[8px]">
+      <div className="flex flex-col flex-wrap gap-x-[16px] gap-y-[8px]">
         {(data || []).map((item) => (
-          <div key={item.protocol} className="flex w-[calc(50%-8px)] items-center">
-            <span className="inline-block h-3 w-3 rounded-full" style={{ backgroundColor: item.color }}></span>
-            <span className="text-sm text-[#C7D2D3]">{item.protocol}</span>
-            <span className="ml-auto text-xs text-[#C7D2D3]">{(item.percent * 100).toFixed(0)}%</span>
+          <div key={item.protocol} className="flex items-center">
+            <span
+              className="mr-[8px] inline-block h-[10px] w-[10px] rounded-full"
+              style={{ backgroundColor: item.color }}
+            ></span>
+            <span className="text-[10px] text-[#C7D2D3]">{item.protocol}</span>
+            <span className="ml-auto text-[10px] text-[#C7D2D3]">
+              {(item.percent * 100).toFixed(0)}%
+            </span>
           </div>
         ))}
       </div>

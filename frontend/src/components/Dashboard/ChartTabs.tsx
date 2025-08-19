@@ -33,13 +33,13 @@ const ChartTabs: React.FC<ChartTabsProps> = ({ apyData, ppsData, tvlData }) => {
       </div>
       <div className="flex h-[250px] items-center justify-center">
         {selected === "apy" && (
-          <ChartAreaLinear data={apyData} seriesLabel="Daily APY" color="#00FBFF" />
+          <ChartAreaLinear data={apyData} seriesLabel="Daily APY" color="#00E6F2" />
         )}
         {selected === "pps" && (
-          <ChartAreaLinear data={ppsData} seriesLabel="Price per share" color="#768AFF" />
+          <ChartAreaLinear data={ppsData} seriesLabel="Price per share" color="#00E6F2" />
         )}
         {selected === "tvl" && (
-          <ChartAreaLinear data={tvlData} seriesLabel="TVL History" color="#E176FF" />
+          <ChartAreaLinear data={tvlData} seriesLabel="TVL History" color="#00E6F2" />
         )}
       </div>
     </div>

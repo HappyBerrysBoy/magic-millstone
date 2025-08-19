@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import ChartTabs from "@/components/Dashboard/ChartTabs";
 import VaultStats from "@/components/Dashboard/VaultStats";
 import Composition from "@/components/Dashboard/Composition";
-import { callApi } from "../_utils/callApi";
+import { callApi, ApiResponse } from "../_utils/callApi";
 
 type ChartPoint = { datetime: string; value: string | number };
 type PortfolioStatus = {
@@ -20,11 +20,16 @@ export default function Dashboard() {
 
   useEffect(() => {
     const handleUpdatePortfolioStatus = async () => {
-      const res = await callApi({
+      const res = await callApi<PortfolioStatus>({
         endpoint: `/portfolio/magic-millstone-usdt/status`,
         method: "GET",
       });
-      const data = (res as any).data ?? res;
+      type MaybeWrapped<T> = ApiResponse<T> | T;
+      const maybeWrapped = res as unknown as MaybeWrapped<PortfolioStatus>;
+      const data =
+        typeof maybeWrapped === "object" && maybeWrapped !== null && "data" in maybeWrapped
+          ? (maybeWrapped as ApiResponse<PortfolioStatus>).data
+          : (maybeWrapped as PortfolioStatus);
       if (data) setStatus(data);
     };
     handleUpdatePortfolioStatus();
@@ -52,8 +57,8 @@ export default function Dashboard() {
   const timeLeft = "—";
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <main className="mx-auto w-full max-w-md flex-1">
+    <div className="flex min-h-[calc(100vh-148px)] flex-col">
+      <main className="mx-auto w-full h-full max-w-md flex flex-col flex-1 gap-[28px] pt-[30px]">
         <VaultStats tvl={tvl} apy={apy} timeLeft={timeLeft} />
         <ChartTabs
           apyData={status?.dailyApyChart || []}
