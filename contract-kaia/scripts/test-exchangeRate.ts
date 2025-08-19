@@ -64,39 +64,17 @@ async function main() {
     "USDT"
   );
 
-  // Show impact on specific NFT
-  console.log("\n🎫 Yield Impact on NFT #6 (50 mmUSDT request):");
-  const nftRequest = await vaultContract.getWithdrawRequest(6);
-  const currentPayout =
-    (Number(nftRequest.amount) * Number(currentRate)) / 1000000;
-  const newPayout = (Number(nftRequest.amount) * Number(newRate)) / 1000000;
-
-  console.log("Without yield:", ethers.formatUnits(currentPayout, 6), "USDT");
-  console.log("With 10% yield:", ethers.formatUnits(newPayout, 6), "USDT");
-  console.log(
-    "User gets extra:",
-    ethers.formatUnits(newPayout - currentPayout, 6),
-    "USDT yield! 🎉"
-  );
 
   // Example: User journey
   console.log("\n👤 User Journey Example:");
   console.log("1. User deposits 50 USDT → gets 50 mmUSDT");
-  console.log("2. Time passes, admin sets yield rate to 1.1 (10% yield)");
-  console.log(
-    "3. User withdraws 50 mmUSDT → gets",
-    ethers.formatUnits(newPayout, 6),
-    "USDT"
-  );
-  console.log(
-    "4. User earned",
-    ethers.formatUnits(newPayout - currentPayout, 6),
-    "USDT profit! 💰"
-  );
+  console.log("2. Time passes, admin sets yield rate to 1.2 (20% yield)");
+  console.log("3. User requests withdrawal of 50 mmUSDT → NFT minted with 60 USDT value");
+  console.log("4. User earned 10 USDT profit when they made the withdrawal request! 💰");
 
   // Actually set the new rate (comment out if you don't want to change it)
   try {
-    console.log("\n⚙️ Setting 10% yield rate...");
+    console.log("\n⚙️ Setting 20% yield rate...");
     const tx = await vaultContract.setExchangeRate(newRate);
     console.log("Transaction sent:", tx.hash);
 
