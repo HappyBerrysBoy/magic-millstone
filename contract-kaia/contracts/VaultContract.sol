@@ -137,12 +137,15 @@ contract VaultContract is
         require(amount > 0, "VaultContract: Amount must be greater than 0");
 
         usdt.safeTransferFrom(msg.sender, address(this), amount);
-        mmUSDTToken.mint(msg.sender, amount);
+        
+        // Calculate mmUSDT to mint: usdtAmount / exchangeRate
+        uint256 mmUSDTToMint = (amount * EXCHANGE_RATE_DECIMALS) / exchangeRate;
+        mmUSDTToken.mint(msg.sender, mmUSDTToMint);
 
         userDeposits[msg.sender] += amount;
         totalDeposited += amount;
 
-        emit Deposited(msg.sender, amount, amount, block.timestamp);
+        emit Deposited(msg.sender, amount, mmUSDTToMint, block.timestamp);
     }
 
     function requestWithdraw(uint256 amount) 
