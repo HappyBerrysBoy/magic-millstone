@@ -7,12 +7,19 @@ const TAB_LIST = [
   { key: "tvl", label: "TVL History" },
 ];
 
-const ChartTabs: React.FC = () => {
+type ChartPoint = { datetime: string; value: string | number };
+
+type ChartTabsProps = {
+  apyData: ChartPoint[];
+  ppsData: ChartPoint[];
+  tvlData: ChartPoint[];
+};
+
+const ChartTabs: React.FC<ChartTabsProps> = ({ apyData, ppsData, tvlData }) => {
   const [selected, setSelected] = useState("apy");
 
   return (
     <div className="w-full">
-      {/* 탭 버튼 */}
       <div className="mb-4 flex gap-[12px] overflow-hidden">
         {TAB_LIST.map((tab) => (
           <button
@@ -24,11 +31,16 @@ const ChartTabs: React.FC = () => {
           </button>
         ))}
       </div>
-      {/* 차트 영역 (임시) */}
       <div className="flex h-[250px] items-center justify-center">
-        {selected === "apy" && <ChartAreaLinear />}
-        {selected === "pps" && <ChartAreaLinear />}
-        {selected === "tvl" && <ChartAreaLinear />}
+        {selected === "apy" && (
+          <ChartAreaLinear data={apyData} seriesLabel="Daily APY" color="#00FBFF" />
+        )}
+        {selected === "pps" && (
+          <ChartAreaLinear data={ppsData} seriesLabel="Price per share" color="#768AFF" />
+        )}
+        {selected === "tvl" && (
+          <ChartAreaLinear data={tvlData} seriesLabel="TVL History" color="#E176FF" />
+        )}
       </div>
     </div>
   );

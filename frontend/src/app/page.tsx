@@ -13,8 +13,14 @@ import NextMagicTime from "@/components/NextMagicTime";
 import { time } from "console";
 import ButtonDefault from "@/app/_components/ButtonDefault";
 import { useRouter } from "next/navigation";
+import { callApi } from "./_utils/callApi";
 
 const USDTContractAddress = "0xf6A77faA9d860a9218E0ab02Ac77AEe03c027372";
+
+type PortfolioStats = {
+  tvl: number;
+  apy: number;
+};
 
 export default function Home() {
   const { account } = useWalletAccountStore();
@@ -22,10 +28,28 @@ export default function Home() {
   const [kaiaBalance, setKaiaBalance] = useState<number | string>("-");
   const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
   const [depositOpen, setDepositOpen] = useState(false);
+  const [tvl, setTvl] = useState(0);
+  const [apy, setApy] = useState(0);
+
   const router = useRouter();
   // 임시 데이터
-  const tvl = "1,234,567";
-  const apy = "8.5%";
+  useEffect(() => {
+    const handleUpdateVaultStats = async () => {
+      try {
+        const res = await callApi({
+          endpoint: `/portfolio/magic-millstone-usdt/stats`,
+          method: "GET",
+        });
+        const data = (res as any).data ?? res;
+        setTvl(data.tvl);
+        setApy(data.apy);
+      } catch (err) {
+        console.error("API error", err);
+      }
+    };
+    handleUpdateVaultStats();
+  }, []);
+
   const timeLeft = "01:23:45";
 
   // balance 불러오기
@@ -62,11 +86,16 @@ export default function Home() {
 
   return (
     <div className="flex min-h-[calc(100vh-124px)] flex-col gap-[20px]">
-      <header className=" flex justify-center">
-        <Image src="/images/MillstoneIcon.png" alt="Magic Millstone" width={20} height={20} />
+      <header className="flex justify-center">
+        <Image
+          src="/images/MillstoneIcon.png"
+          alt="Magic Millstone"
+          width={20}
+          height={20}
+        />
         {/* <span className="text-primary">MagicMillstone</span> */}
       </header>
-      <main className="mx-auto w-full max-w-md flex flex-1 flex-col">
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col">
         <HomeStats tvl={tvl} apy={apy} />
         <div className="mt-[60px]">
           <NextMagicTime timeLeft={timeLeft} />
@@ -74,7 +103,12 @@ export default function Home() {
         <div className="mt-auto">
           {account ? (
             <div className="mx-4 mb-4">
-              <ButtonDefault theme="primary" onClick={() => router.push("/holdings/stake")}>Stake USDT</ButtonDefault>
+              <ButtonDefault
+                theme="primary"
+                onClick={() => router.push("/holdings/stake")}
+              >
+                Stake USDT
+              </ButtonDefault>
             </div>
           ) : (
             <WalletButton />

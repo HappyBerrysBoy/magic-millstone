@@ -1,15 +1,7 @@
 "use client";
 
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -17,32 +9,32 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-];
+type ChartPoint = { datetime: string; value: string | number };
 
-const chartConfig = {
-  desktop: {
-    label: "Daily APY",
-    color: "#00FBFF",
-  },
-} satisfies ChartConfig;
+type ChartAreaLinearProps = {
+  data: ChartPoint[];
+  seriesLabel: string;
+  color: string;
+};
 
-export function ChartAreaLinear() {
+export function ChartAreaLinear({ data, seriesLabel, color }: ChartAreaLinearProps) {
+  const chartData = (data || []).map((p) => ({
+    datetime: p.datetime,
+    desktop: Number(p.value),
+  }));
+
+  const chartConfig = {
+    desktop: {
+      label: seriesLabel,
+      color,
+    },
+  } satisfies ChartConfig;
+
   return (
     <ChartContainer className="h-[250px] w-full" config={chartConfig}>
       <AreaChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
-       
-        <ChartTooltip
-          cursor={false}
-          content={<ChartTooltipContent indicator="dot" hideLabel />}
-        />
+        <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" hideLabel />} />
         <Area
           dataKey="desktop"
           type="linear"

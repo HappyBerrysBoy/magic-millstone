@@ -3,7 +3,7 @@ import styles from "./WalletButton.module.css";
 import { Logo } from "public/svgs/Logo";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
-import { errorRetry, successToast } from "@/utils/notifications";
+import { callApi } from "@/app/_utils/callApi";
 
 export const WalletButton = () => {
   const { connectAndSign } = useKaiaWalletSdk();
@@ -15,6 +15,13 @@ export const WalletButton = () => {
       const [account] = await connectAndSign("connect");
       sessionStorage.setItem("ACCOUNT", account);
       setAccount(account);
+      await callApi({
+        endpoint: `/user`,
+        method: "POST",
+        body: {
+          address: account,
+        },
+      });
     } catch (error: unknown) {
       console.log(error);
     }
