@@ -110,10 +110,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "CompactMultiProtocolVault",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CompactMultiProtocolVault__factory>;
-    getContractFactory(
       name: "EIP1967Proxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EIP1967Proxy__factory>;
@@ -149,10 +145,6 @@ declare module "hardhat/types/runtime" {
       name: "IMorphoBlue",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IMorphoBlue__factory>;
-    getContractFactory(
-      name: "MillstoneAIVault",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MillstoneAIVault__factory>;
     getContractFactory(
       name: "MillstoneAIVault",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -287,11 +279,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "CompactMultiProtocolVault",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CompactMultiProtocolVault>;
-    getContractAt(
       name: "EIP1967Proxy",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -336,11 +323,6 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IMorphoBlue>;
-    getContractAt(
-      name: "MillstoneAIVault",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.MillstoneAIVault>;
     getContractAt(
       name: "MillstoneAIVault",
       address: string | ethers.Addressable,
@@ -454,10 +436,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
     deployContract(
-      name: "CompactMultiProtocolVault",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CompactMultiProtocolVault>;
-    deployContract(
       name: "EIP1967Proxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EIP1967Proxy>;
@@ -493,10 +471,6 @@ declare module "hardhat/types/runtime" {
       name: "IMorphoBlue",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IMorphoBlue>;
-    deployContract(
-      name: "MillstoneAIVault",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.MillstoneAIVault>;
     deployContract(
       name: "MillstoneAIVault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -631,11 +605,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
     deployContract(
-      name: "CompactMultiProtocolVault",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CompactMultiProtocolVault>;
-    deployContract(
       name: "EIP1967Proxy",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -680,11 +649,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IMorphoBlue>;
-    deployContract(
-      name: "MillstoneAIVault",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.MillstoneAIVault>;
     deployContract(
       name: "MillstoneAIVault",
       args: any[],

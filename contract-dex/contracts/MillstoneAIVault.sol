@@ -37,11 +37,13 @@ contract MillstoneAIVault is
     mapping(address => uint256) public aaveAllocations; // basis points
     mapping(address => uint256) public morphoAllocations; // basis points
     
-    // Yield-bearing token 상태
-    mapping(address => uint256) public totalShares;
-    mapping(address => uint256) public totalDeposited;
-    mapping(address => uint256) public totalWithdrawn;
-    mapping(address => mapping(address => uint256)) public userShares; // user -> token -> shares
+    // StakedUSDT 토큰 시스템
+    mapping(address => uint256) public totalStakedTokenSupply; // token -> 총 stakedToken 발행량
+    mapping(address => uint256) public exchangeRateStakedToUnderlying; // token -> 교환비 (1 stakedToken = X underlying, 1e18 scale)
+    mapping(address => mapping(address => uint256)) public userStakedTokenBalance; // user -> token -> stakedToken 보유량
+    mapping(address => uint256) public totalUnderlyingDeposited; // token -> 실제 투자된 underlying 총량
+    mapping(address => uint256) public totalDeposited; // 호환성을 위해 유지
+    mapping(address => uint256) public totalWithdrawn; // 호환성을 위해 유지
     
     // Performance Fee 관리
     uint256 public performanceFeeRate; // basis points (1000 = 10%)
@@ -53,8 +55,9 @@ contract MillstoneAIVault is
     // 이벤트들
     event TokenSupported(address indexed token, bool supported);
     event AllocationSet(address indexed token, uint256 aavePercentage, uint256 morphoPercentage);
-    event SharesMinted(address indexed user, address indexed token, uint256 shares, uint256 assets);
-    event SharesRedeemed(address indexed user, address indexed token, uint256 shares, uint256 assets);
+    event StakedTokenMinted(address indexed user, address indexed token, uint256 stakedTokenAmount, uint256 underlyingAmount);
+    event StakedTokenBurned(address indexed user, address indexed token, uint256 stakedTokenAmount, uint256 underlyingAmount);
+    event ExchangeRateUpdated(address indexed token, uint256 newRate, uint256 previousRate);
     event ProtocolDeposit(address indexed token, uint256 amount, string protocol);
     event PerformanceFeeSet(uint256 newFeeRate);
     event FeeRecipientSet(address indexed newRecipient);
@@ -147,74 +150,134 @@ contract MillstoneAIVault is
     }
 
     /**
-     * @dev Yield-bearing token 예치
+     * @dev USDT 예치하여 StakedUSDT 발행
      */
-    function deposit(address token, uint256 assets) external nonReentrant returns (uint256 shares) {
+    function deposit(address token, uint256 assets) external nonReentrant returns (uint256 stakedTokens) {
         require(supportedTokens[token], "Token not supported");
         require(assets > 0, "Invalid amount");
         
-        // Performance fee 수집 (예치 전)
+        // Performance fee 수집 및 교환비 업데이트 (예치 전)
         _collectPerformanceFee(token);
         
         // 토큰 전송
         IERC20(token).safeTransferFrom(msg.sender, address(this), assets);
         
-        // Shares 계산
-        shares = _convertToShares(token, assets);
+        // 현재 교환비로 StakedToken 수량 계산
+        uint256 currentRate = exchangeRateStakedToUnderlying[token];
+        if (currentRate == 0) {
+            currentRate = 1e6; // 초기 1:1 비율
+            exchangeRateStakedToUnderlying[token] = currentRate;
+        }
         
-        // Shares 발행
-        totalShares[token] += shares;
-        userShares[msg.sender][token] += shares;
-        totalDeposited[token] += assets;
+        // stakedTokens = assets / exchangeRate
+        stakedTokens = (assets * 1e18) / currentRate;
         
-        // 프로토콜에 분배 예치
+        // StakedToken 발행
+        userStakedTokenBalance[msg.sender][token] += stakedTokens;
+        totalStakedTokenSupply[token] += stakedTokens;
+        totalUnderlyingDeposited[token] += assets;
+        totalDeposited[token] += assets; // 호환성 유지
+        
+        // 프로토콜에 분산 투자
         _depositToProtocols(token, assets);
         
-        emit SharesMinted(msg.sender, token, shares, assets);
-        return shares;
+        emit StakedTokenMinted(msg.sender, token, stakedTokens, assets);
+        return stakedTokens;
     }
 
     /**
-     * @dev Shares로 출금
+     * @dev StakedUSDT 소각하여 USDT 출금
      */
-    function redeem(address token, uint256 shares) external nonReentrant returns (uint256 assets) {
-        require(userShares[msg.sender][token] >= shares, "Insufficient shares");
+    function redeem(address token, uint256 stakedTokenAmount) external nonReentrant returns (uint256 actualAmount) {
+        require(userStakedTokenBalance[msg.sender][token] >= stakedTokenAmount, "Insufficient staked tokens");
         
-        // Performance fee 수집 (출금 전)
+        // Performance fee 수집 및 교환비 업데이트 (출금 전)
         _collectPerformanceFee(token);
         
-        // Assets 계산
-        assets = _convertToAssets(token, shares);
+        // 현재 교환비로 실제 출금액 계산
+        uint256 currentRate = exchangeRateStakedToUnderlying[token];
+        if (currentRate == 0) currentRate = 1e6;
+        
+        // actualAmount = stakedTokenAmount * exchangeRate
+        actualAmount = (stakedTokenAmount * currentRate) / 1e6;
         
         // 프로토콜에서 출금
-        uint256 withdrawn = _withdrawFromProtocols(token, assets);
+        uint256 withdrawn = _withdrawFromProtocols(token, actualAmount);
         
-        // Shares 소각
-        totalShares[token] -= shares;
-        userShares[msg.sender][token] -= shares;
+        // StakedToken 소각
+        userStakedTokenBalance[msg.sender][token] -= stakedTokenAmount;
+        totalStakedTokenSupply[token] -= stakedTokenAmount;
         totalWithdrawn[token] += withdrawn;
         
         // 사용자에게 전송
         IERC20(token).safeTransfer(msg.sender, withdrawn);
         
-        emit SharesRedeemed(msg.sender, token, shares, withdrawn);
+        emit StakedTokenBurned(msg.sender, token, stakedTokenAmount, withdrawn);
         return withdrawn;
     }
 
     /**
-     * @dev 기존 브릿지 방식 (하위 호환)
+     * @dev 브릿지에서 자금 수신하여 StakedToken 발행 (사용자 없음)
      */
     function receiveFromBridge(address token, uint256 amount) external {
         require(authorizedBridges[msg.sender], "Unauthorized");
         require(supportedTokens[token], "Token not supported");
         
-        // Performance fee 수집
+        // Performance fee 수집 및 교환비 업데이트 (기존 자금에 대해서)
         _collectPerformanceFee(token);
         
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
-        totalDeposited[token] += amount;
         
+        // 현재 교환비로 StakedToken 수량 계산
+        uint256 currentRate = exchangeRateStakedToUnderlying[token];
+        if (currentRate == 0) {
+            currentRate = 1e6; // 초기 1:1 비율
+            exchangeRateStakedToUnderlying[token] = currentRate;
+        }
+        
+        uint256 stakedTokens = (amount * 1e6) / currentRate;
+        
+        // StakedToken 발행 (Bridge는 사용자가 없으므로 토큰 소각됨)
+        totalStakedTokenSupply[token] += stakedTokens;
+        totalUnderlyingDeposited[token] += amount;
+        totalDeposited[token] += amount; // 호환성 유지
+        
+        // 프로토콜에 분산 투자
         _depositToProtocols(token, amount);
+        
+        emit StakedTokenMinted(address(0), token, stakedTokens, amount); // Bridge는 사용자 없음
+    }
+
+    /**
+     * @dev 브릿지에서 사용자 출금 처리 (StakedToken 소각)
+     */
+    function withdrawForUser(address token, uint256 underlyingAmount) external returns (uint256 actualAmount) {
+        require(authorizedBridges[msg.sender], "Unauthorized");
+        require(supportedTokens[token], "Token not supported");
+        require(underlyingAmount > 0, "Invalid amount");
+        
+        // Performance fee 수집 및 교환비 업데이트 (출금 전)
+        _collectPerformanceFee(token);
+        
+        // 현재 교환비로 소각할 StakedToken 수량 계산
+        uint256 currentRate = exchangeRateStakedToUnderlying[token];
+        if (currentRate == 0) currentRate = 1e6;
+        
+        uint256 stakedTokensToRedeem = (underlyingAmount * 1e6) / currentRate;
+        
+        // StakedToken 공급량에서 차감
+        require(totalStakedTokenSupply[token] >= stakedTokensToRedeem, "Insufficient supply");
+        totalStakedTokenSupply[token] -= stakedTokensToRedeem;
+        totalWithdrawn[token] += underlyingAmount;
+        
+        // 프로토콜에서 출금
+        actualAmount = _withdrawFromProtocols(token, underlyingAmount);
+        
+        // 브릿지에 전송
+        IERC20(token).safeTransfer(msg.sender, actualAmount);
+        
+        emit StakedTokenBurned(address(0), token, stakedTokensToRedeem, actualAmount);
+        return actualAmount;
     }
 
     /**
@@ -299,43 +362,6 @@ contract MillstoneAIVault is
         return 0;
     }
 
-    /**
-     * @dev Assets를 Shares로 변환 (fee 제외 가치 기준)
-     */
-    function _convertToShares(address token, uint256 assets) internal view returns (uint256) {
-        uint256 totalSharesSupply = totalShares[token];
-        uint256 netValue = _getNetValue(token);
-        
-        if (totalSharesSupply == 0 || netValue == 0) {
-            return assets; // 1:1 초기 비율
-        }
-        
-        return (assets * totalSharesSupply) / netValue;
-    }
-
-    /**
-     * @dev Shares를 Assets로 변환 (fee 제외 가치 기준)
-     */
-    function _convertToAssets(address token, uint256 shares) internal view returns (uint256) {
-        uint256 totalSharesSupply = totalShares[token];
-        
-        if (totalSharesSupply == 0) {
-            return 0;
-        }
-        
-        uint256 netValue = _getNetValue(token);
-        return (shares * netValue) / totalSharesSupply;
-    }
-    
-    /**
-     * @dev Fee를 제외한 순 자산 가치 계산
-     */
-    function _getNetValue(address token) internal view returns (uint256) {
-        uint256 totalValue = getTotalValue(token);
-        uint256 feeAmount = accumulatedFees[token];
-        
-        return totalValue > feeAmount ? totalValue - feeAmount : 0;
-    }
 
     /**
      * @dev 전체 vault 가치 조회
@@ -394,22 +420,16 @@ contract MillstoneAIVault is
     }
 
     /**
-     * @dev 사용자 정보 조회 (fee 제외 가치)
+     * @dev 사용자 정보 조회 (StakedToken 기반)
      */
     function getUserInfo(address user, address token) external view returns (
-        uint256 shares,
-        uint256 assets,
-        uint256 shareValue
+        uint256 stakedTokenBalance,
+        uint256 underlyingValue,
+        uint256 currentExchangeRate
     ) {
-        shares = userShares[user][token];
-        assets = _convertToAssets(token, shares);
-        
-        uint256 totalSharesSupply = totalShares[token];
-        if (totalSharesSupply > 0) {
-            shareValue = (_getNetValue(token) * 1e18) / totalSharesSupply;
-        } else {
-            shareValue = 1e18; // 1:1 비율
-        }
+        stakedTokenBalance = userStakedTokenBalance[user][token];
+        currentExchangeRate = exchangeRateStakedToUnderlying[token] == 0 ? 1e6 : exchangeRateStakedToUnderlying[token];
+        underlyingValue = (stakedTokenBalance * currentExchangeRate) / 1e6;
     }
 
     /**
@@ -418,29 +438,129 @@ contract MillstoneAIVault is
     function getAllocations(address token) external view returns (uint256 aave, uint256 morpho) {
         return (aaveAllocations[token], morphoAllocations[token]);
     }
+    
+    /**
+     * @dev 현재 교환비 조회 (1 stakedToken = X underlying)
+     */
+    function getExchangeRate(address token) external view returns (uint256) {
+        return exchangeRateStakedToUnderlying[token] == 0 ? 1e6 : exchangeRateStakedToUnderlying[token];
+    }
+    
+    /**
+     * @dev StakedToken 총 발행량 조회
+     */
+    function getTotalStakedTokenSupply(address token) external view returns (uint256) {
+        return totalStakedTokenSupply[token];
+    }
+    
+    /**
+     * @dev 사용자 StakedToken 잔액 조회
+     */
+    function getStakedTokenBalance(address user, address token) external view returns (uint256) {
+        return userStakedTokenBalance[user][token];
+    }
+    
+    /**
+     * @dev StakedToken 상세 정보 조회
+     */
+    function getStakedTokenInfo(address token) external view returns (
+        uint256 currentExchangeRate,
+        uint256 totalSupply,
+        uint256 totalCurrentValue,
+        uint256 underlyingDepositedAmount,
+        uint256 accumulatedFeeAmount
+    ) {
+        currentExchangeRate = exchangeRateStakedToUnderlying[token] == 0 ? 1e6 : exchangeRateStakedToUnderlying[token];
+        totalSupply = totalStakedTokenSupply[token];
+        totalCurrentValue = getTotalValue(token);
+        underlyingDepositedAmount = totalUnderlyingDeposited[token];
+        accumulatedFeeAmount = accumulatedFees[token];
+    }
+    
+    /**
+     * @dev StakedToken 출금 미리보기
+     */
+    function previewRedeem(address token, uint256 stakedTokenAmount) external view returns (uint256 underlyingAmount) {
+        uint256 currentRate = exchangeRateStakedToUnderlying[token] == 0 ? 1e18 : exchangeRateStakedToUnderlying[token];
+        underlyingAmount = (stakedTokenAmount * currentRate) / 1e6;
+    }
+    
+    /**
+     * @dev USDT 예치 시 받을 StakedToken 미리보기
+     */
+    function previewDeposit(address token, uint256 underlyingAmount) external view returns (uint256 stakedTokenAmount) {
+        uint256 currentRate = exchangeRateStakedToUnderlying[token] == 0 ? 1e18 : exchangeRateStakedToUnderlying[token];
+        stakedTokenAmount = (underlyingAmount * 1e6) / currentRate;
+    }
+    
+    /**
+     * @dev 교환비 변화 시뮬레이션 (StakedToken 기반)
+     */
+    function simulateExchangeRateUpdate(address token) external view returns (
+        uint256 currentRate,
+        uint256 newRate,
+        uint256 totalGain,
+        uint256 feeAmount,
+        uint256 netGain
+    ) {
+        currentRate = exchangeRateStakedToUnderlying[token] == 0 ? 1e18 : exchangeRateStakedToUnderlying[token];
+        uint256 totalSupply = totalStakedTokenSupply[token];
+        
+        if (totalSupply > 0) {
+            uint256 currentValue = getTotalValue(token);
+            uint256 potentialRate = (currentValue * 1e6) / totalSupply;
+            
+            if (potentialRate > currentRate) {
+                totalGain = ((potentialRate - currentRate) * totalSupply) / 1e6;
+                feeAmount = (totalGain * performanceFeeRate) / 10000;
+                netGain = totalGain - feeAmount;
+                newRate = currentRate + (netGain * 1e6) / totalSupply;
+            } else {
+                newRate = currentRate;
+            }
+        } else {
+            newRate = currentRate;
+        }
+    }
 
     /**
-     * @dev Performance fee 수집 (내부 함수)
+     * @dev Performance fee 수집 및 교환비 업데이트 (StakedToken 기반)
      */
     function _collectPerformanceFee(address token) internal {
         uint256 currentValue = getTotalValue(token);
-        uint256 principal = totalDeposited[token] - totalWithdrawn[token];
+        uint256 totalSupply = totalStakedTokenSupply[token];
         
-        // 원금보다 가치가 낮거나 원금이 없으면 수집하지 않음
-        if (currentValue <= principal || principal == 0) {
+        // StakedToken이 없으면 초기 교환비 설정하고 리턴
+        if (totalSupply == 0) {
+            if (exchangeRateStakedToUnderlying[token] == 0) {
+                exchangeRateStakedToUnderlying[token] = 1e6; // 1 stakedToken = 1 underlying
+            }
             return;
         }
         
-        // 전체 수익 계산
-        uint256 totalProfit = currentValue - principal;
-        uint256 totalFeeExpected = (totalProfit * performanceFeeRate) / 10000;
-        uint256 alreadyCollected = accumulatedFees[token] + totalFeesWithdrawn[token];
+        // 현재 교환비 계산: currentValue / totalSupply
+        uint256 currentRate = (currentValue * 1e6) / totalSupply;
+        uint256 previousRate = exchangeRateStakedToUnderlying[token];
         
-        // 추가로 수집해야 할 fee 계산
-        if (totalFeeExpected > alreadyCollected) {
-            uint256 newFeeAmount = totalFeeExpected - alreadyCollected;
-            accumulatedFees[token] += newFeeAmount;
-            emit PerformanceFeeCollected(token, newFeeAmount);
+        // 교환비가 증가한 경우에만 Fee 수집
+        if (currentRate > previousRate) {
+            // 증가분 계산: (새 교환비 - 이전 교환비) * 총 발행량
+            uint256 totalGain = ((currentRate - previousRate) * totalSupply) / 1e6;
+            uint256 feeAmount = (totalGain * performanceFeeRate) / 10000;
+            
+            // Performance Fee 누적
+            if (feeAmount > 0) {
+                accumulatedFees[token] += feeAmount;
+                emit PerformanceFeeCollected(token, feeAmount);
+            }
+            
+            // Fee를 제외한 새로운 교환비 계산
+            uint256 netGain = totalGain - feeAmount;
+            uint256 newRate = previousRate + (netGain * 1e6) / totalSupply;
+            
+            // 교환비 업데이트
+            exchangeRateStakedToUnderlying[token] = newRate;
+            emit ExchangeRateUpdated(token, newRate, previousRate);
         }
     }
     
@@ -504,58 +624,60 @@ contract MillstoneAIVault is
     }
     
     /**
-     * @dev 수수료 제외 순 수익률 계산
+     * @dev 수수료 제외 순 수익률 계산 (StakedToken 기반)
      */
     function calculateYield(address token) external view returns (
         uint256 totalValue,
-        uint256 principal,
+        uint256 totalDepositedAmount,
         uint256 yieldAmount,
         uint256 yieldRate
     ) {
         totalValue = getTotalValue(token);
-        principal = totalDeposited[token] - totalWithdrawn[token];
+        totalDepositedAmount = totalUnderlyingDeposited[token];
         
-        if (totalValue >= principal && principal > 0) {
-            yieldAmount = totalValue - principal;
-            yieldRate = (yieldAmount * 10000) / principal; // basis points
+        if (totalValue >= totalDepositedAmount && totalDepositedAmount > 0) {
+            yieldAmount = totalValue - totalDepositedAmount;
+            yieldRate = (yieldAmount * 10000) / totalDepositedAmount; // basis points
         }
     }
     
     /**
-     * @dev 사용자에게 제공될 순 APY 계산 (fee 제외)
+     * @dev 사용자에게 제공될 순 APY 계산 (fee 제외, StakedToken 기반)
      */
     function calculateNetYield(address token) external view returns (
         uint256 totalValue,
-        uint256 principal,
+        uint256 totalDepositedAmount,
         uint256 grossYield,
         uint256 feeAmount,
         uint256 netYield,
         uint256 netYieldRate
     ) {
         totalValue = getTotalValue(token);
-        principal = totalDeposited[token] - totalWithdrawn[token];
+        totalDepositedAmount = totalUnderlyingDeposited[token];
         
-        if (totalValue >= principal && principal > 0) {
-            grossYield = totalValue - principal;
+        if (totalValue >= totalDepositedAmount && totalDepositedAmount > 0) {
+            grossYield = totalValue - totalDepositedAmount;
             feeAmount = (grossYield * performanceFeeRate) / 10000;
             netYield = grossYield - feeAmount;
-            netYieldRate = (netYield * 10000) / principal; // basis points
+            netYieldRate = (netYield * 10000) / totalDepositedAmount; // basis points
         }
     }
 
     /**
-     * @dev 토큰 통계
+     * @dev 토큰 통계 (StakedToken 기반)
      */
     function getTokenStats(address token) external view returns (
-        uint256 deposited,
-        uint256 withdrawn,
-        uint256 totalSharesSupply,
-        uint256 currentValue
+        uint256 totalStakedSupply,
+        uint256 underlyingDepositedAmount,
+        uint256 totalWithdrawnAmount,
+        uint256 currentValue,
+        uint256 currentExchangeRate
     ) {
-        deposited = totalDeposited[token];
-        withdrawn = totalWithdrawn[token];
-        totalSharesSupply = totalShares[token];
+        totalStakedSupply = totalStakedTokenSupply[token];
+        underlyingDepositedAmount = totalUnderlyingDeposited[token];
+        totalWithdrawnAmount = totalWithdrawn[token]; // 호환성 유지
         currentValue = getTotalValue(token);
+        currentExchangeRate = exchangeRateStakedToUnderlying[token] == 0 ? 1e6 : exchangeRateStakedToUnderlying[token];
     }
 
     /**
