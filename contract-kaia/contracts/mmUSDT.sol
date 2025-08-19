@@ -20,6 +20,7 @@ contract mmUSDT is
     bytes32 public constant UPGRADER_ROLE = keccak256("UPGRADER_ROLE");
 
     uint8 private _decimals;
+    address public vaultContract;
 
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed from, uint256 amount);
@@ -40,6 +41,16 @@ contract mmUSDT is
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(PAUSER_ROLE, admin);
         _grantRole(UPGRADER_ROLE, admin);
+    }
+
+    function setVaultContract(address _vaultContract) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_vaultContract != address(0), "mmUSDT: Invalid vault contract address");
+        vaultContract = _vaultContract;
+    }
+
+    function getVaultContract() public view returns (address) {
+        require(vaultContract != address(0), "mmUSDT: Vault contract not set");
+        return vaultContract;
     }
 
     function decimals() public view virtual override returns (uint8) {
@@ -85,6 +96,29 @@ contract mmUSDT is
         override 
         onlyRole(UPGRADER_ROLE) 
     {}
+
+    function convertToAsset(uint256 mmUsdtAmount) external view returns (uint256) {
+        address vault = getVaultContract();
+        
+        // Get exchange rate from vault contract
+        (bool success, bytes memory data) = vault.staticcall(
+            abi.encodeWithSignature("getExchangeRate()")
+        );
+        
+        if (!success) {
+            // If vault call fails, return 1:1 ratio as fallback
+            return mmUsdtAmount;
+        }
+        
+        uint256 exchangeRate = abi.decode(data, (uint256));
+        uint256 exchangeRateDecimals = 1e6; // EXCHANGE_RATE_DECIMALS from VaultContract
+        
+        return (mmUsdtAmount * exchangeRate) / exchangeRateDecimals;
+    }
+
+    function convertToAsset(address account) external view returns (uint256) {
+        return this.convertToAsset(balanceOf(account));
+    }
 
     function supportsInterface(bytes4 interfaceId) 
         public 
