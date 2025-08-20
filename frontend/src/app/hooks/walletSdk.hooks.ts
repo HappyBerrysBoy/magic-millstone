@@ -27,7 +27,6 @@ export const initializeKaiaWalletSdk = async () => {
       chainId: process.env.NEXT_PUBLIC_CHAIN_ID,
     });
     return sdk as DappPortalSDKType;
-     
   } catch (error: unknown) {
     return null;
   }
@@ -128,29 +127,35 @@ export const useKaiaWalletSdk = () => {
   );
 
   const callContractFunction = useCallback(
-    async (contractAddress: string, abi: unknown[], functionName: string, params: unknown[] = [], signature?: string) => {
+    async (
+      contractAddress: string,
+      abi: unknown[],
+      functionName: string,
+      params: unknown[] = [],
+      signature?: string,
+    ) => {
       // Use specific signature if provided to handle function overloads
       const targetFunction = signature || functionName;
-      
+
       try {
         // Use eth_call for read-only functions
-        const { Interface } = await import('ethers');
+        const { Interface } = await import("ethers");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const iface = new Interface(abi as any);
-        
+
         const data = iface.encodeFunctionData(targetFunction, params);
-        
+        console.log(data);
         const result = await walletProvider.request({
-          method: 'eth_call',
+          method: "eth_call",
           params: [
             {
               to: contractAddress,
-              data: data
+              data: data,
             },
-            'latest'
-          ]
+            "latest",
+          ],
         });
-        
+
         return iface.decodeFunctionResult(targetFunction, result as string)[0];
       } catch (error) {
         console.error(`Error calling ${targetFunction}:`, error);
@@ -161,28 +166,33 @@ export const useKaiaWalletSdk = () => {
   );
 
   const sendContractTransaction = useCallback(
-    async (contractAddress: string, abi: unknown[], functionName: string, params: unknown[] = [], signature?: string) => {
+    async (
+      contractAddress: string,
+      abi: unknown[],
+      functionName: string,
+      params: unknown[] = [],
+      signature?: string,
+    ) => {
       if (!contractAddress) throw new Error("Contract address is required");
-      
+
       // Use specific signature if provided to handle function overloads
       const targetFunction = signature || functionName;
-      
+
       try {
-        const { Interface } = await import('ethers');
+        const { Interface } = await import("ethers");
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const iface = new Interface(abi as any);
-        
+
         const data = iface.encodeFunctionData(targetFunction, params);
         const fromAddress = await getAccount();
-        
+
         const txParams = {
           from: fromAddress,
           to: contractAddress,
           value: "0x0",
-          data: data
+          data: data,
           // Let wallet estimate gas automatically
         };
-        
         return await sendTransaction([txParams]);
       } catch (error) {
         console.error(`Error sending transaction to ${targetFunction}:`, error);
