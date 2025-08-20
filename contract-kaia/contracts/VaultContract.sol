@@ -85,10 +85,6 @@ contract VaultContract is
         uint256 timestamp
     );
 
-    event BridgeDeposit(
-        uint256 amount,
-        uint256 timestamp
-    );
 
     event EmergencyWithdraw(
         address indexed admin,
@@ -144,6 +140,9 @@ contract VaultContract is
 
         userDeposits[msg.sender] += amount;
         totalDeposited += amount;
+
+        // Auto-update PENDING withdrawals to READY if vault now has sufficient funds
+        _updatePendingWithdrawalsToReady();
 
         emit Deposited(msg.sender, amount, mmUSDTToMint, block.timestamp);
     }
@@ -243,6 +242,9 @@ contract VaultContract is
         // Transfer exact USDT amount stored in NFT
         usdt.safeTransfer(msg.sender, payoutAmount);
 
+        // Auto-update PENDING withdrawals to READY after withdrawal execution
+        _updatePendingWithdrawalsToReady();
+
         emit WithdrawExecuted(msg.sender, payoutAmount, nftId, block.timestamp);
     }
 
@@ -289,6 +291,11 @@ contract VaultContract is
         }
         
         return currentBalance - requiredReserves;
+    }
+
+    // Public function to allow external calls to update pending withdrawals
+    function updatePendingWithdrawals() external whenNotPaused {
+        _updatePendingWithdrawalsToReady();
     }
 
     // Internal function to update PENDING withdrawals to READY when vault has sufficient funds
@@ -351,27 +358,34 @@ contract VaultContract is
         emit BridgeTransfer(destination, amount, block.timestamp);
     }
 
-    function depositFromBridge(uint256 amount) 
+    function magicTime(address destination) 
         external 
         onlyRole(ADMIN_ROLE) 
         nonReentrant 
         whenNotPaused 
+        returns (uint256 amountSent, uint256 neededAmount)
     {
-        require(amount > 0, "VaultContract: Amount must be greater than 0");
-
-        usdt.safeTransferFrom(msg.sender, address(this), amount);
+        require(destination != address(0), "VaultContract: Invalid destination address");
         
-        if (bridgeBalance >= amount) {
-            bridgeBalance -= amount;
-        } else {
-            bridgeBalance = 0;
+        uint256 vaultBalance = usdt.balanceOf(address(this));
+        uint256 requiredReserves = getRequiredReserves();
+        
+        // If vault has more than required reserves, send the excess to bridge
+        if (vaultBalance > requiredReserves) {
+            uint256 amountToSend = vaultBalance - requiredReserves;
+            
+            usdt.safeTransfer(destination, amountToSend);
+            bridgeBalance += amountToSend;
+            
+            emit BridgeTransfer(destination, amountToSend, block.timestamp);
+            return (amountToSend, 0);
         }
-
-        // Auto-update PENDING NFTs to READY if vault now has sufficient funds
-        _updatePendingWithdrawalsToReady();
-
-        emit BridgeDeposit(amount, block.timestamp);
+        
+        // If required reserves are more than vault balance, return how much more is needed
+        uint256 deficit = requiredReserves - vaultBalance;
+        return (0, deficit);
     }
+
 
     function emergencyWithdraw(
         address token,
@@ -431,8 +445,8 @@ contract VaultContract is
 
     function getUserInfo(address user) external view returns (
         uint256 mmUSDTBalance,
-        uint256 userDepositAmount,
-        uint256 userWithdrawAmount
+        uint256 userDepositAmount, // lifetime total deposited
+        uint256 userWithdrawAmount // lifetime total 'completed' withdrawals (not pending/ready NFTs)
     ) {
         return (
             mmUSDTToken.balanceOf(user),
