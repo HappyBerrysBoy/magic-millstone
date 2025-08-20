@@ -34,8 +34,8 @@ async function main() {
   console.log("\n📋 Upgrade Summary:");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("WithdrawNFT proxy:", address);
-  console.log("✅ Fixed status display in NFT metadata");
-  console.log("✅ Now shows PENDING/READY correctly");
+  console.log("✅ Added getUserWithdrawals function");
+  console.log("✅ Returns user's NFTs, amounts, and total");
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 }
 

@@ -42,7 +42,7 @@ async function main(): Promise<void> {
 
   // Step 2: Approve vault to spend TestUSDT
   console.log("\n2️⃣ Approving vault to spend TestUSDT...");
-  const depositAmount = ethers.parseUnits("10", 6); // 10 USDT
+  const depositAmount = ethers.parseUnits("100", 6); // 10 USDT
 
   const approveTx = await (testUSDT as any)
     .connect(user)

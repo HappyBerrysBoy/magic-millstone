@@ -24,7 +24,7 @@ async function main() {
   // Get transfer amount and destination from environment
   const transferAmount = process.env.TRANSFER_AMOUNT
     ? ethers.parseUnits(process.env.TRANSFER_AMOUNT, 6)
-    : ethers.parseUnits("50", 6);
+    : ethers.parseUnits("1", 6);
 
   const destinationAddress = process.env.BRIDGE_DESTINATION_ADDRESS || "";
 
