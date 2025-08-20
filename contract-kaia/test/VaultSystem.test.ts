@@ -36,11 +36,11 @@ describe("KAIA Yield Farming Vault System", function () {
     )) as unknown as MmUSDT;
     await mmUSDTToken.waitForDeployment();
 
-    // Deploy WithdrawNFT as upgradeable
+    // Deploy WithdrawNFT as upgradeable (vaultContract will be set later)
     const WithdrawNFTFactory = await ethers.getContractFactory("WithdrawNFT");
     withdrawNFT = (await upgrades.deployProxy(
       WithdrawNFTFactory,
-      ["Withdraw Request NFT", "wNFT", await admin.getAddress()],
+      ["Withdraw Request NFT", "wNFT", await admin.getAddress(), ethers.ZeroAddress],
       { initializer: "initialize" }
     )) as unknown as WithdrawNFT;
     await withdrawNFT.waitForDeployment();
@@ -64,13 +64,14 @@ describe("KAIA Yield Farming Vault System", function () {
     const BURNER_ROLE = await mmUSDTToken.BURNER_ROLE();
     const NFT_MINTER_ROLE = await withdrawNFT.MINTER_ROLE();
     const NFT_BURNER_ROLE = await withdrawNFT.BURNER_ROLE();
-    const NFT_MANAGER_ROLE = await withdrawNFT.MANAGER_ROLE();
 
     await mmUSDTToken.connect(admin).grantRole(MINTER_ROLE, await vaultContract.getAddress());
     await mmUSDTToken.connect(admin).grantRole(BURNER_ROLE, await vaultContract.getAddress());
     await withdrawNFT.connect(admin).grantRole(NFT_MINTER_ROLE, await vaultContract.getAddress());
     await withdrawNFT.connect(admin).grantRole(NFT_BURNER_ROLE, await vaultContract.getAddress());
-    await withdrawNFT.connect(admin).grantRole(NFT_MANAGER_ROLE, await vaultContract.getAddress());
+    
+    // Update vault contract address in WithdrawNFT
+    await withdrawNFT.connect(admin).updateVaultContract(await vaultContract.getAddress());
 
     // Distribute test USDT to users
     await testUSDT.connect(user1).faucet(INITIAL_BALANCE);
@@ -266,6 +267,114 @@ describe("KAIA Yield Farming Vault System", function () {
     it("Should only allow admin to transfer to bridge", async function () {
       await expect(vaultContract.connect(user1).transferToBridge(100))
         .to.be.reverted;
+    });
+  });
+
+  describe("getUserWithdrawals Function", function () {
+    beforeEach(async function () {
+      // User1 deposits and creates multiple withdrawal requests
+      await testUSDT.connect(user1).approve(await vaultContract.getAddress(), DEPOSIT_AMOUNT);
+      await vaultContract.connect(user1).deposit(DEPOSIT_AMOUNT);
+      
+      // User2 also deposits to test isolation
+      await testUSDT.connect(user2).approve(await vaultContract.getAddress(), DEPOSIT_AMOUNT);
+      await vaultContract.connect(user2).deposit(DEPOSIT_AMOUNT);
+    });
+
+    it("Should return empty arrays for user with no withdrawals", async function () {
+      const result = await withdrawNFT.getUserWithdrawals(await admin.getAddress());
+      expect(result.tokenIds.length).to.equal(0);
+      expect(result.amounts.length).to.equal(0);
+      expect(result.totalAmount).to.equal(0);
+    });
+
+    it("Should return correct data for user with single withdrawal", async function () {
+      const withdrawAmount = ethers.parseUnits("200", USDT_DECIMALS);
+      await vaultContract.connect(user1).requestWithdraw(withdrawAmount);
+      
+      const result = await withdrawNFT.getUserWithdrawals(await user1.getAddress());
+      expect(result.tokenIds.length).to.equal(1);
+      expect(result.amounts.length).to.equal(1);
+      expect(result.amounts[0]).to.equal(withdrawAmount);
+      expect(result.totalAmount).to.equal(withdrawAmount);
+    });
+
+    it("Should return correct data for user with multiple withdrawals", async function () {
+      const withdrawal1 = ethers.parseUnits("200", USDT_DECIMALS);
+      const withdrawal2 = ethers.parseUnits("300", USDT_DECIMALS);
+      
+      await vaultContract.connect(user1).requestWithdraw(withdrawal1);
+      await vaultContract.connect(user1).requestWithdraw(withdrawal2);
+      
+      const result = await withdrawNFT.getUserWithdrawals(await user1.getAddress());
+      expect(result.tokenIds.length).to.equal(2);
+      expect(result.amounts.length).to.equal(2);
+      expect(result.totalAmount).to.equal(withdrawal1 + withdrawal2);
+    });
+
+    it("Should isolate withdrawals between different users", async function () {
+      const user1Amount = ethers.parseUnits("200", USDT_DECIMALS);
+      const user2Amount = ethers.parseUnits("150", USDT_DECIMALS);
+      
+      await vaultContract.connect(user1).requestWithdraw(user1Amount);
+      await vaultContract.connect(user2).requestWithdraw(user2Amount);
+      
+      const user1Result = await withdrawNFT.getUserWithdrawals(await user1.getAddress());
+      const user2Result = await withdrawNFT.getUserWithdrawals(await user2.getAddress());
+      
+      expect(user1Result.tokenIds.length).to.equal(1);
+      expect(user1Result.totalAmount).to.equal(user1Amount);
+      
+      expect(user2Result.tokenIds.length).to.equal(1);
+      expect(user2Result.totalAmount).to.equal(user2Amount);
+    });
+
+    it("Should test specific address 0x26AC28D33EcBf947951d6B7d8a1e6569eE73d076", async function () {
+      const testAddress = "0x26AC28D33EcBf947951d6B7d8a1e6569eE73d076";
+      const result = await withdrawNFT.getUserWithdrawals(testAddress);
+      
+      console.log("Address:", testAddress);
+      console.log("Token IDs:", result.tokenIds.map(id => id.toString()));
+      console.log("Amounts:", result.amounts.map(amt => amt.toString()));
+      console.log("Total Amount:", result.totalAmount.toString());
+      
+      expect(result.tokenIds.length).to.equal(0);
+      expect(result.amounts.length).to.equal(0);
+      expect(result.totalAmount).to.equal(0);
+    });
+
+    it("Should not include burned NFTs in results", async function () {
+      const withdrawAmount = ethers.parseUnits("200", USDT_DECIMALS);
+      const tx = await vaultContract.connect(user1).requestWithdraw(withdrawAmount);
+      
+      // Get the NFT ID from the event
+      const receipt = await tx.wait();
+      const event = receipt!.logs.find((log: any) => {
+        try {
+          return vaultContract.interface.parseLog(log)?.name === "WithdrawRequested";
+        } catch {
+          return false;
+        }
+      });
+      
+      let nftId: bigint = 0n;
+      if (event) {
+        const parsedEvent = vaultContract.interface.parseLog(event);
+        nftId = parsedEvent!.args[2];
+      }
+      
+      // Check if withdrawal is already ready (auto-marked), if not mark it ready
+      const request = await vaultContract.getWithdrawRequest(nftId);
+      if (request.status === 0) { // PENDING
+        await vaultContract.connect(admin).markWithdrawReady([nftId]);
+      }
+      
+      // Execute withdrawal (which burns the NFT)
+      await vaultContract.connect(user1).executeWithdraw(nftId);
+      
+      const result = await withdrawNFT.getUserWithdrawals(await user1.getAddress());
+      expect(result.tokenIds.length).to.equal(0);
+      expect(result.totalAmount).to.equal(0);
     });
   });
 
