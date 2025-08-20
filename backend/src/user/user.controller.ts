@@ -8,7 +8,6 @@ import {
 import { UserService } from './user.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DataOutput } from '@common/dtos/output.dto';
-import { mm_users } from '@database/millstone/models/mm_users';
 
 @ApiTags('User')
 @Controller('user')

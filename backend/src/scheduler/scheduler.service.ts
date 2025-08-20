@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ethers } from 'ethers';
 import { vaultABI } from '../abis/vault';
+import { millstoneAIVaultAbi } from 'src/abis/millstoneAIVaultAbi';
 
 @Injectable()
 export class SchedulerService {
@@ -9,6 +10,7 @@ export class SchedulerService {
   private provider: ethers.JsonRpcProvider;
   private wallet: ethers.Wallet;
   private vaultContract: ethers.Contract;
+  private providers: { [chainId: string]: ethers.JsonRpcProvider } = {};
 
   constructor() {
     this.initializeContract();
@@ -37,6 +39,12 @@ export class SchedulerService {
         this.wallet,
       );
 
+      const rpcUrls = JSON.parse(process.env.RPC_URLS!);
+      Object.entries(rpcUrls).forEach(([chainId, rpcUrl]) => {
+        const provider = new ethers.JsonRpcProvider(rpcUrl as string);
+        this.providers[chainId] = provider;
+      });
+
       this.logger.log('Scheduler service initialized successfully');
       this.logger.log(`Vault address: ${vaultAddress}`);
       this.logger.log(`Admin address: ${this.wallet.address}`);
@@ -63,6 +71,24 @@ export class SchedulerService {
     this.logger.log(`Bridge destination: ${bridgeAddress}`);
 
     try {
+      const millstoneAIVaultContract = new ethers.Contract(
+        process.env.MILLSTONE_AI_VAULT_ADDRESS!,
+        millstoneAIVaultAbi,
+        this.providers['1'],
+      );
+
+      const [
+        currentExchangeRate,
+        totalSupply,
+        totalCurrentValue,
+        underlyingDepositedAmount,
+        accumulatedFeeAmount,
+      ] = await millstoneAIVaultContract.getStakedTokenInfo(
+        process.env.USDT_ADDRESS!,
+      );
+
+      await this.vaultContract.setExchangeRate(currentExchangeRate);
+
       this.logger.log('🔍 Checking magicTime return values...');
       const staticResult =
         await this.vaultContract.magicTime.staticCall(bridgeAddress);
@@ -133,7 +159,7 @@ export class SchedulerService {
 
   async triggerMagicTimeManually() {
     this.logger.log('🧪 Manual Magic Time trigger initiated');
-    
+
     const bridgeAddress = process.env.BRIDGE_DESTINATION_ADDRESS;
     if (!bridgeAddress) {
       throw new Error('BRIDGE_DESTINATION_ADDRESS is not set');
@@ -155,7 +181,8 @@ export class SchedulerService {
 
     try {
       // Get static call results first
-      const staticResult = await this.vaultContract.magicTime.staticCall(bridgeAddress);
+      const staticResult =
+        await this.vaultContract.magicTime.staticCall(bridgeAddress);
       const amountSent = staticResult[0];
       const amountNeeded = staticResult[1];
 
@@ -169,7 +196,9 @@ export class SchedulerService {
       const receipt = await tx.wait();
       result.blockNumber = receipt.blockNumber;
       result.gasUsed = receipt.gasUsed.toString();
-      result.gasPrice = tx.gasPrice ? ethers.formatUnits(tx.gasPrice, 'gwei') : null;
+      result.gasPrice = tx.gasPrice
+        ? ethers.formatUnits(tx.gasPrice, 'gwei')
+        : null;
 
       // Check for BridgeTransfer events
       const bridgeTransferEvents = receipt.logs.filter((log: any) => {
@@ -182,7 +211,9 @@ export class SchedulerService {
       });
 
       if (bridgeTransferEvents.length > 0) {
-        const parsed = this.vaultContract.interface.parseLog(bridgeTransferEvents[0]);
+        const parsed = this.vaultContract.interface.parseLog(
+          bridgeTransferEvents[0],
+        );
         if (parsed) {
           result.bridgeTransferEvent = {
             destination: parsed.args.destination,
@@ -194,7 +225,7 @@ export class SchedulerService {
 
       result.success = true;
       result.executionTime = Date.now() - startTime;
-      
+
       return result;
     } catch (error) {
       result.error = {
@@ -203,7 +234,7 @@ export class SchedulerService {
         reason: error.reason,
       };
       result.executionTime = Date.now() - startTime;
-      
+
       this.logger.error('❌ Manual Magic Time execution failed:', error);
       return result;
     }
