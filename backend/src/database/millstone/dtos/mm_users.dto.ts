@@ -1,4 +1,4 @@
-import { IsString, IsOptional,IsNumber,IsDate } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsDate } from 'class-validator';
 
 export class MmUsersDto {
   @IsString()
