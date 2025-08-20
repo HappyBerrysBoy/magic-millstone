@@ -15,6 +15,7 @@ import { JwtService } from '@common/jwt/jwt.service';
 import { MillstoneModule } from '@database/millstone/millstone.module';
 import { UserModule } from './user/user.module';
 import { PortfolioModule } from './portfolio/portfolio.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,6 +28,7 @@ import { PortfolioModule } from './portfolio/portfolio.module';
     MillstoneModule,
     UserModule,
     PortfolioModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [
