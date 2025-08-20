@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PortfolioRepository } from './portfolio.repository';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Contract, JsonRpcProvider } from 'ethers';
+import { Contract, formatUnits, JsonRpcProvider } from 'ethers';
 import { millstoneAIVaultAbi } from 'src/abis/millstoneAIVaultAbi';
 
 @Injectable()
@@ -186,7 +186,8 @@ export class PortfolioService {
       const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
       const apy =
         timeDiffYears > 0
-          ? (currentExchangeRate - exchangeRate.dataValues.rate) /
+          ? (Number(formatUnits(currentExchangeRate, 6)) -
+              exchangeRate.dataValues.rate) /
             exchangeRate.dataValues.rate /
             timeDiffYears
           : 0;
@@ -201,14 +202,15 @@ export class PortfolioService {
       await this.portfolioRepository.createExchangeRateHistory(
         portfolio.dataValues.tokenAddress,
         datetime,
-        currentExchangeRate,
+        Number(formatUnits(currentExchangeRate, 6)),
         transaction,
       );
 
       await this.portfolioRepository.createTvlHistory(
         portfolioId,
         datetime,
-        totalCurrentValue - accumulatedFeeAmount,
+        Number(formatUnits(totalCurrentValue, 6)) -
+          Number(formatUnits(accumulatedFeeAmount, 6)),
         transaction,
       );
 
