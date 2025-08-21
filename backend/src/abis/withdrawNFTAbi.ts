@@ -1,4 +1,4 @@
-export const vaultABI = [
+export const withdrawNFTAbi = [
   {
     inputs: [],
     name: 'AccessControlBadConfirmation',
@@ -48,6 +48,109 @@ export const vaultABI = [
     type: 'error',
   },
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721IncorrectOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC721InsufficientApproval',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'approver',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidApprover',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidOperator',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidReceiver',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+    ],
+    name: 'ERC721InvalidSender',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC721NonexistentToken',
+    type: 'error',
+  },
+  {
     inputs: [],
     name: 'EnforcedPause',
     type: 'error',
@@ -74,22 +177,6 @@ export const vaultABI = [
   },
   {
     inputs: [],
-    name: 'ReentrancyGuardReentrantCall',
-    type: 'error',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'SafeERC20FailedOperation',
-    type: 'error',
-  },
-  {
-    inputs: [],
     name: 'UUPSUnauthorizedCallContext',
     type: 'error',
   },
@@ -110,23 +197,23 @@ export const vaultABI = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'destination',
+        name: 'owner',
         type: 'address',
       },
       {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
+        indexed: true,
+        internalType: 'address',
+        name: 'approved',
+        type: 'address',
       },
       {
-        indexed: false,
+        indexed: true,
         internalType: 'uint256',
-        name: 'timestamp',
+        name: 'tokenId',
         type: 'uint256',
       },
     ],
-    name: 'BridgeTransfer',
+    name: 'Approval',
     type: 'event',
   },
   {
@@ -135,91 +222,23 @@ export const vaultABI = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'mmUSDTMinted',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
-      },
-    ],
-    name: 'Deposited',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'admin',
+        name: 'owner',
         type: 'address',
       },
       {
         indexed: true,
         internalType: 'address',
-        name: 'token',
+        name: 'operator',
         type: 'address',
       },
       {
         indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
+        internalType: 'bool',
+        name: 'approved',
+        type: 'bool',
       },
     ],
-    name: 'EmergencyWithdraw',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'oldRate',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'newRate',
-        type: 'uint256',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'updatedBy',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
-      },
-    ],
-    name: 'ExchangeRateUpdated',
+    name: 'ApprovalForAll',
     type: 'event',
   },
   {
@@ -327,6 +346,31 @@ export const vaultABI = [
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: false,
         internalType: 'address',
         name: 'account',
@@ -354,8 +398,33 @@ export const vaultABI = [
     inputs: [
       {
         indexed: true,
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
         internalType: 'address',
-        name: 'user',
+        name: 'from',
+        type: 'address',
+      },
+    ],
+    name: 'WithdrawNFTBurned',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'to',
         type: 'address',
       },
       {
@@ -367,72 +436,16 @@ export const vaultABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'nftId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
         name: 'timestamp',
         type: 'uint256',
       },
     ],
-    name: 'WithdrawExecuted',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'uint256',
-        name: 'nftId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
-      },
-    ],
-    name: 'WithdrawMarkedReady',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'nftId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'timestamp',
-        type: 'uint256',
-      },
-    ],
-    name: 'WithdrawRequested',
+    name: 'WithdrawNFTMinted',
     type: 'event',
   },
   {
     inputs: [],
-    name: 'ADMIN_ROLE',
+    name: 'BURNER_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -458,38 +471,12 @@ export const vaultABI = [
   },
   {
     inputs: [],
-    name: 'EXCHANGE_RATE_DECIMALS',
+    name: 'MINTER_ROLE',
     outputs: [
       {
-        internalType: 'uint256',
+        internalType: 'bytes32',
         name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'MINIMUM_DEPOSIT',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'MINIMUM_WITHDRAW',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
+        type: 'bytes32',
       },
     ],
     stateMutability: 'view',
@@ -535,27 +522,19 @@ export const vaultABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'bridgeBalance',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
         internalType: 'uint256',
-        name: 'amount',
+        name: 'tokenId',
         type: 'uint256',
       },
     ],
-    name: 'deposit',
+    name: 'approve',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -564,23 +543,11 @@ export const vaultABI = [
     inputs: [
       {
         internalType: 'address',
-        name: 'token',
+        name: 'owner',
         type: 'address',
       },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
     ],
-    name: 'emergencyWithdraw',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'exchangeRate',
+    name: 'balanceOf',
     outputs: [
       {
         internalType: 'uint256',
@@ -595,23 +562,29 @@ export const vaultABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'nftId',
+        name: 'tokenId',
         type: 'uint256',
       },
     ],
-    name: 'executeWithdraw',
+    name: 'burn',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'getExchangeRate',
-    outputs: [
+    inputs: [
       {
         internalType: 'uint256',
-        name: '',
+        name: 'tokenId',
         type: 'uint256',
+      },
+    ],
+    name: 'getApproved',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -619,20 +592,7 @@ export const vaultABI = [
   },
   {
     inputs: [],
-    name: 'getMaxTransferableAmount',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getRequiredReserves',
+    name: 'getCurrentTokenId',
     outputs: [
       {
         internalType: 'uint256',
@@ -663,19 +623,6 @@ export const vaultABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'getTotalRequestedWithdrawals',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'address',
@@ -683,64 +630,21 @@ export const vaultABI = [
         type: 'address',
       },
     ],
-    name: 'getUserInfo',
+    name: 'getUserWithdrawals',
     outputs: [
       {
-        internalType: 'uint256',
-        name: 'mmUSDTBalance',
-        type: 'uint256',
+        internalType: 'uint256[]',
+        name: 'tokenIds',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'amounts',
+        type: 'uint256[]',
       },
       {
         internalType: 'uint256',
-        name: 'userDepositAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'userWithdrawAmount',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getVaultInfo',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: 'usdtBalance',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'totalMmUSDTSupply',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'totalDepositedAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'totalWithdrawnAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'bridgeBalanceAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'totalRequestedAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'currentExchangeRate',
+        name: 'totalAmount',
         type: 'uint256',
       },
     ],
@@ -751,43 +655,55 @@ export const vaultABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'nftId',
+        name: 'tokenId',
         type: 'uint256',
       },
     ],
-    name: 'getWithdrawRequest',
+    name: 'getWithdrawRequestFromVault',
     outputs: [
       {
-        components: [
-          {
-            internalType: 'uint256',
-            name: 'amount',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'requestTime',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'readyTime',
-            type: 'uint256',
-          },
-          {
-            internalType: 'enum VaultContract.WithdrawStatus',
-            name: 'status',
-            type: 'uint8',
-          },
-          {
-            internalType: 'address',
-            name: 'requester',
-            type: 'address',
-          },
-        ],
-        internalType: 'struct VaultContract.WithdrawRequest',
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'requestTime',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'readyTime',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint8',
+        name: 'status',
+        type: 'uint8',
+      },
+      {
+        internalType: 'address',
+        name: 'requester',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getWithdrawalAmount',
+    outputs: [
+      {
+        internalType: 'uint256',
         name: '',
-        type: 'tuple',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -838,23 +754,23 @@ export const vaultABI = [
   {
     inputs: [
       {
+        internalType: 'string',
+        name: 'name',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'symbol',
+        type: 'string',
+      },
+      {
         internalType: 'address',
-        name: '_usdt',
+        name: 'admin',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_mmUSDTToken',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_withdrawNFT',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_admin',
+        name: '_vaultContract',
         type: 'address',
       },
     ],
@@ -867,45 +783,75 @@ export const vaultABI = [
     inputs: [
       {
         internalType: 'address',
-        name: 'destination',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'operator',
         type: 'address',
       },
     ],
-    name: 'magicTime',
+    name: 'isApprovedForAll',
     outputs: [
       {
-        internalType: 'uint256',
-        name: 'amountSent',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'neededAmount',
-        type: 'uint256',
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
       {
-        internalType: 'uint256[]',
-        name: 'nftIds',
-        type: 'uint256[]',
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
       },
     ],
-    name: 'markWithdrawReady',
-    outputs: [],
+    name: 'mint',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [],
-    name: 'mmUSDTToken',
+    name: 'name',
     outputs: [
       {
-        internalType: 'contract mmUSDT',
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ownerOf',
+    outputs: [
+      {
+        internalType: 'address',
         name: '',
         type: 'address',
       },
@@ -967,25 +913,6 @@ export const vaultABI = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'requestWithdraw',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'bytes32',
         name: 'role',
         type: 'bytes32',
@@ -1005,16 +932,21 @@ export const vaultABI = [
     inputs: [
       {
         internalType: 'address',
-        name: 'destination',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
         type: 'address',
       },
       {
         internalType: 'uint256',
-        name: 'amount',
+        name: 'tokenId',
         type: 'uint256',
       },
     ],
-    name: 'sendToBridge',
+    name: 'safeTransferFrom',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1022,12 +954,45 @@ export const vaultABI = [
   {
     inputs: [
       {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
         internalType: 'uint256',
-        name: 'newRate',
+        name: 'tokenId',
         type: 'uint256',
       },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
     ],
-    name: 'setExchangeRate',
+    name: 'safeTransferFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        internalType: 'bool',
+        name: 'approved',
+        type: 'bool',
+      },
+    ],
+    name: 'setApprovalForAll',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1053,28 +1018,57 @@ export const vaultABI = [
   },
   {
     inputs: [],
-    name: 'totalDeposited',
+    name: 'symbol',
     outputs: [
       {
-        internalType: 'uint256',
+        internalType: 'string',
         name: '',
-        type: 'uint256',
+        type: 'string',
       },
     ],
     stateMutability: 'view',
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'totalWithdrawn',
-    outputs: [
+    inputs: [
       {
         internalType: 'uint256',
-        name: '',
+        name: 'tokenId',
         type: 'uint256',
       },
     ],
+    name: 'tokenURI',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'transferFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -1085,8 +1079,14 @@ export const vaultABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'updatePendingWithdrawals',
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_newVaultContract',
+        type: 'address',
+      },
+    ],
+    name: 'updateVaultContract',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1111,61 +1111,10 @@ export const vaultABI = [
   },
   {
     inputs: [],
-    name: 'usdt',
+    name: 'vaultContract',
     outputs: [
-      {
-        internalType: 'contract IERC20',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
       {
         internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'userDeposits',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    name: 'userWithdrawals',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'withdrawNFT',
-    outputs: [
-      {
-        internalType: 'contract WithdrawNFT',
         name: '',
         type: 'address',
       },
@@ -1181,32 +1130,12 @@ export const vaultABI = [
         type: 'uint256',
       },
     ],
-    name: 'withdrawRequests',
+    name: 'withdrawalAmounts',
     outputs: [
       {
         internalType: 'uint256',
-        name: 'amount',
+        name: '',
         type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'requestTime',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'readyTime',
-        type: 'uint256',
-      },
-      {
-        internalType: 'enum VaultContract.WithdrawStatus',
-        name: 'status',
-        type: 'uint8',
-      },
-      {
-        internalType: 'address',
-        name: 'requester',
-        type: 'address',
       },
     ],
     stateMutability: 'view',

@@ -27,7 +27,9 @@ export default function Dashboard() {
       type MaybeWrapped<T> = ApiResponse<T> | T;
       const maybeWrapped = res as unknown as MaybeWrapped<PortfolioStatus>;
       const data =
-        typeof maybeWrapped === "object" && maybeWrapped !== null && "data" in maybeWrapped
+        typeof maybeWrapped === "object" &&
+        maybeWrapped !== null &&
+        "data" in maybeWrapped
           ? (maybeWrapped as ApiResponse<PortfolioStatus>).data
           : (maybeWrapped as PortfolioStatus);
       if (data) setStatus(data);
@@ -57,8 +59,8 @@ export default function Dashboard() {
   const timeLeft = "—";
 
   return (
-    <div className="flex min-h-[calc(100vh-148px)] flex-col">
-      <main className="mx-auto w-full h-full max-w-md flex flex-col flex-1 gap-[28px] pt-[30px]">
+    <div className="flex min-h-[calc(100vh-124px)] flex-col pt-[50px]">
+      <main className="mx-auto flex h-full w-full max-w-md flex-1 flex-col gap-[28px]">
         <VaultStats tvl={tvl} apy={apy} timeLeft={timeLeft} />
         <ChartTabs
           apyData={status?.dailyApyChart || []}

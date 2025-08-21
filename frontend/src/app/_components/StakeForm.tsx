@@ -1,0 +1,214 @@
+"use client";
+
+import { testUSDTABI } from "@/app/_abis/testUSDT";
+import { vaultABI } from "@/app/_abis/vault";
+import ButtonDefault from "@/app/_components/ButtonDefault";
+import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
+import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
+import { useCountdownToNoonMidnight } from "@/app/hooks/time.hooks";
+import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
+import { vaultContractAddress } from "@/utils/contractAddress";
+import { microUSDTHexToUSDTDecimal } from "@/utils/format";
+import { usdtTokenAddress } from "@/utils/tokenAddress";
+import { parseUnits } from "ethers";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+interface PercentageButtonProps {
+  percentage: number;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+function PercentageButton({
+  percentage,
+  isActive,
+  onClick,
+}: PercentageButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-fit rounded-[20px] px-2 py-1 text-[10px] font-medium transition-colors ${
+        isActive
+          ? "bg-primary text-black"
+          : "bg-mm-gray-default hover:bg-primary text-black"
+      }`}
+    >
+      {percentage}%
+    </button>
+  );
+}
+
+export default function StakeForm() {
+  const { account } = useWalletAccountStore();
+  const { getErc20TokenBalance, sendContractTransaction, web3Provider } =
+    useKaiaWalletSdk();
+
+  const { timeLeft, targetLabel } = useCountdownToNoonMidnight();
+  const [stakeAmount, setStakeAmount] = useState<number>(0);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [selectedPercentage, setSelectedPercentage] = useState<number | null>(
+    null,
+  );
+  const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
+  const [isStaking, setIsStaking] = useState<boolean>(false);
+  const router = useRouter();
+
+  const fetchBalance = async () => {
+    if (account) {
+      getErc20TokenBalance(usdtTokenAddress, account).then((balance) => {
+        const formattedUSDTBalance = Number(
+          microUSDTHexToUSDTDecimal(balance as string),
+        ).toFixed(2);
+        console.log(`balance updated ${formattedUSDTBalance}`);
+        setUsdtBalance(formattedUSDTBalance);
+      });
+    }
+  };
+  useEffect(() => {
+    fetchBalance();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account]);
+
+  // Handle stake request
+  const handleStakeRequest = async () => {
+    if (!account || stakeAmount <= 0 || isStaking) return;
+
+    try {
+      setIsStaking(true);
+
+      // Convert withdrawal amount to wei (6 decimals for mmUSDT)
+      console.log(stakeAmount);
+      const withdrawAmountWei = parseUnits(stakeAmount.toString(), 6);
+      console.log(`Allowance USDT : ${usdtBalance}`);
+      console.log(`Requesting withdrawal of ${stakeAmount} USDT`);
+      console.log(`Amount in wei: ${withdrawAmountWei.toString()}`);
+
+      // Call requestWithdraw on the VaultContract
+
+      const approveHash = await sendContractTransaction(
+        usdtTokenAddress,
+        testUSDTABI as unknown as unknown[],
+        "approve",
+        [vaultContractAddress, withdrawAmountWei],
+      );
+      console.log("response : ", approveHash);
+      const approveReceipt = await web3Provider!.waitForTransaction(
+        approveHash as string,
+      );
+      if (!approveReceipt || approveReceipt.status !== 1) {
+        throw new Error("Approve failed");
+      }
+      console.log("✅ Approve confirmed!");
+
+      const depositTx = await sendContractTransaction(
+        vaultContractAddress,
+        vaultABI as unknown as unknown[],
+        "deposit",
+        [withdrawAmountWei],
+      );
+      console.log("depositTx :", depositTx);
+      console.log("✅ Stake request sent successfully!");
+
+      // Reset form
+      setStakeAmount(0);
+      setInputValue("");
+      setSelectedPercentage(null);
+    } catch (error: any) {
+      console.error("❌ Stake request failed:", error);
+
+      // Handle specific error cases
+      if (error.message?.includes("Insufficient mmUSDT balance")) {
+        alert("Insufficient mmUSDT balance for Stake");
+      } else if (error.message?.includes("Amount too small")) {
+        alert("Stake amount is below minimum requirement");
+      } else {
+        alert(`Stake failed: ${error.message || "Unknown error"}`);
+      }
+    } finally {
+      setIsStaking(false);
+      fetchBalance();
+    }
+  };
+
+  const percentages = [25, 50, 75, 100];
+
+  const formatDisplayValue = (value: string): string => {
+    // Split into whole and decimal parts
+    const [wholePart, decimalPart] = value.split(".");
+
+    // Format the whole part with commas
+    const formattedWhole = parseInt(wholePart || "0").toLocaleString("en-US");
+
+    // Return with decimal part if it exists
+    return decimalPart !== undefined
+      ? `${formattedWhole}.${decimalPart}`
+      : formattedWhole;
+  };
+
+  const handlePercentageClick = (percentage: number) => {
+    const amount = (Number(usdtBalance) * percentage) / 100;
+    setStakeAmount(amount);
+    setSelectedPercentage(percentage);
+    setInputValue(formatDisplayValue(amount.toFixed(2)));
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Remove commas but keep numbers and dots
+    const cleanValue = value.replace(/,/g, "");
+
+    // Only allow numbers and one decimal point
+    if (!/^\d*\.?\d*$/.test(cleanValue)) return;
+
+    const numValue = parseFloat(cleanValue) || 0;
+    setStakeAmount(numValue);
+    setSelectedPercentage(null);
+
+    // Format in real-time while typing
+    if (cleanValue) {
+      setInputValue(formatDisplayValue(cleanValue));
+    } else {
+      setInputValue("");
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-end gap-2">
+          {percentages.map((percentage) => (
+            <PercentageButton
+              key={percentage}
+              percentage={percentage}
+              isActive={selectedPercentage === percentage}
+              onClick={() => handlePercentageClick(percentage)}
+            />
+          ))}
+        </div>
+        <div className="border-primary flex flex-col gap-5 rounded-lg border-[0.8px] p-3">
+          <div className="text-mm-gray-default flex items-center justify-between text-[10px] font-normal">
+            <p>Stake</p>
+            <p>Balance: {formatNumberWithCommas(usdtBalance)} USDT</p>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <div className="flex items-center gap-1 text-2xl font-normal text-white">
+              <span className="">$</span>
+              <input
+                type="text"
+                value={inputValue}
+                onChange={handleInputChange}
+                placeholder="0.00"
+                className="bg-taransparent w-full border-none font-normal text-white outline-none"
+              />
+            </div>
+            <p className="text-base font-normal text-white">USDT</p>
+          </div>
+        </div>
+      </div>
+      <ButtonDefault theme="primary" onClick={handleStakeRequest}>
+        Stake
+      </ButtonDefault>
+    </div>
+  );
+}

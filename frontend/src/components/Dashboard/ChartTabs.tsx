@@ -24,7 +24,7 @@ const ChartTabs: React.FC<ChartTabsProps> = ({ apyData, ppsData, tvlData }) => {
         {TAB_LIST.map((tab) => (
           <button
             key={tab.key}
-            className={`border-primary flex-1 border-b-1 py-2 text-[12px] ${selected === tab.key ? "text-primary" : "text-[#ABB4B4]"}`}
+            className={`flex-1 border-b-1 py-2 text-[12px] ${selected === tab.key ? "text-primary border-primary" : "border-transparent text-[#ABB4B4]"}`}
             onClick={() => setSelected(tab.key)}
           >
             {tab.label}
@@ -33,13 +33,25 @@ const ChartTabs: React.FC<ChartTabsProps> = ({ apyData, ppsData, tvlData }) => {
       </div>
       <div className="flex h-[250px] items-center justify-center">
         {selected === "apy" && (
-          <ChartAreaLinear data={apyData} seriesLabel="Daily APY" color="#00E6F2" />
+          <ChartAreaLinear
+            data={apyData}
+            seriesLabel="Daily APY"
+            color="#00E6F2"
+          />
         )}
         {selected === "pps" && (
-          <ChartAreaLinear data={ppsData} seriesLabel="Price per share" color="#00E6F2" />
+          <ChartAreaLinear
+            data={ppsData}
+            seriesLabel="Price per share"
+            color="#00E6F2"
+          />
         )}
         {selected === "tvl" && (
-          <ChartAreaLinear data={tvlData} seriesLabel="TVL History" color="#00E6F2" />
+          <ChartAreaLinear
+            data={tvlData}
+            seriesLabel="TVL History"
+            color="#00E6F2"
+          />
         )}
       </div>
     </div>

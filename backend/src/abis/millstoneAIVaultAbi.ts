@@ -1495,4 +1495,4 @@ export const millstoneAIVaultAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-];
+] as const;
