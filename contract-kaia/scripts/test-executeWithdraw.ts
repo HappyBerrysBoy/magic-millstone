@@ -7,11 +7,11 @@ async function main() {
   console.log("User address:", user.address);
 
   const VAULT_ADDRESS = process.env.VAULT_ADDRESS;
-  const TESTUUSDT_ADDRESS = process.env.TESTUUSDT_ADDRESS;
+  const USDT_ADDRESS = process.env.USDT_ADDRESS;
   const WITHDRAWNFT_ADDRESS = process.env.WITHDRAWNFT_ADDRESS;
   const NFT_ID = process.env.NFT_ID;
 
-  if (!VAULT_ADDRESS || !TESTUUSDT_ADDRESS || !WITHDRAWNFT_ADDRESS) {
+  if (!VAULT_ADDRESS || !USDT_ADDRESS || !WITHDRAWNFT_ADDRESS) {
     console.error("❌ Missing contract addresses in environment");
     process.exit(1);
   }
@@ -21,7 +21,7 @@ async function main() {
     "VaultContract",
     VAULT_ADDRESS
   );
-  const testUSDT = await ethers.getContractAt("TestUSDT", TESTUUSDT_ADDRESS);
+  const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
   const withdrawNFT = await ethers.getContractAt(
     "WithdrawNFT",
     WITHDRAWNFT_ADDRESS

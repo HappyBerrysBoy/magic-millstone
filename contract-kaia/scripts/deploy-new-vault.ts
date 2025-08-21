@@ -13,13 +13,15 @@ async function main() {
   );
 
   // Get existing token addresses from environment
-  const USDT_ADDRESS = process.env.TESTUUSDT_ADDRESS;
+  const USDT_ADDRESS = process.env.USDT_ADDRESS;
   const MMUSDT_ADDRESS = process.env.MMUSDT_ADDRESS;
   const WITHDRAWNFT_ADDRESS = process.env.WITHDRAWNFT_ADDRESS;
 
   if (!USDT_ADDRESS || !MMUSDT_ADDRESS || !WITHDRAWNFT_ADDRESS) {
     console.error("❌ Missing required environment variables");
-    console.error("Required: TESTUUSDT_ADDRESS, MMUSDT_ADDRESS, WITHDRAWNFT_ADDRESS");
+    console.error(
+      "Required: USDT_ADDRESS, MMUSDT_ADDRESS, WITHDRAWNFT_ADDRESS"
+    );
     process.exit(1);
   }
 
@@ -32,19 +34,19 @@ async function main() {
     // Deploy new VaultContract
     console.log("\n1. Deploying new VaultContract...");
     const VaultContract = await ethers.getContractFactory("VaultContract");
-    
+
     const vault = await upgrades.deployProxy(
       VaultContract,
       [
         USDT_ADDRESS,
         MMUSDT_ADDRESS,
         WITHDRAWNFT_ADDRESS,
-        await deployer.getAddress()
+        await deployer.getAddress(),
       ],
-      { 
+      {
         initializer: "initialize",
         kind: "uups",
-        timeout: 120000
+        timeout: 120000,
       }
     );
 
@@ -56,13 +58,16 @@ async function main() {
 
     // Test the new contract
     console.log("\n2. Testing new contract functionality...");
-    
+
     // Check initial state
     const isPaused = await vault.paused();
     console.log("✅ Contract paused status:", isPaused);
 
     const exchangeRate = await vault.getExchangeRate();
-    console.log("✅ Initial exchange rate:", ethers.formatUnits(exchangeRate, 6));
+    console.log(
+      "✅ Initial exchange rate:",
+      ethers.formatUnits(exchangeRate, 6)
+    );
 
     // Test the new depositToVault function exists
     console.log("\n3. Testing new depositToVault function...");
@@ -70,7 +75,9 @@ async function main() {
       await vault.depositToVault.staticCall(0);
     } catch (error: any) {
       if (error.message.includes("Amount must be greater than 0")) {
-        console.log("✅ depositToVault function exists and validates correctly!");
+        console.log(
+          "✅ depositToVault function exists and validates correctly!"
+        );
       } else {
         console.log("⚠️  depositToVault function validation:", error.message);
       }
@@ -90,10 +97,11 @@ async function main() {
     console.log("\n🎉 Deployment completed successfully!");
     console.log("✅ New VaultContract includes the depositToVault function");
     console.log("✅ Function allows USDT transfers without minting mmUSDT");
-    console.log("✅ Function automatically calls _updatePendingWithdrawalsToReady()");
+    console.log(
+      "✅ Function automatically calls _updatePendingWithdrawalsToReady()"
+    );
     console.log("\n📝 Update your .env file with the new VAULT_ADDRESS:");
     console.log(`VAULT_ADDRESS=${vaultAddress}`);
-
   } catch (error) {
     console.error("❌ Deployment failed:", error);
     process.exit(1);

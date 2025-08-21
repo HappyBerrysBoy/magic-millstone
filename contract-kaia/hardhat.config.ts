@@ -22,6 +22,12 @@ const config: HardhatUserConfig = {
         ? [process.env.KAIROS_PRIVATE_KEY]
         : [],
     },
+    kaia: {
+      url: "https://public-en.node.kaia.io",
+      accounts: process.env.KAIA_PRIVATE_KEY
+        ? [process.env.KAIA_PRIVATE_KEY]
+        : [],
+    },
   },
 };
 

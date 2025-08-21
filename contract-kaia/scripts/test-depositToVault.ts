@@ -4,15 +4,14 @@ async function main(): Promise<void> {
   const [user] = await ethers.getSigners();
 
   // Get contract addresses from environment
-  const TESTUUSDT_ADDRESS: string =
-    process.env.TESTUUSDT_ADDRESS || "YOUR_TESTUUSDT_ADDRESS";
+  const USDT_ADDRESS: string = process.env.USDT_ADDRESS || "YOUR_USDT_ADDRESS";
   const VAULT_ADDRESS: string =
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
   const MMUSDT_ADDRESS: string =
     process.env.MMUSDT_ADDRESS || "YOUR_MMUSDT_ADDRESS";
 
   // Connect to deployed contracts
-  const testUSDT = await ethers.getContractAt("TestUSDT", TESTUUSDT_ADDRESS);
+  const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
   const vaultContract = await ethers.getContractAt(
     "VaultContract",
     VAULT_ADDRESS
