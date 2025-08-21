@@ -95,6 +95,30 @@ contract WithdrawNFT is
         return _tokenIdCounter;
     }
 
+    function getUserWithdrawals(address user) external view returns (uint256[] memory tokenIds, uint256[] memory amounts, uint256 totalAmount) {
+        uint256 balance = balanceOf(user);
+        tokenIds = new uint256[](balance);
+        amounts = new uint256[](balance);
+        totalAmount = 0;
+        
+        uint256 found = 0;
+        for (uint256 i = 1; i < _tokenIdCounter && found < balance; i++) {
+            if (_exists(i)) {
+                try this.ownerOf(i) returns (address owner) {
+                    if (owner == user) {
+                        tokenIds[found] = i;
+                        amounts[found] = withdrawalAmounts[i];
+                        totalAmount += withdrawalAmounts[i];
+                        found++;
+                    }
+                } catch {
+                    // Skip if ownerOf reverts
+                    continue;
+                }
+            }
+        }
+    }
+
     function updateVaultContract(address _newVaultContract) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(_newVaultContract != address(0), "WithdrawNFT: Invalid vault address");
         vaultContract = _newVaultContract;

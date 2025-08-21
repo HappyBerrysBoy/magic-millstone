@@ -45,7 +45,7 @@ async function main(): Promise<void> {
   // Set withdrawal amount (default 50 mmUSDT or environment variable)
   const withdrawAmount = process.env.WITHDRAW_AMOUNT
     ? ethers.parseUnits(process.env.WITHDRAW_AMOUNT, 6)
-    : ethers.parseUnits("200", 6);
+    : ethers.parseUnits("10", 6);
 
   console.log(
     "Requested withdrawal amount:",

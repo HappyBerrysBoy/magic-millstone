@@ -27,7 +27,7 @@ async function main() {
     WITHDRAWNFT_ADDRESS
   );
 
-  const nftId = NFT_ID ? parseInt(NFT_ID) : 9;
+  const nftId = NFT_ID ? parseInt(NFT_ID) : 16;
 
   console.log("\n🎫 NFT ID to execute:", nftId);
 

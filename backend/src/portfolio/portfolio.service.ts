@@ -1,9 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PortfolioRepository } from './portfolio.repository';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { Contract, formatUnits, JsonRpcProvider } from 'ethers';
+import { millstoneAIVaultAbi } from 'src/abis/millstoneAIVaultAbi';
 
 @Injectable()
 export class PortfolioService {
-  constructor(private readonly portfolioRepository: PortfolioRepository) {}
+  private providers: { [chainId: string]: JsonRpcProvider } = {};
+
+  constructor(private readonly portfolioRepository: PortfolioRepository) {
+    const rpcUrls = JSON.parse(process.env.RPC_URLS!);
+
+    Object.entries(rpcUrls).forEach(([chainId, rpcUrl]) => {
+      const provider = new JsonRpcProvider(rpcUrl as string);
+      this.providers[chainId] = provider;
+    });
+  }
 
   async getVaultStatus(portfolioId: string): Promise<any> {
     try {
@@ -124,6 +136,89 @@ export class PortfolioService {
     } catch (error) {
       throw new BadRequestException(
         error.message || 'Failed to get vault stats',
+      );
+    }
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async createPortfolioStatus() {
+    const transaction = await this.portfolioRepository.createTransaction();
+    try {
+      const portfolioId = 'magic-millstone-usdt';
+      const portfolio =
+        await this.portfolioRepository.getPortfolioById(portfolioId);
+      if (!portfolio) {
+        throw new BadRequestException('Portfolio not found');
+      }
+
+      const datetime = new Date();
+      const millstoneAIVaultContract = new Contract(
+        process.env.MILLSTONE_AI_VAULT_ADDRESS!,
+        millstoneAIVaultAbi,
+        this.providers['1'],
+      );
+
+      const [
+        currentExchangeRate,
+        totalSupply,
+        totalCurrentValue,
+        underlyingDepositedAmount,
+        accumulatedFeeAmount,
+      ] = await millstoneAIVaultContract.getStakedTokenInfo(
+        process.env.USDT_ADDRESS!,
+      );
+
+      const exchangeRateHsts =
+        await this.portfolioRepository.getExchangeRateHistoryByPortfolioId(
+          portfolio.dataValues.tokenAddress,
+        );
+      const exchangeRate =
+        exchangeRateHsts.length > 0
+          ? exchangeRateHsts.reduce((latest, curr) =>
+              curr.dataValues.datetime > latest.dataValues.datetime
+                ? curr
+                : latest,
+            )
+          : null;
+
+      const timeDiffMs =
+        datetime.getTime() - exchangeRate.dataValues.datetime.getTime();
+      const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
+      const apy =
+        timeDiffYears > 0
+          ? (Number(formatUnits(currentExchangeRate, 6)) -
+              exchangeRate.dataValues.rate) /
+            exchangeRate.dataValues.rate /
+            timeDiffYears
+          : 0;
+
+      await this.portfolioRepository.createApyHistory(
+        portfolioId,
+        datetime,
+        apy,
+        transaction,
+      );
+
+      await this.portfolioRepository.createExchangeRateHistory(
+        portfolio.dataValues.tokenAddress,
+        datetime,
+        Number(formatUnits(currentExchangeRate, 6)),
+        transaction,
+      );
+
+      await this.portfolioRepository.createTvlHistory(
+        portfolioId,
+        datetime,
+        Number(formatUnits(totalCurrentValue, 6)) -
+          Number(formatUnits(accumulatedFeeAmount, 6)),
+        transaction,
+      );
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw new BadRequestException(
+        error.message || 'Failed to set portfolio status',
       );
     }
   }
