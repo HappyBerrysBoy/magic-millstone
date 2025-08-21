@@ -1,16 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { ethers } from 'ethers';
+import { Contract, formatUnits, JsonRpcProvider, Wallet } from 'ethers';
 import { vaultABI } from '../abis/vault';
 import { millstoneAIVaultAbi } from 'src/abis/millstoneAIVaultAbi';
 
 @Injectable()
 export class SchedulerService {
   private readonly logger = new Logger(SchedulerService.name);
-  private provider: ethers.JsonRpcProvider;
-  private wallet: ethers.Wallet;
-  private vaultContract: ethers.Contract;
-  private providers: { [chainId: string]: ethers.JsonRpcProvider } = {};
+  private kaiaProvider: JsonRpcProvider;
+  private kaiaWallet: Wallet;
+  private kaiaVaultContract: Contract;
+  private ethProvider: JsonRpcProvider;
+  private ethWallet: Wallet;
+  private ethVaultContract: Contract;
 
   constructor() {
     this.initializeContract();
@@ -18,7 +20,7 @@ export class SchedulerService {
 
   private initializeContract() {
     try {
-      const rpcUrl =
+      const kaiaRpcUrl =
         process.env.KAIA_RPC_URL || 'https://public-en.node.kaia.io';
       const privateKey = process.env.ADMIN_PRIVATE_KEY;
       const vaultAddress = process.env.VAULT_ADDRESS;
@@ -30,24 +32,27 @@ export class SchedulerService {
         throw new Error('VAULT_ADDRESS environment variable is required');
       }
 
-      this.provider = new ethers.JsonRpcProvider(rpcUrl);
-      this.wallet = new ethers.Wallet(privateKey, this.provider);
+      this.kaiaProvider = new JsonRpcProvider(kaiaRpcUrl);
+      this.kaiaWallet = new Wallet(privateKey, this.kaiaProvider);
 
-      this.vaultContract = new ethers.Contract(
+      this.kaiaVaultContract = new Contract(
         vaultAddress,
         vaultABI,
-        this.wallet,
+        this.kaiaWallet,
       );
 
-      const rpcUrls = JSON.parse(process.env.RPC_URLS!);
-      Object.entries(rpcUrls).forEach(([chainId, rpcUrl]) => {
-        const provider = new ethers.JsonRpcProvider(rpcUrl as string);
-        this.providers[chainId] = provider;
-      });
+      const ethRpcUrls = process.env.ETH_RPC_URLS || 'https://eth.drpc.org';
+      this.ethProvider = new JsonRpcProvider(ethRpcUrls);
+      this.ethWallet = new Wallet(privateKey, this.ethProvider);
+      this.ethVaultContract = new Contract(
+        process.env.MILLSTONE_AI_VAULT_ADDRESS!,
+        millstoneAIVaultAbi,
+        this.ethWallet,
+      );
 
       this.logger.log('Scheduler service initialized successfully');
       this.logger.log(`Vault address: ${vaultAddress}`);
-      this.logger.log(`Admin address: ${this.wallet.address}`);
+      this.logger.log(`Admin address: ${this.kaiaWallet.address}`);
     } catch (error) {
       this.logger.error('Failed to initialize scheduler service:', error);
       throw error;
@@ -71,37 +76,31 @@ export class SchedulerService {
     this.logger.log(`Bridge destination: ${bridgeAddress}`);
 
     try {
-      const millstoneAIVaultContract = new ethers.Contract(
-        process.env.MILLSTONE_AI_VAULT_ADDRESS!,
-        millstoneAIVaultAbi,
-        this.providers['1'],
-      );
-
       const [
         currentExchangeRate,
         totalSupply,
         totalCurrentValue,
         underlyingDepositedAmount,
         accumulatedFeeAmount,
-      ] = await millstoneAIVaultContract.getStakedTokenInfo(
+      ] = await this.ethVaultContract.getStakedTokenInfo(
         process.env.USDT_ADDRESS!,
       );
 
-      await this.vaultContract.setExchangeRate(currentExchangeRate);
+      await this.kaiaVaultContract.setExchangeRate(currentExchangeRate);
 
       this.logger.log('🔍 Checking magicTime return values...');
       const staticResult =
-        await this.vaultContract.magicTime.staticCall(bridgeAddress);
+        await this.kaiaVaultContract.magicTime.staticCall(bridgeAddress);
       const amountSent = staticResult[0];
       const amountNeeded = staticResult[1];
 
       this.logger.log(
-        `Static call results: amountSent=${ethers.formatUnits(amountSent, 6)} USDT, amountNeeded=${ethers.formatUnits(amountNeeded, 6)} USDT`,
+        `Static call results: amountSent=${formatUnits(amountSent, 6)} USDT, amountNeeded=${formatUnits(amountNeeded, 6)} USDT`,
       );
 
       // Execute the actual transaction
       this.logger.log('🚀 Executing magicTime transaction...');
-      const tx = await this.vaultContract.magicTime(bridgeAddress);
+      const tx = await this.kaiaVaultContract.magicTime(bridgeAddress);
       this.logger.log(`Transaction sent: ${tx.hash}`);
 
       const receipt = await tx.wait();
@@ -111,7 +110,7 @@ export class SchedulerService {
 
       const bridgeTransferEvents = receipt.logs.filter((log: any) => {
         try {
-          const parsed = this.vaultContract.interface.parseLog(log);
+          const parsed = this.kaiaVaultContract.interface.parseLog(log);
           return parsed && parsed.name === 'BridgeTransfer';
         } catch {
           return false;
@@ -119,14 +118,14 @@ export class SchedulerService {
       });
 
       if (bridgeTransferEvents.length > 0) {
-        const parsed = this.vaultContract.interface.parseLog(
+        const parsed = this.kaiaVaultContract.interface.parseLog(
           bridgeTransferEvents[0],
         );
         if (parsed) {
           this.logger.log('🎉 Funds transferred successfully:');
           this.logger.log(`  Destination: ${parsed.args.destination}`);
           this.logger.log(
-            `  Amount: ${ethers.formatUnits(parsed.args.amount, 6)} USDT`,
+            `  Amount: ${formatUnits(parsed.args.amount, 6)} USDT`,
           );
         }
       } else {
@@ -134,10 +133,13 @@ export class SchedulerService {
           '⚠️ No funds transferred - we need to deposit more USDT to vault',
         );
         this.logger.warn(
-          `💰 Amount needed: ${ethers.formatUnits(amountNeeded, 6)} USDT`,
+          `💰 Amount needed: ${formatUnits(amountNeeded, 6)} USDT`,
         );
 
-        // TODO: 부족한 만큼 Morpho 혹은 AAVE에 withdrawal 신청
+        await this.ethVaultContract.withdrawForUser(
+          process.env.USDT_ADDRESS!,
+          amountNeeded,
+        );
       }
       this.logger.log('🪄 Magic Time execution completed');
     } catch (error) {
@@ -182,28 +184,26 @@ export class SchedulerService {
     try {
       // Get static call results first
       const staticResult =
-        await this.vaultContract.magicTime.staticCall(bridgeAddress);
+        await this.kaiaVaultContract.magicTime.staticCall(bridgeAddress);
       const amountSent = staticResult[0];
       const amountNeeded = staticResult[1];
 
-      result.amountSent = ethers.formatUnits(amountSent, 6);
-      result.amountNeeded = ethers.formatUnits(amountNeeded, 6);
+      result.amountSent = formatUnits(amountSent, 6);
+      result.amountNeeded = formatUnits(amountNeeded, 6);
 
       // Execute the transaction
-      const tx = await this.vaultContract.magicTime(bridgeAddress);
+      const tx = await this.kaiaVaultContract.magicTime(bridgeAddress);
       result.transactionHash = tx.hash;
 
       const receipt = await tx.wait();
       result.blockNumber = receipt.blockNumber;
       result.gasUsed = receipt.gasUsed.toString();
-      result.gasPrice = tx.gasPrice
-        ? ethers.formatUnits(tx.gasPrice, 'gwei')
-        : null;
+      result.gasPrice = tx.gasPrice ? formatUnits(tx.gasPrice, 'gwei') : null;
 
       // Check for BridgeTransfer events
       const bridgeTransferEvents = receipt.logs.filter((log: any) => {
         try {
-          const parsed = this.vaultContract.interface.parseLog(log);
+          const parsed = this.kaiaVaultContract.interface.parseLog(log);
           return parsed && parsed.name === 'BridgeTransfer';
         } catch {
           return false;
@@ -211,13 +211,13 @@ export class SchedulerService {
       });
 
       if (bridgeTransferEvents.length > 0) {
-        const parsed = this.vaultContract.interface.parseLog(
+        const parsed = this.kaiaVaultContract.interface.parseLog(
           bridgeTransferEvents[0],
         );
         if (parsed) {
           result.bridgeTransferEvent = {
             destination: parsed.args.destination,
-            amount: ethers.formatUnits(parsed.args.amount, 6),
+            amount: formatUnits(parsed.args.amount, 6),
             timestamp: parsed.args.timestamp.toString(),
           };
         }
@@ -243,8 +243,8 @@ export class SchedulerService {
   // Check scheduler status
   getSchedulerStatus() {
     return {
-      isInitialized: !!this.vaultContract,
-      walletAddress: this.wallet?.address,
+      isInitialized: !!this.kaiaVaultContract,
+      kaiaWalletAddress: this.kaiaWallet?.address,
       vaultAddress: process.env.VAULT_ADDRESS,
       bridgeAddress: process.env.BRIDGE_DESTINATION_ADDRESS,
       nextMidnightUTC: this.getNextMidnightUTC(),
