@@ -3,19 +3,14 @@ import { WalletButton } from "@/components/Button/WalletButton";
 import { useState, useEffect } from "react";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
-import Modal from "@/components/Common/Modal";
-import DepositForm from "@/components/DepositForm";
 import { keiHexToKaiaDecimal, microUSDTHexToUSDTDecimal } from "@/utils/format";
-import Image from "next/image";
-import VaultStats from "@/components/Dashboard/VaultStats";
 import HomeStats from "@/components/HomeStats";
-import NextMagicTime from "@/components/NextMagicTime";
-import { time } from "console";
-import ButtonDefault from "@/app/_components/ButtonDefault";
 import { useRouter } from "next/navigation";
 import { callApi } from "./_utils/callApi";
 import MillstoneIcon from "public/svgs/MillstoneIcon";
 import MillstoneTextIcon from "public/svgs/MillstoneTextIcon";
+import StakeForm from "./_components/StakeForm";
+import ButtonDefault from "./_components/ButtonDefault";
 
 const USDTContractAddress = "0xf6A77faA9d860a9218E0ab02Ac77AEe03c027372";
 
@@ -78,14 +73,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
-  const handleStake = async (amount: number) => {
-    // TODO: 실제 deposit 로직으로 대체
-    // await deposit(amount);
-    // setDepositOpen(false);
-    // await fetchBalance(); // 예치 후 잔액 새로고침
-    // router.push("/holdings/stake");
-  };
-
   return (
     <div className="flex min-h-[calc(100vh-124px)] flex-col gap-[68px] pt-[50px]">
       <header className="flex w-full justify-center">
@@ -94,30 +81,12 @@ export default function Home() {
             <MillstoneIcon className="h-10 w-10" />
             <MillstoneTextIcon className="h-[46px] w-[285px]" />
           </div>
-          <p>Stake more and more</p>
+          <p className="text-lg font-medium text-white">Stake more and more</p>
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-md flex-col gap-[92px]">
-        <DepositForm
-          balance={Number(usdtBalance)}
-          onStake={handleStake}
-          onClose={() => setDepositOpen(false)}
-        />
+      <main className="mx-auto flex w-full max-w-md flex-col gap-20">
+        {account ? <StakeForm /> : <WalletButton />}
         <HomeStats tvl={tvl} apy={apy} />
-        {/* <div className="mt-auto">
-          {account ? (
-            <div className="mx-4 mb-4">
-              <ButtonDefault
-                theme="primary"
-                onClick={() => router.push("/holdings/stake")}
-              >
-                Stake USDT
-              </ButtonDefault>
-            </div>
-          ) : (
-            <WalletButton />
-          )}
-        </div> */}
       </main>
     </div>
   );

@@ -1,18 +1,23 @@
-'use client';
+"use client";
 
 interface ButtonDefaultProps {
   children: React.ReactNode;
   onClick?: () => void;
-  theme?: 'primary' | 'outline' | 'secondary';
+  theme?: "primary" | "outline" | "secondary";
   disabled?: boolean;
 }
 
-export default function ButtonDefault({ children, onClick, theme = 'outline', disabled = false }: ButtonDefaultProps) {
+export default function ButtonDefault({
+  children,
+  onClick,
+  theme = "outline",
+  disabled = false,
+}: ButtonDefaultProps) {
   const getThemeClasses = () => {
     switch (theme) {
-      case 'primary':
+      case "primary":
         return "text-black bg-primary";
-      case 'outline':
+      case "outline":
         return "text-mm-gray-light bg-transparent border-[1px] border-mm-gray-light";
       default:
         return "text-black bg-primary";
@@ -20,8 +25,8 @@ export default function ButtonDefault({ children, onClick, theme = 'outline', di
   };
 
   return (
-    <button 
-      className={`${getThemeClasses()} py-3 rounded-[20px] w-full text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+    <button
+      className={`${getThemeClasses()} w-full cursor-pointer rounded-[20px] py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50`}
       onClick={onClick}
       disabled={disabled}
     >
