@@ -1,3 +1,4 @@
+import { formatBigNumber } from "@/app/_utils/formatFuncs";
 import React from "react";
 
 interface VaultStatsProps {
@@ -6,18 +7,19 @@ interface VaultStatsProps {
 }
 
 const HomeStats: React.FC<VaultStatsProps> = ({ tvl, apy }) => {
+  tvl = 3100000;
+  apy = 12.7;
   return (
-    <div>
-      {/* Content */}
-      <div className="flex items-center justify-between mb-[28px]">
-        <div>
-          <div className="mb-[6px] text-[28px] ">${tvl}</div>
-          <div className="text-[10px] text-[#C7D2D3] font-normal">Total Value Locked</div>
-        </div>
+    <div className="flex w-full items-center justify-center gap-16">
+      <div className="flex flex-col items-center">
+        <p className="text-mm-gray-light text-base font-medium">TVL</p>
+        <p className="text-[40px] font-medium">{formatBigNumber(tvl)}</p>
       </div>
-      <div>
-        <div className="mb-[6px] text-[28px] font-normal">{apy}</div>
-        <div className="text-[10px] text-[#C7D2D3]">Next APY (24h)</div>
+      <div className="flex flex-col items-center">
+        <p className="text-mm-gray-light text-base font-medium">Next APY</p>
+        <p className="text-primary text-[40px] font-medium">
+          {apy.toFixed(2)} %
+        </p>
       </div>
     </div>
   );

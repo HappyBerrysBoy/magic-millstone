@@ -72,4 +72,52 @@ export class PortfolioRepository {
       transaction,
     });
   }
+
+  async createExchangeRateHistory(
+    tokenAddress: string,
+    datetime: Date,
+    rate: number,
+    transaction: Transaction,
+  ): Promise<mm_exchange_rate_hsts> {
+    return await this.dbMillstone.models.mm_exchange_rate_hsts.create(
+      {
+        tokenAddress,
+        datetime,
+        rate,
+      },
+      { transaction },
+    );
+  }
+
+  async createTvlHistory(
+    portfolioId: string,
+    datetime: Date,
+    value: number,
+    transaction: Transaction,
+  ): Promise<mm_tvl_hsts> {
+    return await this.dbMillstone.models.mm_tvl_hsts.create(
+      {
+        portfolioId,
+        datetime,
+        value,
+      },
+      { transaction },
+    );
+  }
+
+  async createApyHistory(
+    portfolioId: string,
+    datetime: Date,
+    value: number,
+    transaction: Transaction,
+  ): Promise<mm_apy_hsts> {
+    return await this.dbMillstone.models.mm_apy_hsts.create(
+      {
+        portfolioId,
+        datetime,
+        value,
+      },
+      { transaction },
+    );
+  }
 }

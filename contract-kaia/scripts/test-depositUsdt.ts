@@ -67,6 +67,56 @@ async function main(): Promise<void> {
   const receipt = await tx.wait();
   console.log("✅ Confirmed in block:", receipt.blockNumber);
 
+  // Parse debug events from deposit transaction
+  console.log("\n📝 All transaction logs:");
+  console.log(`Total logs: ${receipt.logs.length}`);
+  for (let i = 0; i < receipt.logs.length; i++) {
+    const log = receipt.logs[i];
+    console.log(
+      `Log ${i}: Address: ${log.address}, Topics: ${log.topics.length}`
+    );
+    try {
+      const parsedLog = (vaultContract as any).interface.parseLog(log);
+      console.log(`  - Parsed: ${parsedLog?.name || "UNKNOWN"}`);
+      if (parsedLog?.name === "DebugFunctionCalled") {
+        console.log(`  - DebugFunctionCalled: ${parsedLog.args[0]}`);
+      } else if (parsedLog?.name === "DebugUpdateStart") {
+        console.log(
+          `  - DebugUpdateStart: Balance ${ethers.formatUnits(
+            parsedLog.args[0],
+            6
+          )}, Reserved ${ethers.formatUnits(
+            parsedLog.args[1],
+            6
+          )}, Available ${ethers.formatUnits(parsedLog.args[2], 6)}`
+        );
+      } else if (parsedLog?.name === "DebugNFTProcessing") {
+        console.log(
+          `  - DebugNFTProcessing: NFT ${parsedLog.args[0]}, Status ${
+            parsedLog.args[1]
+          }, Amount ${ethers.formatUnits(parsedLog.args[2], 6)}, CanProcess ${
+            parsedLog.args[3]
+          }`
+        );
+      } else if (parsedLog?.name === "DebugUpdateEnd") {
+        console.log(`  - DebugUpdateEnd: Processed ${parsedLog.args[0]} NFTs`);
+      } else if (parsedLog?.name === "WithdrawMarkedReady") {
+        console.log(
+          `  - WithdrawMarkedReady: NFT ${parsedLog.args[0]}, Time: ${parsedLog.args[1]}`
+        );
+      } else if (parsedLog?.name === "Deposited") {
+        console.log(
+          `  - Deposited: Amount ${ethers.formatUnits(
+            parsedLog.args[1],
+            6
+          )}, mmUSDT ${ethers.formatUnits(parsedLog.args[2], 6)}`
+        );
+      }
+    } catch (e) {
+      console.log(`  - Parse failed: ${e}`);
+    }
+  }
+
   // Step 4: Check results
   console.log("\n4️⃣ Final balances:");
   const finalUsdtBalance = await (testUSDT as any).balanceOf(user.address);

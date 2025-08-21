@@ -14,6 +14,8 @@ import { time } from "console";
 import ButtonDefault from "@/app/_components/ButtonDefault";
 import { useRouter } from "next/navigation";
 import { callApi } from "./_utils/callApi";
+import MillstoneIcon from "public/svgs/MillstoneIcon";
+import MillstoneTextIcon from "public/svgs/MillstoneTextIcon";
 
 const USDTContractAddress = "0xf6A77faA9d860a9218E0ab02Ac77AEe03c027372";
 
@@ -85,22 +87,24 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-124px)] flex-col gap-[20px]">
-      <header className="flex justify-center">
-        <Image
-          src="/images/MillstoneIcon.png"
-          alt="Magic Millstone"
-          width={20}
-          height={20}
-        />
-        {/* <span className="text-primary">MagicMillstone</span> */}
-      </header>
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col">
-        <HomeStats tvl={tvl} apy={apy} />
-        <div className="mt-[60px]">
-          <NextMagicTime timeLeft={timeLeft} />
+    <div className="flex min-h-[calc(100vh-124px)] flex-col gap-[68px] pt-[50px]">
+      <header className="flex w-full justify-center">
+        <div className="flex flex-col items-center gap-10">
+          <div className="flex flex-col gap-3">
+            <MillstoneIcon className="h-10 w-10" />
+            <MillstoneTextIcon className="h-[46px] w-[285px]" />
+          </div>
+          <p>Stake more and more</p>
         </div>
-        <div className="mt-auto">
+      </header>
+      <main className="mx-auto flex w-full max-w-md flex-col gap-[92px]">
+        <DepositForm
+          balance={Number(usdtBalance)}
+          onStake={handleStake}
+          onClose={() => setDepositOpen(false)}
+        />
+        <HomeStats tvl={tvl} apy={apy} />
+        {/* <div className="mt-auto">
           {account ? (
             <div className="mx-4 mb-4">
               <ButtonDefault
@@ -113,7 +117,7 @@ export default function Home() {
           ) : (
             <WalletButton />
           )}
-        </div>
+        </div> */}
       </main>
     </div>
   );
