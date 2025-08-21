@@ -54,7 +54,8 @@ export default function Holdings() {
         "balanceOf",
         [account],
       );
-      const formattedBalance = Number(formatUnits(mmBalance, 6));
+      console.log(mmBalance)
+      const formattedBalance = Number(formatUnits(mmBalance[0], 6));
       setBalance(formattedBalance);
     } catch (error) {
       console.error("Error fetching mmUSDT balance:", error);
@@ -73,12 +74,15 @@ export default function Holdings() {
     try {
       setIsLoading(true);
       const withdrawal = await callContractFunction(
-        mmUSDTContractAddress,
-        mmUSDTABI as unknown as unknown[],
+        withdrawNFTAddress,
+        withdrawNFTABI as unknown as unknown[],
         "getUserWithdrawals",
         [account],
       );
-      const formattedWithdrawal = Number(formatUnits(withdrawal, 6));
+      console.log("withdrawals", withdrawal, withdrawal.totalAmount);
+      const formattedWithdrawal = Number(
+        formatUnits(withdrawal.totalAmount, 6),
+      );
       setWithdrawals(formattedWithdrawal);
     } catch (error) {
       console.error("Error fetching getUserWithdrawals:", error);
@@ -101,7 +105,8 @@ export default function Holdings() {
         vaultABI as unknown as unknown[],
         "exchangeRate",
       );
-      const formattedRate = Number(formatUnits(rate, 6));
+      console.log("rate",rate)
+      const formattedRate = Number(formatUnits(rate[0], 6));
       setExchangeRate(formattedRate);
     } catch (error) {
       console.error("Error fetching exchangeRate:", error);
@@ -116,10 +121,10 @@ export default function Holdings() {
     fetchBalance();
     fetchUserWithdrawals();
     fetchTotalAmount();
-    console.log(`balance : ${balance}`);
-    console.log(`withdrawals : ${withdrawals}`);
-    console.log(`exchange rate : ${exchangeRate}`);
-    console.log(Number(withdrawals) * Number(exchangeRate));
+    // console.log(`balance : ${balance}`);
+    // console.log(`withdrawals : ${withdrawals}`);
+    // console.log(`exchange rate : ${exchangeRate}`);
+    // console.log(Number(withdrawals) * Number(exchangeRate));
   }, [provider, USDT_ADDRESS]);
   return (
     <div className="flex h-full min-h-[calc(100vh-148px)] flex-col">
