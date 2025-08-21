@@ -104,7 +104,7 @@ export default function Home() {
           onClose={() => setDepositOpen(false)}
         />
         <HomeStats tvl={tvl} apy={apy} />
-        {/* <div className="mt-auto">
+        <div className="mt-auto">
           {account ? (
             <div className="mx-4 mb-4">
               <ButtonDefault
@@ -117,7 +117,7 @@ export default function Home() {
           ) : (
             <WalletButton />
           )}
-        </div> */}
+        </div>
       </main>
     </div>
   );
