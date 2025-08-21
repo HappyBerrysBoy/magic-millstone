@@ -65,7 +65,7 @@ export default function Withdraw() {
         "balanceOf",
         [account],
       );
-      const formattedBalance = Number(formatUnits(mmBalance, 6));
+      const formattedBalance = Number(formatUnits(mmBalance[0], 6));
       setBalance(formattedBalance);
     } catch (error) {
       console.error("Error fetching mmUSDT balance:", error);
@@ -124,7 +124,7 @@ export default function Withdraw() {
       }
     } finally {
       setIsWithdrawing(false);
-      fetchBalance
+      fetchBalance()
     }
   };
 

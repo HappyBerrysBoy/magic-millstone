@@ -87,6 +87,20 @@ export default function Home() {
       <main className="mx-auto flex w-full max-w-md flex-col gap-20">
         {account ? <StakeForm /> : <WalletButton />}
         <HomeStats tvl={tvl} apy={apy} />
+        {/*<div className="mt-auto">
+          {account ? (
+            <div className="mx-4 mb-4">
+              <ButtonDefault
+                theme="primary"
+                onClick={() => router.push("/holdings/stake")}
+              >
+                Stake USDT
+              </ButtonDefault>
+            </div>
+          ) : (
+            <WalletButton />
+          )}
+        </div>*/}
       </main>
     </div>
   );

@@ -164,7 +164,7 @@ export const useKaiaWalletSdk = () => {
           ],
         });
 
-        return iface.decodeFunctionResult(targetFunction, result as string)[0];
+        return iface.decodeFunctionResult(targetFunction, result as string);
       } catch (error) {
         console.error(`Error calling ${targetFunction}:`, error);
         throw error;

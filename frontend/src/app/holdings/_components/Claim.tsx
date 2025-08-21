@@ -6,54 +6,114 @@ import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { withdrawNFTABI } from "@/app/_abis/withdrawNFT";
 import { withdrawNFTAddress } from "@/utils/contractAddress";
+import { formatUnits } from "ethers";
+
+// 1) 컨트랙트 반환 타입(제네릭에 쓸 것)
+type UserWithdrawalsRet = readonly [
+  readonly bigint[], // tokenIds
+  readonly bigint[], // amounts
+  bigint, // totalAmount
+];
+
+// getWithdrawRequestFromVault(uint256) 의 리턴이
+// [amount, requestTime, readyTime, status, requester] 라고 가정
+type WithdrawRequestRet = readonly [
+  bigint,
+  bigint,
+  bigint,
+  bigint | number,
+  string,
+];
+
+// 2) UI에 쓰일 가공 타입
+type WithdrawalItemUI = {
+  id: string; // 표시/키용 string
+  amountText: string; // 사람이 읽는 문자열 (예: 6 decimals)
+  status: "available" | "pending";
+};
 
 export default function Claim() {
   const { callContractFunction } = useKaiaWalletSdk();
   const { account } = useWalletAccountStore();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [userWithdraws, setUserWithdraws] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [userWithdraws, setUserWithdraws] = useState<WithdrawalItemUI[]>([]);
 
   const fetchPendingWithdraws = async () => {
     if (!account) {
       setIsLoading(false);
+      setUserWithdraws([]);
       return;
     }
 
     try {
       setIsLoading(true);
-      console.log("balanceof",await callContractFunction(
+
+      // [tokenIds[], amounts[], totalAmount]
+      const [tokenIds] = await callContractFunction(
         withdrawNFTAddress,
         withdrawNFTABI as unknown as unknown[],
-        "balanceOf",
-        [account],
-      ))
-      const userWithdrawData = await callContractFunction(
-        withdrawNFTAddress,
-        withdrawNFTABI as unknown as unknown[],
-        "getUserWithdrawals",
+        "getUserWithdrawals(address)",
         [account],
       );
-      console.log("userWithdrawData", userWithdrawData)
-      console.log("totalamount", userWithdrawData.totalAmount);
-      console.log("tokenIds : ", userWithdrawData.tokenIds);
-      console.log("amounts : ", userWithdrawData.amounts);
-      setIsLoading(userWithdrawData);
+
+      if (!Array.isArray(tokenIds)) {
+        setUserWithdraws([]);
+        return;
+      }
+
+      const details: WithdrawalItemUI[] = await Promise.all(
+        tokenIds.map(async (id) => {
+          const [amount, , , status] = await callContractFunction(
+            withdrawNFTAddress,
+            withdrawNFTABI as unknown as unknown[],
+            "getWithdrawRequestFromVault(uint256)", // 오버로드면 풀 시그니처 유지
+            [id],
+          );
+
+          const statusNum = Number(status);
+          return {
+            id: id.toString(),
+            amountText: formatUnits(amount, 6), // 여기서 문자열로 변환
+            status: statusNum === 1 ? "available" : "pending",
+          };
+        }),
+      );
+
+      setUserWithdraws(details);
     } catch (error) {
-      console.error("Error fetching withdraws balance:", error);
+      console.error("Error fetching withdraws:", error);
+      setUserWithdraws([]);
     } finally {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchPendingWithdraws();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, callContractFunction]);
+
   return (
     <div className="flex flex-col gap-[10px]">
       <h1 className="text-base font-medium text-white">Claim</h1>
-      <div className="flex flex-col gap-2">
-        <ClaimCard status="available" amount={100} />
-        <ClaimCard status="pending" amount={100} />
-      </div>
+
+      {isLoading ? (
+        <div className="text-white/70">Loading...</div>
+      ) : userWithdraws.length === 0 ? (
+        <div className="text-white/70">No pending withdrawals</div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {userWithdraws.map((w) => (
+            <ClaimCard
+              key={w.id}
+              id={w.id}
+              status={w.status}
+              amount={w.amountText}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

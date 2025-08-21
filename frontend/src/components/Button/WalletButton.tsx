@@ -10,7 +10,7 @@ export const WalletButton = () => {
 
   const { setAccount } = useWalletAccountStore();
 
-  const handleClick = async () => {
+  const handleConnect = async () => {
     try {
       const [account] = await connectAndSign("connect");
       sessionStorage.setItem("ACCOUNT", account);
@@ -28,7 +28,7 @@ export const WalletButton = () => {
   };
 
   return (
-    <button className={styles.root} onClick={handleClick}>
+    <button className={styles.root} onClick={handleConnect}>
       <Logo className={styles.icon} />
       <p className={styles.description}>connect</p>
     </button>
