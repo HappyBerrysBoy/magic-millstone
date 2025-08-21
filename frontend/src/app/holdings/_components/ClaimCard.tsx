@@ -1,13 +1,11 @@
-import { vaultABI } from "@/app/_abis/vault";
 import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
-import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
-import { vaultContractAddress } from "@/utils/contractAddress";
 
 interface ClaimCardProps {
   id: string;
   status: "available" | "pending";
   amount: number | string;
   currency?: string;
+  handleClaim: (id: string) => void;
 }
 
 export default function ClaimCard({
@@ -15,8 +13,8 @@ export default function ClaimCard({
   status,
   amount,
   currency = "USDT",
+  handleClaim,
 }: ClaimCardProps) {
-  const { sendContractTransaction } = useKaiaWalletSdk();
   const isAvailable = status === "available";
 
   const cardStyles = isAvailable
@@ -28,32 +26,6 @@ export default function ClaimCard({
   const buttonStyles = isAvailable
     ? "text-[10px] font-normal text-black bg-primary rounded-sm py-2 w-full"
     : "text-[10px] font-normal text-mm-gray-light bg-[#808787] rounded-sm py-2 w-full";
-
-  const handleClaim = async () => {
-    if (status === "pending") return;
-    try {
-      await sendContractTransaction(
-        vaultContractAddress,
-        vaultABI as unknown as unknown[],
-        "executeWithdraw",
-        [id],
-      );
-
-      console.log("✅ Claim request sent successfully!");
-    } catch (error: any) {
-      console.error("❌ Withdrawal request failed:", error);
-
-      // Handle specific error cases
-      if (error.message?.includes("Insufficient mmUSDT balance")) {
-        alert("Insufficient mmUSDT balance for withdrawal");
-      } else if (error.message?.includes("Amount too small")) {
-        alert("Withdrawal amount is below minimum requirement");
-      } else {
-        alert(`Withdrawal failed: ${error.message || "Unknown error"}`);
-      }
-    } finally {
-    }
-  };
 
   return (
     <div className={cardStyles}>
@@ -73,7 +45,9 @@ export default function ClaimCard({
       <button
         className={buttonStyles}
         disabled={!isAvailable}
-        onClick={handleClaim}
+        onClick={() => {
+          handleClaim(id);
+        }}
       >
         Claim
       </button>

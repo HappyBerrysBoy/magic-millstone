@@ -3,10 +3,17 @@
 import ButtonBack from "@/app/_components/ButtonBack";
 import Stake from "../_components/Stake";
 import { useRouter } from "next/navigation";
+import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
+import { useEffect } from "react";
 
 export default function StakePage() {
   const router = useRouter();
-
+  const { account } = useWalletAccountStore();
+  useEffect(() => {
+    if (!account) {
+      router.replace("/"); // 뒤로가기 눌러도 못돌아오게
+    }
+  }, [account, router]);
   // balance 불러오기
 
   return (

@@ -8,7 +8,6 @@ import {
   default as DappPortalSDK,
 } from "@/utils/dapp-portal-sdk";
 import { Web3Provider } from "@kaiachain/ethers-ext/v6";
-import { useWalletAccountStore } from "./auth.hooks";
 // Contract will be created using wallet provider directly
 // import {liff} from "@/utils/liff";
 
@@ -183,15 +182,6 @@ export const useKaiaWalletSdk = () => {
     ) => {
       // const { account } = useWalletAccountStore();
       if (!contractAddress) throw new Error("Contract address is required");
-      const account = await getAccount();
-
-      if (!account) {
-        const account = await walletProvider.request({
-          method: "kaia_connectAndSign",
-          params: [],
-        });
-      }
-
       // Use specific signature if provided to handle function overloads
       const targetFunction = signature || functionName;
 
@@ -201,7 +191,7 @@ export const useKaiaWalletSdk = () => {
         const iface = new Interface(abi as any);
 
         const data = iface.encodeFunctionData(targetFunction, params);
-        const fromAddress = account;
+        const fromAddress = await getAccount();
 
         const txParams = {
           from: fromAddress,

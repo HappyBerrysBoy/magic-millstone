@@ -54,7 +54,7 @@ export default function Holdings() {
         "balanceOf",
         [account],
       );
-      console.log(mmBalance)
+      console.log(mmBalance);
       const formattedBalance = Number(formatUnits(mmBalance[0], 6));
       setBalance(formattedBalance);
     } catch (error) {
@@ -105,7 +105,7 @@ export default function Holdings() {
         vaultABI as unknown as unknown[],
         "exchangeRate",
       );
-      console.log("rate",rate)
+      console.log("rate", rate);
       const formattedRate = Number(formatUnits(rate[0], 6));
       setExchangeRate(formattedRate);
     } catch (error) {
@@ -130,6 +130,7 @@ export default function Holdings() {
     <div className="flex h-full min-h-[calc(100vh-148px)] flex-col">
       <div className="flex-1">
         <PositionSummary
+          totalValue={formatNumberWithCommas(balance * exchangeRate)}
           withdrawals={formatNumberWithCommas(withdrawals)}
           balance={formatNumberWithCommas(balance)}
           exchangeRate={formatNumberWithCommas(exchangeRate)}

@@ -127,7 +127,9 @@ export default function StakeForm() {
       }
     } finally {
       setIsStaking(false);
-      fetchBalance();
+      setTimeout(() => {
+        fetchBalance();
+      }, 1000);
     }
   };
 

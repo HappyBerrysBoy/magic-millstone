@@ -1,11 +1,10 @@
 "use client";
 
 import { ReactNode } from "react";
-import {
-  useKaiaWalletSecurity,
-} from "@/app/hooks/walletSdk.hooks";
+import { useKaiaWalletSecurity } from "@/app/hooks/walletSdk.hooks";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Loading from "@/app/_components/Loading";
 
 export type BootstrapProps = {
   className?: string;
@@ -23,7 +22,7 @@ export const Bootstrap = ({ className, children }: BootstrapProps) => {
         closeOnClick
         pauseOnHover={false}
       />
-      <div className={className}>{isSuccess && children}</div>
+      <div className={className}>{isSuccess ? children : <Loading />}</div>
     </>
   );
 };

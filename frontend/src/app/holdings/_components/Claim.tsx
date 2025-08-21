@@ -5,8 +5,12 @@ import ClaimCard from "./ClaimCard";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { withdrawNFTABI } from "@/app/_abis/withdrawNFT";
-import { withdrawNFTAddress } from "@/utils/contractAddress";
+import {
+  vaultContractAddress,
+  withdrawNFTAddress,
+} from "@/utils/contractAddress";
 import { formatUnits } from "ethers";
+import { vaultABI } from "@/app/_abis/vault";
 
 // 1) 컨트랙트 반환 타입(제네릭에 쓸 것)
 type UserWithdrawalsRet = readonly [
@@ -33,7 +37,7 @@ type WithdrawalItemUI = {
 };
 
 export default function Claim() {
-  const { callContractFunction } = useKaiaWalletSdk();
+  const { callContractFunction, sendContractTransaction } = useKaiaWalletSdk();
   const { account } = useWalletAccountStore();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -75,7 +79,7 @@ export default function Claim() {
           return {
             id: id.toString(),
             amountText: formatUnits(amount, 6), // 여기서 문자열로 변환
-            status: statusNum === 1 ? "available" : "pending",
+            status: statusNum === 0 ? "available" : "pending",
           };
         }),
       );
@@ -93,6 +97,34 @@ export default function Claim() {
     fetchPendingWithdraws();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, callContractFunction]);
+  const handleClaim = async (id: string) => {
+    if (status === "pending") return;
+    try {
+      await sendContractTransaction(
+        vaultContractAddress,
+        vaultABI as unknown as unknown[],
+        "executeWithdraw",
+        [id],
+      );
+
+      console.log("✅ Claim request sent successfully!");
+    } catch (error: any) {
+      console.error("❌ Withdrawal request failed:", error);
+
+      // Handle specific error cases
+      if (error.message?.includes("Insufficient mmUSDT balance")) {
+        alert("Insufficient mmUSDT balance for withdrawal");
+      } else if (error.message?.includes("Amount too small")) {
+        alert("Withdrawal amount is below minimum requirement");
+      } else {
+        alert(`Withdrawal failed: ${error.message || "Unknown error"}`);
+      }
+    } finally {
+      setTimeout(() => {
+        fetchPendingWithdraws();
+      }, 1000);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-[10px]">
@@ -110,6 +142,7 @@ export default function Claim() {
               id={w.id}
               status={w.status}
               amount={w.amountText}
+              handleClaim={handleClaim}
             />
           ))}
         </div>
