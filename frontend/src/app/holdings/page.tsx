@@ -20,9 +20,10 @@ import {
 } from "@/utils/contractAddress";
 import { withdrawNFTABI } from "../_abis/withdrawNFT";
 import { mmUSDTABI } from "../_abis/mmUSDT";
+import { formatNumberWithCommas } from "../_utils/formatFuncs";
 
 export default function Holdings() {
-  const USDT_ADDRESS = usdtTokenAddress();
+  const USDT_ADDRESS = usdtTokenAddress;
   const { sdk } = useKaiaWalletSdkStore();
   const { getAccount, requestAccount, callContractFunction } =
     useKaiaWalletSdk();
@@ -85,9 +86,9 @@ export default function Holdings() {
     <div className="flex h-full min-h-[calc(100vh-148px)] flex-col">
       <div className="flex-1">
         <PositionSummary
-          withdrawals={withdrawals}
-          balance={balance}
-          exchangeRate={exchangeRate}
+          withdrawals={formatNumberWithCommas(withdrawals)}
+          balance={formatNumberWithCommas(balance)}
+          exchangeRate={formatNumberWithCommas(exchangeRate)}
         />
       </div>
       <HoldingButtons />
