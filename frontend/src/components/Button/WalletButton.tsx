@@ -13,7 +13,7 @@ export const WalletButton = () => {
   const handleConnect = async () => {
     try {
       const [account] = await connectAndSign("connect");
-      sessionStorage.setItem("ACCOUNT", account);
+      // sessionStorage.setItem("ACCOUNT", account);
       setAccount(account);
       await callApi({
         endpoint: `/user`,

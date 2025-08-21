@@ -85,7 +85,13 @@ export default function Home() {
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-md flex-col gap-20">
-        {account ? <StakeForm /> : <WalletButton />}
+        {account ? (
+          <StakeForm />
+        ) : (
+          <div className="h-[180px] flex justify-center items-center">
+            <WalletButton />
+          </div>
+        )}
         <HomeStats tvl={tvl} apy={apy} />
         {/*<div className="mt-auto">
           {account ? (
