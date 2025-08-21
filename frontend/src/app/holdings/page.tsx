@@ -3,7 +3,7 @@
 import PositionSummary from "./_components/PositionSummary";
 import HoldingButtons from "./_components/HoldingButtons";
 import { usdtTokenAddress } from "@/utils/tokenAddress";
-import { ethers } from "ethers";
+import { ethers, formatUnits } from "ethers";
 import {
   useKaiaWalletSdk,
   useKaiaWalletSdkStore,
@@ -20,17 +20,18 @@ import {
 } from "@/utils/contractAddress";
 import { withdrawNFTABI } from "../_abis/withdrawNFT";
 import { mmUSDTABI } from "../_abis/mmUSDT";
+import { formatNumberWithCommas } from "../_utils/formatFuncs";
 
 export default function Holdings() {
-  const USDT_ADDRESS = usdtTokenAddress();
+  const USDT_ADDRESS = usdtTokenAddress;
   const { sdk } = useKaiaWalletSdkStore();
   const { getAccount, requestAccount, callContractFunction } =
     useKaiaWalletSdk();
   const { account } = useWalletAccountStore();
-
-  const [withdrawals, setWithdrawals] = useState<string>("0.00");
-  const [balance, setBalance] = useState<string>("0.00");
-  const [exchangeRate, setExchangeRate] = useState<string>("0.00");
+  const [loading, setIsLoading] = useState(false);
+  const [withdrawals, setWithdrawals] = useState<number>(0);
+  const [balance, setBalance] = useState<number>(0);
+  const [exchangeRate, setExchangeRate] = useState<number>(0);
 
   const provider = useMemo(() => {
     if (!sdk) return null;
@@ -38,56 +39,95 @@ export default function Holdings() {
     return new Web3Provider(walletProvider);
   }, [sdk]);
 
+  // Fetch mmUSDT balance
+  const fetchBalance = async () => {
+    if (!account) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const mmBalance = await callContractFunction(
+        mmUSDTContractAddress,
+        mmUSDTABI as unknown as unknown[],
+        "balanceOf",
+        [account],
+      );
+      const formattedBalance = Number(formatUnits(mmBalance, 6));
+      setBalance(formattedBalance);
+    } catch (error) {
+      console.error("Error fetching mmUSDT balance:", error);
+      setBalance(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  // Fetch userWithdrawals balance
+  const fetchUserWithdrawals = async () => {
+    if (!account) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const withdrawal = await callContractFunction(
+        mmUSDTContractAddress,
+        mmUSDTABI as unknown as unknown[],
+        "getUserWithdrawals",
+        [account],
+      );
+      const formattedWithdrawal = Number(formatUnits(withdrawal, 6));
+      setWithdrawals(formattedWithdrawal);
+    } catch (error) {
+      console.error("Error fetching getUserWithdrawals:", error);
+      setWithdrawals(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  // Fetch totalAmount balance
+  const fetchTotalAmount = async () => {
+    if (!account) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const rate = await callContractFunction(
+        vaultContractAddress,
+        vaultABI as unknown as unknown[],
+        "exchangeRate",
+      );
+      const formattedRate = Number(formatUnits(rate, 6));
+      setExchangeRate(formattedRate);
+    } catch (error) {
+      console.error("Error fetching exchangeRate:", error);
+      setExchangeRate(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!provider) return; // sdk 준비 전이면 패스
-    (async () => {
-      try {
-        const contract = new ethers.Contract(
-          withdrawNFTAddress,
-          withdrawNFTABI,
-          provider,
-        );
-        const contractCallData = await contract.getUserWithdrawals(account);
-        setWithdrawals(contractCallData.totalAmount);
-      } catch (err) {
-        console.error("getUserWithdrawals 실패:", err);
-      }
-    })();
-    (async () => {
-      try {
-        const contract = new ethers.Contract(
-          mmUSDTContractAddress,
-          mmUSDTABI,
-          provider,
-        );
-        const contractCallData = await contract.balanceOf(account);
-        setBalance(contractCallData);
-      } catch (err) {
-        console.error("balanceOf 실패:", err);
-      }
-    })();
-    (async () => {
-      try {
-        const contract = new ethers.Contract(
-          vaultContractAddress,
-          vaultABI,
-          provider,
-        );
-        const contractCallData = await contract.exchangeRate();
-        setExchangeRate(ethers.formatUnits(contractCallData, 6));
-        console.log(exchangeRate);
-      } catch (err) {
-        console.error("exchangeRate 실패:", err);
-      }
-    })();
+    fetchBalance();
+    fetchUserWithdrawals();
+    fetchTotalAmount();
+    console.log(`balance : ${balance}`);
+    console.log(`withdrawals : ${withdrawals}`);
+    console.log(`exchange rate : ${exchangeRate}`);
+    console.log(Number(withdrawals) * Number(exchangeRate));
   }, [provider, USDT_ADDRESS]);
   return (
     <div className="flex h-full min-h-[calc(100vh-148px)] flex-col">
       <div className="flex-1">
         <PositionSummary
-          withdrawals={withdrawals}
-          balance={balance}
-          exchangeRate={exchangeRate}
+          withdrawals={formatNumberWithCommas(withdrawals)}
+          balance={formatNumberWithCommas(balance)}
+          exchangeRate={formatNumberWithCommas(exchangeRate)}
         />
       </div>
       <HoldingButtons />

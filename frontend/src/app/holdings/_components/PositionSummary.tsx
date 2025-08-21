@@ -1,5 +1,3 @@
-import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
-
 type PositionSummaryProps = {
   withdrawals: string;
   balance: string;
@@ -11,7 +9,7 @@ export default function PositionSummary({
   balance,
   exchangeRate,
 }: PositionSummaryProps) {
-  const totalValue = Number(withdrawals) * Number(exchangeRate);
+  const totalValue = Number(balance) * Number(exchangeRate);
   return (
     <>
       <div>

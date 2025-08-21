@@ -1,12 +1,14 @@
 "use client";
 
 import { create } from "zustand";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   DappPortalSDKType,
   default as DappPortalSDK,
 } from "@/utils/dapp-portal-sdk";
+import { Web3Provider } from "@kaiachain/ethers-ext/v6";
+import { useWalletAccountStore } from "./auth.hooks";
 // Contract will be created using wallet provider directly
 // import {liff} from "@/utils/liff";
 
@@ -26,6 +28,7 @@ export const initializeKaiaWalletSdk = async () => {
       clientId: process.env.NEXT_PUBLIC_CLIENT_ID as string,
       chainId: process.env.NEXT_PUBLIC_CHAIN_ID,
     });
+    console.log("kaia wallet initialized");
     return sdk as DappPortalSDKType;
   } catch (error: unknown) {
     return null;
@@ -63,6 +66,12 @@ export const useKaiaWalletSdk = () => {
   }
 
   const walletProvider = sdk.getWalletProvider();
+
+  const web3Provider = useMemo(() => {
+    if (!sdk) return null;
+    const walletProvider = sdk.getWalletProvider();
+    return new Web3Provider(walletProvider);
+  }, [sdk]);
 
   const getAccount = useCallback(async () => {
     const addresses = (await walletProvider.request({
@@ -108,7 +117,7 @@ export const useKaiaWalletSdk = () => {
 
   const sendTransaction = useCallback(
     async (params: Transaction[]) => {
-      await walletProvider.request({
+      return await walletProvider.request({
         method: "kaia_sendTransaction",
         params: params,
       });
@@ -144,7 +153,6 @@ export const useKaiaWalletSdk = () => {
         const iface = new Interface(abi as any);
 
         const data = iface.encodeFunctionData(targetFunction, params);
-        console.log(data);
         const result = await walletProvider.request({
           method: "eth_call",
           params: [
@@ -173,7 +181,16 @@ export const useKaiaWalletSdk = () => {
       params: unknown[] = [],
       signature?: string,
     ) => {
+      // const { account } = useWalletAccountStore();
       if (!contractAddress) throw new Error("Contract address is required");
+      const account = await getAccount();
+
+      if (!account) {
+        const account = await walletProvider.request({
+          method: "kaia_connectAndSign",
+          params: [],
+        });
+      }
 
       // Use specific signature if provided to handle function overloads
       const targetFunction = signature || functionName;
@@ -184,7 +201,7 @@ export const useKaiaWalletSdk = () => {
         const iface = new Interface(abi as any);
 
         const data = iface.encodeFunctionData(targetFunction, params);
-        const fromAddress = await getAccount();
+        const fromAddress = account;
 
         const txParams = {
           from: fromAddress,
@@ -193,6 +210,9 @@ export const useKaiaWalletSdk = () => {
           data: data,
           // Let wallet estimate gas automatically
         };
+        console.log(`tx params from: ${txParams.from}`);
+        console.log(`tx params to: ${txParams.to}`);
+        console.log(`tx params data: ${txParams.data}`);
         return await sendTransaction([txParams]);
       } catch (error) {
         console.error(`Error sending transaction to ${targetFunction}:`, error);
@@ -208,6 +228,8 @@ export const useKaiaWalletSdk = () => {
     connectAndSign,
     disconnectWallet,
     getBalance,
+    walletProvider,
+    web3Provider,
     sendTransaction,
     getErc20TokenBalance,
     callContractFunction,
