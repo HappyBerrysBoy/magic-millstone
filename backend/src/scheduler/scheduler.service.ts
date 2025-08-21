@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { Contract, formatUnits, JsonRpcProvider, Wallet } from 'ethers';
-import { vaultABI } from '../abis/vault';
+import { vaultAbi } from '../abis/vaultAbi';
 import { millstoneAIVaultAbi } from 'src/abis/millstoneAIVaultAbi';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class SchedulerService {
 
       this.kaiaVaultContract = new Contract(
         vaultAddress,
-        vaultABI,
+        vaultAbi,
         this.kaiaWallet,
       );
 
@@ -221,6 +221,11 @@ export class SchedulerService {
             timestamp: parsed.args.timestamp.toString(),
           };
         }
+      } else {
+        await this.ethVaultContract.withdrawForUser(
+          process.env.USDT_ADDRESS!,
+          amountNeeded,
+        );
       }
 
       result.success = true;
