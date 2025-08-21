@@ -1,8 +1,7 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import {
-  useKaiaWalletSdk,
   useKaiaWalletSecurity,
 } from "@/app/hooks/walletSdk.hooks";
 import { ToastContainer } from "react-toastify";

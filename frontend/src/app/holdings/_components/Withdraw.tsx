@@ -8,7 +8,7 @@ import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { mmUSDTABI } from "@/app/_abis/mmUSDT";
 import { vaultABI } from "@/app/_abis/vault";
 import { formatUnits, parseUnits } from "ethers";
-import { vaultContractAddress } from "@/utils/contractAddress";
+import { mmUSDTContractAddress, vaultContractAddress } from "@/utils/contractAddress";
 
 interface PercentageButtonProps {
   percentage: number;
@@ -35,7 +35,6 @@ function PercentageButton({
   );
 }
 
-const mmUSDTContractAddress = "0x067D105909560aBeF3441dd4B2d24D3dD6c8d93c";
 
 export default function Withdraw() {
   const { account } = useWalletAccountStore();

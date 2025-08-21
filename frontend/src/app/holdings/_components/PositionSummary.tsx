@@ -9,7 +9,7 @@ export default function PositionSummary({
   balance,
   exchangeRate,
 }: PositionSummaryProps) {
-  const totalValue = Number(withdrawals) * Number(exchangeRate);
+  const totalValue = Number(balance) * Number(exchangeRate);
   return (
     <>
       <div>
