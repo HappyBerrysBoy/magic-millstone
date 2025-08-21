@@ -38,13 +38,13 @@ async function main() {
       const request = await vaultContract.getWithdrawRequest(i);
       
       activeNFTs++;
-      if (request.status === 0) pendingNFTs++;
-      if (request.status === 1) readyNFTs++;
+      if (Number(request.status) === 0) pendingNFTs++;
+      if (Number(request.status) === 1) readyNFTs++;
       
       console.log(`\n📄 NFT #${i}:`);
       console.log(`  Owner: ${owner.slice(0, 10)}...`);
       console.log(`  Amount: ${ethers.formatUnits(request.amount, 6)} USDT`);
-      console.log(`  Status: ${["🔄 PENDING", "✅ READY"][request.status]}`);
+      console.log(`  Status: ${["🔄 PENDING", "✅ READY"][Number(request.status)]}`);
       console.log(`  Request: ${new Date(Number(request.requestTime) * 1000).toLocaleString()}`);
       if (request.readyTime > 0) {
         console.log(`  Ready: ${new Date(Number(request.readyTime) * 1000).toLocaleString()}`);

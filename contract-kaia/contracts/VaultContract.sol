@@ -86,6 +86,7 @@ contract VaultContract is
     );
 
 
+
     event EmergencyWithdraw(
         address indexed admin,
         address indexed token,
@@ -97,6 +98,12 @@ contract VaultContract is
         uint256 oldRate,
         uint256 newRate,
         address indexed updatedBy,
+        uint256 timestamp
+    );
+
+    event VaultDeposit(
+        address indexed depositor,
+        uint256 amount,
         uint256 timestamp
     );
 
@@ -147,7 +154,22 @@ contract VaultContract is
         emit Deposited(msg.sender, amount, mmUSDTToMint, block.timestamp);
     }
 
-    function requestWithdraw(uint256 amount) 
+    function depositToVault(uint256 amount) 
+        external 
+        nonReentrant 
+        whenNotPaused 
+    {
+        require(amount > 0, "VaultContract: Amount must be greater than 0");
+
+        usdt.safeTransferFrom(msg.sender, address(this), amount);
+
+        // Auto-update PENDING withdrawals to READY if vault now has sufficient funds
+        _updatePendingWithdrawalsToReady();
+
+        emit VaultDeposit(msg.sender, amount, block.timestamp);
+    }
+
+ function requestWithdraw(uint256 amount) 
         external 
         nonReentrant 
         whenNotPaused 
@@ -302,20 +324,46 @@ contract VaultContract is
     function _updatePendingWithdrawalsToReady() internal {
         uint256 currentBalance = usdt.balanceOf(address(this));
         uint256 currentTokenId = withdrawNFT.getCurrentTokenId();
+        
+        // Calculate total amount already committed to READY withdrawals
+        uint256 reservedForReady = 0;
+        uint256 pendingCount = 0;
+        
+        // First pass: Calculate reserved amounts and count pending requests
+        for (uint256 i = 1; i < currentTokenId; i++) {
+            try withdrawNFT.ownerOf(i) returns (address) {
+                WithdrawRequest storage request = withdrawRequests[i];
+                if (request.status == WithdrawStatus.READY) {
+                    reservedForReady += request.amount;
+                } else if (request.status == WithdrawStatus.PENDING) {
+                    pendingCount++;
+                }
+            } catch {
+                // NFT doesn't exist (burned), skip
+                continue;
+            }
+        }
+        
+        // Early exit if no pending requests or insufficient funds
+        if (pendingCount == 0 || currentBalance <= reservedForReady) {
+            return;
+        }
+        
+        // Calculate available balance for new READY withdrawals
+        uint256 availableBalance = currentBalance - reservedForReady;
         uint256 usedBalance = 0;
         
-        // Process NFTs in order (FIFO) until we run out of funds
+        // Second pass: Process PENDING requests in FIFO order
         for (uint256 i = 1; i < currentTokenId; i++) {
-            // Check if NFT exists (not burned)
             try withdrawNFT.ownerOf(i) returns (address) {
                 WithdrawRequest storage request = withdrawRequests[i];
                 
                 // Only process PENDING requests
                 if (request.status == WithdrawStatus.PENDING) {
-                    uint256 requiredAmount = request.amount; // Exchange rate already applied when NFT was minted
+                    uint256 requiredAmount = request.amount;
                     
-                    // Check if we have enough balance for this request
-                    if (usedBalance + requiredAmount <= currentBalance) {
+                    // Check if we have enough available balance for this request
+                    if (usedBalance + requiredAmount <= availableBalance) {
                         // Mark as READY and account for used balance
                         request.status = WithdrawStatus.READY;
                         request.readyTime = block.timestamp;
@@ -323,7 +371,7 @@ contract VaultContract is
                         
                         emit WithdrawMarkedReady(i, block.timestamp);
                     } else {
-                        // Not enough funds for this request, stop processing
+                        // Not enough available funds for this request, stop processing
                         // (later NFTs will remain PENDING)
                         break;
                     }
@@ -332,6 +380,45 @@ contract VaultContract is
                 // NFT doesn't exist (burned), skip
                 continue;
             }
+        }
+    }
+
+    // Internal function to check and mark a single NFT as READY if vault has sufficient funds
+    function _checkAndMarkSingleNFTReady(uint256 nftId) internal {
+        WithdrawRequest storage request = withdrawRequests[nftId];
+        
+        // Only process if currently PENDING
+        if (request.status != WithdrawStatus.PENDING) {
+            return;
+        }
+        
+        uint256 currentBalance = usdt.balanceOf(address(this));
+        uint256 requiredAmount = request.amount;
+        
+        // Calculate total amount already committed to READY withdrawals (excluding this NFT)
+        uint256 reservedForReady = 0;
+        uint256 currentTokenId = withdrawNFT.getCurrentTokenId();
+        
+        for (uint256 i = 1; i < currentTokenId; i++) {
+            if (i == nftId) continue; // Skip the current NFT we're checking
+            
+            try withdrawNFT.ownerOf(i) returns (address) {
+                WithdrawRequest storage otherRequest = withdrawRequests[i];
+                if (otherRequest.status == WithdrawStatus.READY) {
+                    reservedForReady += otherRequest.amount;
+                }
+            } catch {
+                // NFT doesn't exist (burned), skip
+                continue;
+            }
+        }
+        
+        // Check if we have enough available balance for this specific request
+        if (currentBalance >= reservedForReady + requiredAmount) {
+            request.status = WithdrawStatus.READY;
+            request.readyTime = block.timestamp;
+            
+            emit WithdrawMarkedReady(nftId, block.timestamp);
         }
     }
 

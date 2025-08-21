@@ -12,56 +12,68 @@ async function main() {
     )
   );
 
-  const EXISTING_VAULT_PROXY = process.env.VAULT_ADDRESS;
-  if (!EXISTING_VAULT_PROXY) {
+  // Get existing vault address from environment
+  const VAULT_ADDRESS = process.env.VAULT_ADDRESS;
+  if (!VAULT_ADDRESS) {
     console.error("❌ VAULT_ADDRESS not set in environment variables");
     process.exit(1);
   }
 
-  console.log("Existing VaultContract proxy:", EXISTING_VAULT_PROXY);
+  console.log("📋 Existing VaultContract address:", VAULT_ADDRESS);
 
-  // Get the new VaultContract factory
-  console.log("\n📦 Preparing new implementation...");
-  const VaultContractV2Factory = await ethers.getContractFactory("VaultContract");
-
-  // Upgrade the proxy to point to the new implementation
-  console.log("🚀 Upgrading proxy...");
-  const upgradedVault = await upgrades.upgradeProxy(
-    EXISTING_VAULT_PROXY,
-    VaultContractV2Factory
-  );
-
-  await upgradedVault.waitForDeployment();
-  const address = await upgradedVault.getAddress();
-
-  console.log("✅ VaultContract upgraded successfully!");
-  console.log("Proxy address (unchanged):", address);
-
-  // Test that the upgrade worked
-  console.log("\n🧪 Testing upgraded contract...");
   try {
-    const exchangeRate = await upgradedVault.getExchangeRate();
-    const maxTransferable = await upgradedVault.getMaxTransferableAmount();
-    
-    console.log("Exchange rate:", ethers.formatUnits(exchangeRate, 6));
-    console.log("Max transferable:", ethers.formatUnits(maxTransferable, 6), "USDT");
-    console.log("✅ New functions working correctly!");
-  } catch (error) {
-    console.log("❌ Error testing new functions:", (error as any).message);
-  }
+    // Get the new VaultContract factory
+    console.log("\n1. Getting new VaultContract implementation...");
+    const VaultContractV2 = await ethers.getContractFactory("VaultContract");
 
-  console.log("\n📋 Upgrade Summary:");
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  console.log("VaultContract proxy:", address);
-  console.log("✅ Auto-ready withdrawal logic added");
-  console.log("✅ All existing state preserved");
-  console.log("✅ No role changes needed");
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    // Force import existing proxy first
+    console.log("\n2. Force importing existing proxy...");
+    await upgrades.forceImport(VAULT_ADDRESS, VaultContractV2, { kind: 'uups' });
+    console.log("✅ Existing proxy imported successfully!");
+
+    // Upgrade the proxy
+    console.log("\n3. Upgrading proxy to new implementation...");
+    const upgradedVault = await upgrades.upgradeProxy(VAULT_ADDRESS, VaultContractV2, {
+      timeout: 120000, // 2 minutes timeout
+      unsafeAllow: ['constructor']
+    });
+
+    console.log("✅ VaultContract upgraded successfully!");
+    console.log("📋 Proxy address remains:", await upgradedVault.getAddress());
+
+    // Test the upgraded contract
+    console.log("\n4. Testing upgraded contract...");
+    
+    // Check if contract is still paused/unpaused
+    const isPaused = await upgradedVault.paused();
+    console.log("✅ Contract paused status:", isPaused);
+
+    // Get current exchange rate
+    const exchangeRate = await upgradedVault.getExchangeRate();
+    console.log("✅ Current exchange rate:", ethers.formatUnits(exchangeRate, 6));
+
+    // Test the updatePendingWithdrawals function
+    console.log("\n5. Testing updatePendingWithdrawals function...");
+    try {
+      const gasEstimate = await upgradedVault.updatePendingWithdrawals.estimateGas();
+      console.log("✅ Gas estimate for updatePendingWithdrawals:", gasEstimate.toString());
+    } catch (error) {
+      console.log("ℹ️  Gas estimation failed (might be due to no pending withdrawals or insufficient funds)");
+    }
+
+    console.log("\n🎉 Upgrade completed successfully!");
+    console.log("✅ VaultContract now has improved _updatePendingWithdrawalsToReady logic");
+    console.log("✅ The function now properly considers reserved amounts for READY withdrawals");
+
+  } catch (error) {
+    console.error("❌ Upgrade failed:", error);
+    process.exit(1);
+  }
 }
 
 main()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("❌ Upgrade failed:", error);
+    console.error("❌ Script failed:", error);
     process.exit(1);
   });
