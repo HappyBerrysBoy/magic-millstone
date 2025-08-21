@@ -1,5 +1,3 @@
-import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
-
 type PositionSummaryProps = {
   withdrawals: string;
   balance: string;

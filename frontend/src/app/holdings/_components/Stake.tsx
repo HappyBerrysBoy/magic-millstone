@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
 
 interface PercentageButtonProps {
@@ -29,16 +28,22 @@ function PercentageButton({
 }
 
 interface StakeProps {
-  usdtAmount: number | string;
+  usdtAmount: number;
   setStakeAmount: (amount: number) => void;
+  inputValue: string;
+  setInputValue: (value: string) => void;
+  selectedPercentage: number | null;
+  setSelectedPercentage: (amount: number | null) => void;
 }
 
-export default function Stake({ usdtAmount, setStakeAmount }: StakeProps) {
-  const [selectedPercentage, setSelectedPercentage] = useState<number | null>(
-    null,
-  );
-  const [inputValue, setInputValue] = useState<string>("");
-
+export default function Stake({
+  usdtAmount,
+  setStakeAmount,
+  inputValue,
+  setInputValue,
+  selectedPercentage,
+  setSelectedPercentage,
+}: StakeProps) {
   const percentages = [25, 50, 75, 100];
 
   const formatDisplayValue = (value: string): string => {

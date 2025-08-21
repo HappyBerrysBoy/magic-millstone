@@ -1,12 +1,13 @@
 "use client";
 
 import { create } from "zustand";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   DappPortalSDKType,
   default as DappPortalSDK,
 } from "@/utils/dapp-portal-sdk";
+import { Web3Provider } from "@kaiachain/ethers-ext/v6";
 // Contract will be created using wallet provider directly
 // import {liff} from "@/utils/liff";
 
@@ -64,6 +65,12 @@ export const useKaiaWalletSdk = () => {
 
   const walletProvider = sdk.getWalletProvider();
 
+  const web3Provider = useMemo(() => {
+    if (!sdk) return null;
+    const walletProvider = sdk.getWalletProvider();
+    return new Web3Provider(walletProvider);
+  }, [sdk]);
+
   const getAccount = useCallback(async () => {
     const addresses = (await walletProvider.request({
       method: "kaia_accounts",
@@ -108,7 +115,7 @@ export const useKaiaWalletSdk = () => {
 
   const sendTransaction = useCallback(
     async (params: Transaction[]) => {
-      await walletProvider.request({
+      return await walletProvider.request({
         method: "kaia_sendTransaction",
         params: params,
       });
@@ -144,7 +151,6 @@ export const useKaiaWalletSdk = () => {
         const iface = new Interface(abi as any);
 
         const data = iface.encodeFunctionData(targetFunction, params);
-        console.log(data);
         const result = await walletProvider.request({
           method: "eth_call",
           params: [
@@ -208,6 +214,7 @@ export const useKaiaWalletSdk = () => {
     connectAndSign,
     disconnectWallet,
     getBalance,
+    web3Provider,
     sendTransaction,
     getErc20TokenBalance,
     callContractFunction,
