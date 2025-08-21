@@ -25,7 +25,7 @@
             "label": "mmUSDTToken",
             "offset": 0,
             "slot": "1",
-            "type": "t_contract(mmUSDT)12232",
+            "type": "t_contract(mmUSDT)12354",
             "contract": "VaultContract",
             "src": "contracts/VaultContract.sol:28"
           },
@@ -33,7 +33,7 @@
             "label": "withdrawNFT",
             "offset": 0,
             "slot": "2",
-            "type": "t_contract(WithdrawNFT)11894",
+            "type": "t_contract(WithdrawNFT)12016",
             "contract": "VaultContract",
             "src": "contracts/VaultContract.sol:29"
           },
@@ -99,7 +99,7 @@
             "slot": "10",
             "type": "t_array(t_uint256)40_storage",
             "contract": "VaultContract",
-            "src": "contracts/VaultContract.sol:502"
+            "src": "contracts/VaultContract.sol:541"
           }
         ],
         "types": {
@@ -211,11 +211,11 @@
             "label": "contract IERC20",
             "numberOfBytes": "20"
           },
-          "t_contract(WithdrawNFT)11894": {
+          "t_contract(WithdrawNFT)12016": {
             "label": "contract WithdrawNFT",
             "numberOfBytes": "20"
           },
-          "t_contract(mmUSDT)12232": {
+          "t_contract(mmUSDT)12354": {
             "label": "contract mmUSDT",
             "numberOfBytes": "20"
           },
@@ -322,7 +322,10 @@
             }
           ]
         }
-      }
+      },
+      "allAddresses": [
+        "0xdF031Ac2b3574ABb8DEF300Ac6555Afb0be4F242"
+      ]
     },
     "c362139e841065b25c5e64d5daa1452bedc3636774b78063ee8dd79008033ac8": {
       "address": "0xdF031Ac2b3574ABb8DEF300Ac6555Afb0be4F242",

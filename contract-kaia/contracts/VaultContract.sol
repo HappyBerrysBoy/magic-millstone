@@ -188,34 +188,16 @@ contract VaultContract is
         // Mint NFT with final USDT amount (exchange rate applied)
         uint256 nftId = withdrawNFT.mint(msg.sender, finalUsdtAmount);
 
-        // Check if vault has sufficient funds including this new request
-        uint256 currentBalance = usdt.balanceOf(address(this));
-        uint256 totalRequestedAfter = getTotalRequestedWithdrawals() + finalUsdtAmount;
-        uint256 requiredReservesAfter = totalRequestedAfter; // No need to apply exchange rate, already applied
-        
-        // Auto-set status based on vault balance
-        WithdrawStatus initialStatus = WithdrawStatus.PENDING;
-        uint256 readyTime = 0;
-        
-        if (currentBalance >= requiredReservesAfter) {
-            initialStatus = WithdrawStatus.READY;
-            readyTime = block.timestamp;
-        }
-
-        // Store withdrawal request in THIS contract (store final USDT amount)
+        // Store withdrawal request as PENDING initially
         withdrawRequests[nftId] = WithdrawRequest({
             amount: finalUsdtAmount,
             requestTime: block.timestamp,
-            readyTime: readyTime,
-            status: initialStatus,
+            readyTime: 0,
+            status: WithdrawStatus.PENDING,
             requester: msg.sender
         });
 
         emit WithdrawRequested(msg.sender, finalUsdtAmount, nftId, block.timestamp);
-        
-        if (initialStatus == WithdrawStatus.READY) {
-            emit WithdrawMarkedReady(nftId, block.timestamp);
-        }
 
         return nftId;
     }
