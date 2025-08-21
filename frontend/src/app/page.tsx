@@ -88,7 +88,7 @@ export default function Home() {
         {account ? (
           <StakeForm />
         ) : (
-          <div className="h-[180px] flex justify-center items-center">
+          <div className="flex h-[180px] items-center justify-center">
             <WalletButton />
           </div>
         )}

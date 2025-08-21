@@ -1,4 +1,5 @@
 type PositionSummaryProps = {
+  totalValue : string;
   withdrawals: string;
   balance: string;
   exchangeRate: string;
@@ -8,8 +9,8 @@ export default function PositionSummary({
   withdrawals,
   balance,
   exchangeRate,
+  totalValue
 }: PositionSummaryProps) {
-  const totalValue = Number(balance) * Number(exchangeRate);
   return (
     <div className="flex w-full flex-col gap-7 pt-[50px]">
       <h1 className="text-base font-medium">Your Position</h1>
