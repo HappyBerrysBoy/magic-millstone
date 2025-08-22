@@ -4,15 +4,12 @@ async function main(): Promise<void> {
   const [user] = await ethers.getSigners();
 
   // Replace these with your deployed contract addresses
-  const TESTUUSDT_ADDRESS: string =
-    process.env.TESTUUSDT_ADDRESS || "YOUR_TESTUUSDT_ADDRESS";
+  const USDT_ADDRESS: string = process.env.USDT_ADDRESS || "YOUR_USDT_ADDRESS";
   const VAULT_ADDRESS: string =
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
-  const WITHDRAW_NFT_ADDRESS: string =
-    process.env.WITHDRAW_NFT_ADDRESS || "YOUR_WITHDRAW_NFT_ADDRESS";
 
   // Connect to deployed contracts
-  const testUSDT = await ethers.getContractAt("TestUSDT", TESTUUSDT_ADDRESS);
+  const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
   const vaultContract = await ethers.getContractAt(
     "VaultContract",
     VAULT_ADDRESS
@@ -24,14 +21,20 @@ async function main(): Promise<void> {
   // Step 1: Check vault balance
   console.log("\n1️⃣ Checking vault balance:");
   const vaultBalance = await testUSDT.balanceOf(VAULT_ADDRESS);
-  console.log("Vault USDT balance:", ethers.formatUnits(vaultBalance, 6), "USDT");
+  console.log(
+    "Vault USDT balance:",
+    ethers.formatUnits(vaultBalance, 6),
+    "USDT"
+  );
 
   // Step 2: Check current token ID and pending withdrawals
   console.log("\n2️⃣ Checking withdrawal requests:");
-  const currentTokenId = await vaultContract.withdrawNFT().then(async (nftAddress: string) => {
-    const withdrawNFT = await ethers.getContractAt("WithdrawNFT", nftAddress);
-    return await withdrawNFT.getCurrentTokenId();
-  });
+  const currentTokenId = await vaultContract
+    .withdrawNFT()
+    .then(async (nftAddress: string) => {
+      const withdrawNFT = await ethers.getContractAt("WithdrawNFT", nftAddress);
+      return await withdrawNFT.getCurrentTokenId();
+    });
   console.log("Current token ID:", currentTokenId.toString());
 
   let pendingCount = 0;
@@ -40,23 +43,33 @@ async function main(): Promise<void> {
 
   // Get withdrawNFT contract reference
   const withdrawNFTAddress = await vaultContract.withdrawNFT();
-  const withdrawNFT = await ethers.getContractAt("WithdrawNFT", withdrawNFTAddress);
+  const withdrawNFT = await ethers.getContractAt(
+    "WithdrawNFT",
+    withdrawNFTAddress
+  );
 
   // Check all existing NFTs for their withdrawal status
   for (let i = 1; i < currentTokenId; i++) {
     try {
       const owner = await withdrawNFT.ownerOf(i);
       const withdrawRequest = await vaultContract.withdrawRequests(i);
-      
+
       const status = withdrawRequest.status;
       const amount = withdrawRequest.amount;
-      
-      console.log(`NFT ${i}: Status ${status}, Amount: ${ethers.formatUnits(amount, 6)} USDT, Owner: ${owner}`);
-      
-      if (Number(status) === 0) { // PENDING
+
+      console.log(
+        `NFT ${i}: Status ${status}, Amount: ${ethers.formatUnits(
+          amount,
+          6
+        )} USDT, Owner: ${owner}`
+      );
+
+      if (Number(status) === 0) {
+        // PENDING
         pendingCount++;
         totalPendingAmount += BigInt(amount.toString());
-      } else if (Number(status) === 1) { // READY
+      } else if (Number(status) === 1) {
+        // READY
         readyCount++;
       }
     } catch (error) {
@@ -68,12 +81,14 @@ async function main(): Promise<void> {
   console.log(`\nSummary before update:`);
   console.log(`- Pending withdrawals: ${pendingCount}`);
   console.log(`- Ready withdrawals: ${readyCount}`);
-  console.log(`- Total pending amount: ${ethers.formatUnits(totalPendingAmount, 6)} USDT`);
+  console.log(
+    `- Total pending amount: ${ethers.formatUnits(totalPendingAmount, 6)} USDT`
+  );
   console.log(`- Vault balance: ${ethers.formatUnits(vaultBalance, 6)} USDT`);
 
   // Step 3: Check contract state before calling function
   console.log("\n3️⃣ Checking contract state...");
-  
+
   try {
     const isPaused = await (vaultContract as any).paused();
     console.log("Contract paused:", isPaused);
@@ -85,13 +100,40 @@ async function main(): Promise<void> {
   console.log("\n4️⃣ Calling updatePendingWithdrawals...");
 
   try {
-    // Try with a fixed high gas limit first
-    const tx = await (vaultContract as any).connect(user).updatePendingWithdrawals({
-      gasLimit: 500000, // Fixed high gas limit
+    // First try a static call to get the revert reason
+    console.log("Testing with static call first...");
+
+    // Get the function interface manually
+    const functionInterface = vaultContract.interface.getFunction(
+      "updatePendingWithdrawals"
+    );
+    if (!functionInterface) {
+      throw new Error("Function updatePendingWithdrawals not found");
+    }
+    console.log("Function selector:", functionInterface.selector);
+
+    // Encode the function call
+    const encodedData = vaultContract.interface.encodeFunctionData(
+      "updatePendingWithdrawals"
+    );
+    console.log("Encoded data:", encodedData);
+
+    // Try static call
+    await vaultContract.updatePendingWithdrawals.staticCall();
+    console.log("Static call succeeded");
+
+    // Send the transaction with explicit function call
+    const tx = await user.sendTransaction({
+      to: VAULT_ADDRESS,
+      data: encodedData,
+      gasLimit: 500000,
     });
 
     console.log("Transaction sent:", tx.hash);
     const receipt = await tx.wait();
+    if (!receipt) {
+      throw new Error("Transaction receipt is null");
+    }
     console.log("✅ Confirmed in block:", receipt.blockNumber);
 
     // Parse events from the transaction
@@ -100,13 +142,29 @@ async function main(): Promise<void> {
       try {
         const parsedLog = (vaultContract as any).interface.parseLog(log);
         if (parsedLog?.name === "WithdrawMarkedReady") {
-          console.log(`- WithdrawMarkedReady: NFT ${parsedLog.args[0]}, Time: ${parsedLog.args[1]}`);
+          console.log(
+            `- WithdrawMarkedReady: NFT ${parsedLog.args[0]}, Time: ${parsedLog.args[1]}`
+          );
         } else if (parsedLog?.name === "DebugFunctionCalled") {
           console.log(`- DebugFunctionCalled: ${parsedLog.args[0]}`);
         } else if (parsedLog?.name === "DebugUpdateStart") {
-          console.log(`- DebugUpdateStart: Balance ${ethers.formatUnits(parsedLog.args[0], 6)}, Reserved ${ethers.formatUnits(parsedLog.args[1], 6)}, Available ${ethers.formatUnits(parsedLog.args[2], 6)}`);
+          console.log(
+            `- DebugUpdateStart: Balance ${ethers.formatUnits(
+              parsedLog.args[0],
+              6
+            )}, Reserved ${ethers.formatUnits(
+              parsedLog.args[1],
+              6
+            )}, Available ${ethers.formatUnits(parsedLog.args[2], 6)}`
+          );
         } else if (parsedLog?.name === "DebugNFTProcessing") {
-          console.log(`- DebugNFTProcessing: NFT ${parsedLog.args[0]}, Status ${parsedLog.args[1]}, Amount ${ethers.formatUnits(parsedLog.args[2], 6)}, CanProcess ${parsedLog.args[3]}`);
+          console.log(
+            `- DebugNFTProcessing: NFT ${parsedLog.args[0]}, Status ${
+              parsedLog.args[1]
+            }, Amount ${ethers.formatUnits(parsedLog.args[2], 6)}, CanProcess ${
+              parsedLog.args[3]
+            }`
+          );
         } else if (parsedLog?.name === "DebugUpdateEnd") {
           console.log(`- DebugUpdateEnd: Processed ${parsedLog.args[0]} NFTs`);
         }
@@ -114,7 +172,6 @@ async function main(): Promise<void> {
         // Not a VaultContract event, skip
       }
     }
-
   } catch (error) {
     console.error("❌ Transaction failed:", error);
     return;
@@ -122,7 +179,7 @@ async function main(): Promise<void> {
 
   // Step 5: Check results after update
   console.log("\n5️⃣ Checking results after update:");
-  
+
   let newPendingCount = 0;
   let newReadyCount = 0;
   let newTotalPendingAmount = 0n;
@@ -131,17 +188,24 @@ async function main(): Promise<void> {
     try {
       const owner = await withdrawNFT.ownerOf(i);
       const withdrawRequest = await vaultContract.withdrawRequests(i);
-      
+
       const status = withdrawRequest.status;
       const amount = withdrawRequest.amount;
       const readyTime = withdrawRequest.readyTime;
-      
-      console.log(`NFT ${i}: Status ${status}, Amount: ${ethers.formatUnits(amount, 6)} USDT, ReadyTime: ${readyTime}, Owner: ${owner}`);
-      
-      if (Number(status) === 0) { // PENDING
+
+      console.log(
+        `NFT ${i}: Status ${status}, Amount: ${ethers.formatUnits(
+          amount,
+          6
+        )} USDT, ReadyTime: ${readyTime}, Owner: ${owner}`
+      );
+
+      if (Number(status) === 0) {
+        // PENDING
         newPendingCount++;
         newTotalPendingAmount += BigInt(amount.toString());
-      } else if (Number(status) === 1) { // READY
+      } else if (Number(status) === 1) {
+        // READY
         newReadyCount++;
       }
     } catch (error) {
@@ -155,14 +219,23 @@ async function main(): Promise<void> {
   console.log(`Before: ${pendingCount} pending, ${readyCount} ready`);
   console.log(`After:  ${newPendingCount} pending, ${newReadyCount} ready`);
   console.log(`Withdrawals marked ready: ${newReadyCount - readyCount}`);
-  console.log(`Pending amount reduced by: ${ethers.formatUnits(totalPendingAmount - newTotalPendingAmount, 6)} USDT`);
-  
+  console.log(
+    `Pending amount reduced by: ${ethers.formatUnits(
+      totalPendingAmount - newTotalPendingAmount,
+      6
+    )} USDT`
+  );
+
   if (newPendingCount < pendingCount) {
-    console.log("✅ Some pending withdrawals were successfully marked as ready!");
+    console.log(
+      "✅ Some pending withdrawals were successfully marked as ready!"
+    );
   } else if (pendingCount === 0) {
     console.log("ℹ️  No pending withdrawals to process");
   } else {
-    console.log("ℹ️  No withdrawals were marked ready (insufficient vault balance)");
+    console.log(
+      "ℹ️  No withdrawals were marked ready (insufficient vault balance)"
+    );
   }
 
   console.log("\n✅ updatePendingWithdrawals test completed!");

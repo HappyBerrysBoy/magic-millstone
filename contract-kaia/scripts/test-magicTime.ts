@@ -4,16 +4,17 @@ async function main(): Promise<void> {
   const signers = await ethers.getSigners();
   const admin = signers[0];
 
-  const bridgeAddress = process.env.BRIDGE_DESTINATION_ADDRESS || "0x4875fA58c1b60f8b6C2358252A302A6D0c823B6d";
+  const bridgeAddress =
+    process.env.BRIDGE_DESTINATION_ADDRESS ||
+    "0x4875fA58c1b60f8b6C2358252A302A6D0c823B6d";
 
   // Replace these with your deployed contract addresses
-  const TESTUUSDT_ADDRESS: string =
-    process.env.TESTUUSDT_ADDRESS || "YOUR_TESTUUSDT_ADDRESS";
+  const USDT_ADDRESS: string = process.env.USDT_ADDRESS || "YOUR_USDT_ADDRESS";
   const VAULT_ADDRESS: string =
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
 
   // Connect to deployed contracts
-  const testUSDT = await ethers.getContractAt("TestUSDT", TESTUUSDT_ADDRESS);
+  const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
   const vaultContract = await ethers.getContractAt(
     "VaultContract",
     VAULT_ADDRESS
@@ -59,19 +60,18 @@ async function main(): Promise<void> {
     );
 
     console.log("Static call result:");
-    console.log("Success:", staticResult[0]);
     console.log(
       "Amount that would be sent:",
-      ethers.formatUnits(staticResult[1], 6),
+      ethers.formatUnits(staticResult[0], 6),
       "USDT"
     );
     console.log(
       "Amount needed (if insufficient):",
-      ethers.formatUnits(staticResult[2], 6),
+      ethers.formatUnits(staticResult[1], 6),
       "USDT"
     );
 
-    if (staticResult[0]) {
+    if (staticResult[0] > 0n) {
       console.log("✅ magicTime would send funds to bridge");
     } else {
       console.log("❌ magicTime would fail - need more funds in vault");
@@ -92,11 +92,16 @@ async function main(): Promise<void> {
     console.log("✅ Confirmed in block:", receipt.blockNumber);
 
     // Get the actual return values from the transaction by calling staticCall after execution
-    const actualResult = await (vaultContract as any).magicTime.staticCall(bridgeAddress);
+    const actualResult = await (vaultContract as any).magicTime.staticCall(
+      bridgeAddress
+    );
     console.log("\n📊 Actual function return values:");
-    console.log("Success:", actualResult[0]);
-    console.log("Amount sent:", ethers.formatUnits(actualResult[1], 6), "USDT");
-    console.log("Amount needed:", ethers.formatUnits(actualResult[2], 6), "USDT");
+    console.log("Amount sent:", ethers.formatUnits(actualResult[0], 6), "USDT");
+    console.log(
+      "Amount needed:",
+      ethers.formatUnits(actualResult[1], 6),
+      "USDT"
+    );
 
     // Check event logs
     const bridgeTransferEvents = receipt.logs.filter((log: any) => {

@@ -5,7 +5,7 @@ async function main() {
 
   const [admin] = await ethers.getSigners();
   const VAULT_ADDRESS = process.env.VAULT_ADDRESS;
-
+  const NEW_RATE: string = process.env.NEW_RATE || "1.2";
   if (!VAULT_ADDRESS) {
     console.error("❌ Missing vault address");
     process.exit(1);
@@ -45,9 +45,10 @@ async function main() {
   );
 
   // Test setting a yield rate (1.1 = 10% yield for users)
-  const newRate = ethers.parseUnits("1.2", 6); // 10% yield!
+  const newRate = ethers.parseUnits(NEW_RATE, 6);
+  const yieldPercentage = (parseFloat(NEW_RATE) - 1) * 100;
 
-  console.log("\n🚀 Testing 10% Yield Rate (1.1):");
+  console.log(`\n🚀 Testing ${yieldPercentage}% Yield Rate (${NEW_RATE}):`);
   console.log("New rate:", ethers.formatUnits(newRate, 6));
 
   const newReserves = (totalRequested * newRate) / BigInt(1000000);
@@ -63,14 +64,6 @@ async function main() {
     ethers.formatUnits(additionalReserves, 6),
     "USDT"
   );
-
-
-  // Example: User journey
-  console.log("\n👤 User Journey Example:");
-  console.log("1. User deposits 50 USDT → gets 50 mmUSDT");
-  console.log("2. Time passes, admin sets yield rate to 1.2 (20% yield)");
-  console.log("3. User requests withdrawal of 50 mmUSDT → NFT minted with 60 USDT value");
-  console.log("4. User earned 10 USDT profit when they made the withdrawal request! 💰");
 
   // Actually set the new rate (comment out if you don't want to change it)
   try {
