@@ -9,6 +9,7 @@ async function main(): Promise<void> {
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
   const MMUSDT_ADDRESS: string =
     process.env.MMUSDT_ADDRESS || "YOUR_MMUSDT_ADDRESS";
+  const DEPOSIT_AMOUNT: string = process.env.DEPOSIT_AMOUNT || "100";
 
   // Connect to deployed contracts
   const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
@@ -47,7 +48,7 @@ async function main(): Promise<void> {
 
   // Step 2: Approve vault to spend TestUSDT
   console.log("\n2️⃣ Approving vault to spend TestUSDT...");
-  const depositAmount = ethers.parseUnits("10", 6); // 5 USDT
+  const depositAmount = ethers.parseUnits(DEPOSIT_AMOUNT, 6);
 
   const approveTx = await (testUSDT as any)
     .connect(user)
@@ -141,9 +142,9 @@ async function main(): Promise<void> {
 
   // Verify correct behavior: USDT transferred but no mmUSDT minted
   console.log("\n✅ Verification:");
-  const usdtTransferCorrect = usdtSpent === depositAmount;
-  const noMmUSDTMinted = mmUSDTChange === 0n;
-  const vaultReceivedCorrect = vaultGained === depositAmount;
+  const usdtTransferCorrect = BigInt(usdtSpent) === depositAmount;
+  const noMmUSDTMinted = BigInt(mmUSDTChange) === 0n;
+  const vaultReceivedCorrect = BigInt(vaultGained) === depositAmount;
 
   console.log("USDT transferred correctly:", usdtTransferCorrect ? "✅" : "❌");
   console.log("No mmUSDT minted:", noMmUSDTMinted ? "✅" : "❌");

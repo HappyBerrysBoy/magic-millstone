@@ -60,19 +60,18 @@ async function main(): Promise<void> {
     );
 
     console.log("Static call result:");
-    console.log("Success:", staticResult[0]);
     console.log(
       "Amount that would be sent:",
-      ethers.formatUnits(staticResult[1], 6),
+      ethers.formatUnits(staticResult[0], 6),
       "USDT"
     );
     console.log(
       "Amount needed (if insufficient):",
-      ethers.formatUnits(staticResult[2], 6),
+      ethers.formatUnits(staticResult[1], 6),
       "USDT"
     );
 
-    if (staticResult[0]) {
+    if (staticResult[0] > 0n) {
       console.log("✅ magicTime would send funds to bridge");
     } else {
       console.log("❌ magicTime would fail - need more funds in vault");
@@ -97,11 +96,10 @@ async function main(): Promise<void> {
       bridgeAddress
     );
     console.log("\n📊 Actual function return values:");
-    console.log("Success:", actualResult[0]);
-    console.log("Amount sent:", ethers.formatUnits(actualResult[1], 6), "USDT");
+    console.log("Amount sent:", ethers.formatUnits(actualResult[0], 6), "USDT");
     console.log(
       "Amount needed:",
-      ethers.formatUnits(actualResult[2], 6),
+      ethers.formatUnits(actualResult[1], 6),
       "USDT"
     );
 

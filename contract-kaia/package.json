@@ -16,6 +16,8 @@
     "@nomicfoundation/hardhat-typechain": "^3.0.0",
     "@nomicfoundation/hardhat-verify": "^3.0.0",
     "@openzeppelin/hardhat-upgrades": "^3.9.1",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.2.0",
     "@types/chai-as-promised": "^8.0.1",
     "@types/mocha": ">=10.0.10",
@@ -26,6 +28,7 @@
     "hardhat": "2.22.12",
     "mocha": "^11.0.0",
     "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
     "typescript": "~5.8.0"
   },
   "dependencies": {

@@ -7,8 +7,6 @@ async function main(): Promise<void> {
   const USDT_ADDRESS: string = process.env.USDT_ADDRESS || "YOUR_USDT_ADDRESS";
   const VAULT_ADDRESS: string =
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
-  const WITHDRAW_NFT_ADDRESS: string =
-    process.env.WITHDRAW_NFT_ADDRESS || "YOUR_WITHDRAW_NFT_ADDRESS";
 
   // Connect to deployed contracts
   const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
@@ -102,15 +100,40 @@ async function main(): Promise<void> {
   console.log("\n4️⃣ Calling updatePendingWithdrawals...");
 
   try {
-    // Try with a fixed high gas limit first
-    const tx = await (vaultContract as any)
-      .connect(user)
-      .updatePendingWithdrawals({
-        gasLimit: 500000, // Fixed high gas limit
-      });
+    // First try a static call to get the revert reason
+    console.log("Testing with static call first...");
+
+    // Get the function interface manually
+    const functionInterface = vaultContract.interface.getFunction(
+      "updatePendingWithdrawals"
+    );
+    if (!functionInterface) {
+      throw new Error("Function updatePendingWithdrawals not found");
+    }
+    console.log("Function selector:", functionInterface.selector);
+
+    // Encode the function call
+    const encodedData = vaultContract.interface.encodeFunctionData(
+      "updatePendingWithdrawals"
+    );
+    console.log("Encoded data:", encodedData);
+
+    // Try static call
+    await vaultContract.updatePendingWithdrawals.staticCall();
+    console.log("Static call succeeded");
+
+    // Send the transaction with explicit function call
+    const tx = await user.sendTransaction({
+      to: VAULT_ADDRESS,
+      data: encodedData,
+      gasLimit: 500000,
+    });
 
     console.log("Transaction sent:", tx.hash);
     const receipt = await tx.wait();
+    if (!receipt) {
+      throw new Error("Transaction receipt is null");
+    }
     console.log("✅ Confirmed in block:", receipt.blockNumber);
 
     // Parse events from the transaction

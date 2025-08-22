@@ -6,6 +6,7 @@ async function main(): Promise<void> {
   const VAULT_ADDRESS = process.env.VAULT_ADDRESS || "";
   const MMUSDT_ADDRESS = process.env.MMUSDT_ADDRESS || "";
   const WITHDRAWNFT_ADDRESS = process.env.WITHDRAWNFT_ADDRESS || "";
+  const WITHDRAW_AMOUNT = process.env.WITHDRAW_AMOUNT || "10";
 
   console.log("🔄 User Withdrawal Request Process");
   console.log("User address:", user.address);
@@ -43,9 +44,7 @@ async function main(): Promise<void> {
   }
 
   // Set withdrawal amount (default 50 mmUSDT or environment variable)
-  const withdrawAmount = process.env.WITHDRAW_AMOUNT
-    ? ethers.parseUnits(process.env.WITHDRAW_AMOUNT, 6)
-    : ethers.parseUnits("10", 6);
+  const withdrawAmount = ethers.parseUnits(WITHDRAW_AMOUNT, 6);
 
   console.log(
     "Requested withdrawal amount:",

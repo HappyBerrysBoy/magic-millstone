@@ -9,7 +9,7 @@ async function main() {
   const VAULT_ADDRESS = process.env.VAULT_ADDRESS;
   const USDT_ADDRESS = process.env.USDT_ADDRESS;
   const WITHDRAWNFT_ADDRESS = process.env.WITHDRAWNFT_ADDRESS;
-  const NFT_ID = process.env.NFT_ID;
+  const NFT_ID = process.env.NFT_ID || "1";
 
   if (!VAULT_ADDRESS || !USDT_ADDRESS || !WITHDRAWNFT_ADDRESS) {
     console.error("❌ Missing contract addresses in environment");
@@ -27,7 +27,7 @@ async function main() {
     WITHDRAWNFT_ADDRESS
   );
 
-  const nftId = NFT_ID ? parseInt(NFT_ID) : 16;
+  const nftId = parseInt(NFT_ID);
 
   console.log("\n🎫 NFT ID to execute:", nftId);
 

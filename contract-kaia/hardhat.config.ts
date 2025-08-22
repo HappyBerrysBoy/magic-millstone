@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-ethers";
 import "@nomicfoundation/hardhat-chai-matchers";
+import "@typechain/hardhat";
 import "@openzeppelin/hardhat-upgrades";
 import "dotenv/config";
 
@@ -14,6 +15,12 @@ const config: HardhatUserConfig = {
       },
       viaIR: true,
     },
+  },
+  typechain: {
+    outDir: "types",
+    target: "ethers-v6",
+    alwaysGenerateOverloads: false,
+    dontOverrideCompile: false,
   },
   networks: {
     kairos: {
