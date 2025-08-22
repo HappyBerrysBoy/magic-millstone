@@ -11,7 +11,7 @@ import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { vaultContractAddress } from "@/utils/contractAddress";
 import { microUSDTHexToUSDTDecimal } from "@/utils/format";
 import { usdtTokenAddress } from "@/utils/tokenAddress";
-import { parseUnits } from "ethers";
+import { parseUnits, formatUnits } from "ethers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -42,8 +42,12 @@ function PercentageButton({
 
 export default function Stake() {
   const { account } = useWalletAccountStore();
-  const { getErc20TokenBalance, sendContractTransaction, web3Provider } =
-    useKaiaWalletSdk();
+  const {
+    getErc20TokenBalance,
+    sendContractTransaction,
+    web3Provider,
+    callContractFunction,
+  } = useKaiaWalletSdk();
 
   const { timeLeft, targetLabel } = useCountdownToNoonMidnight();
   const showToast = useBottomToastStore((s) => s.show);
@@ -55,6 +59,7 @@ export default function Stake() {
   );
   const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
   const [isStaking, setIsStaking] = useState<boolean>(false);
+  const [exchangeRate, setExchangeRate] = useState<number>(0);
 
   const router = useRouter();
 
@@ -69,8 +74,26 @@ export default function Stake() {
       });
     }
   };
+
+  const fetchExchangeRate = async () => {
+    try {
+      const rate = await callContractFunction(
+        vaultContractAddress,
+        vaultABI as unknown as unknown[],
+        "exchangeRate",
+      );
+      console.log("Exchange rate:", rate);
+      const formattedRate = Number(formatUnits(rate[0], 6));
+      setExchangeRate(formattedRate);
+    } catch (error) {
+      console.error("Error fetching exchangeRate:", error);
+      setExchangeRate(0);
+    }
+  };
+
   useEffect(() => {
     fetchBalance();
+    fetchExchangeRate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
@@ -224,7 +247,7 @@ export default function Stake() {
               </div>
               <div className="flex justify-end gap-1">
                 <p className="text-mm-gray-default text-xs font-normal">
-                  1 mmUSDT = $ 1.0143 USDT
+                  1 mmUSDT = ${exchangeRate} USDT
                 </p>
               </div>
             </div>

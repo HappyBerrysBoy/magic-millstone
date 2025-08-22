@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import ChartTabs from "@/components/Dashboard/ChartTabs";
 import VaultStats from "@/components/Dashboard/VaultStats";
 import Composition from "@/components/Dashboard/Composition";
-import { callApi, ApiResponse } from "../_utils/callApi";
+import { ApiResponse } from "../_utils/callApi";
+import getStatus from "../_services/getStatus";
 
 type ChartPoint = { datetime: string; value: string | number };
 type PortfolioStatus = {
@@ -20,10 +21,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const handleUpdatePortfolioStatus = async () => {
-      const res = await callApi<PortfolioStatus>({
-        endpoint: `/portfolio/magic-millstone-usdt/status`,
-        method: "GET",
-      });
+      const res = await getStatus("magic-millstone-usdt");
       type MaybeWrapped<T> = ApiResponse<T> | T;
       const maybeWrapped = res as unknown as MaybeWrapped<PortfolioStatus>;
       const data =
@@ -55,13 +53,12 @@ export default function Dashboard() {
       )
     : [];
   const tvl = status?.tvl ?? "-";
-  const apy = status?.apy != null ? `${Number(status.apy).toFixed(2)}%` : "-";
-  const timeLeft = "—";
+  const apy = status?.apy ?? "-";
 
   return (
     <div className="flex min-h-[calc(100vh-124px)] flex-col pt-[50px]">
       <main className="mx-auto flex h-full w-full max-w-md flex-1 flex-col gap-[28px]">
-        <VaultStats tvl={tvl} apy={apy} timeLeft={timeLeft} />
+        <VaultStats tvl={tvl} apy={apy} />
         <ChartTabs
           apyData={status?.dailyApyChart || []}
           ppsData={status?.pricePerShareChart || []}

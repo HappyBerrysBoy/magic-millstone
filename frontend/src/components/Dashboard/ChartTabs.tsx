@@ -24,7 +24,7 @@ const ChartTabs: React.FC<ChartTabsProps> = ({ apyData, ppsData, tvlData }) => {
         {TAB_LIST.map((tab) => (
           <button
             key={tab.key}
-            className={`flex-1 border-b-1 py-2 text-[12px] ${selected === tab.key ? "text-primary border-primary" : "border-transparent text-[#ABB4B4]"}`}
+            className={`flex-1 cursor-pointer border-b-1 py-2 text-[12px] ${selected === tab.key ? "text-primary border-primary" : "border-transparent text-[#ABB4B4]"}`}
             onClick={() => setSelected(tab.key)}
           >
             {tab.label}
