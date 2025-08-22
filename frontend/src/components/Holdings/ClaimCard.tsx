@@ -1,4 +1,4 @@
-import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
+import { formatNumberWithCommas } from "@/utils/formatFuncs";
 
 interface ClaimCardProps {
   id: string;

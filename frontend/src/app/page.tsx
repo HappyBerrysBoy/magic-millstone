@@ -5,7 +5,7 @@ import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import HomeStats from "@/components/HomeStats";
 import MillstoneIcon from "public/svgs/MillstoneIcon";
 import MillstoneTextIcon from "public/svgs/MillstoneTextIcon";
-import StakeForm from "./_components/StakeForm";
+import StakeForm from "@/components/Home/StakeForm";
 import getStats from "./_services/getStats";
 import { useEffect, useState } from "react";
 
