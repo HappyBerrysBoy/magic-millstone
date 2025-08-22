@@ -1,5 +1,5 @@
 type PositionSummaryProps = {
-  totalValue : string;
+  totalValue: string;
   withdrawals: string;
   balance: string;
   exchangeRate: string;
@@ -9,7 +9,7 @@ export default function PositionSummary({
   withdrawals,
   balance,
   exchangeRate,
-  totalValue
+  totalValue,
 }: PositionSummaryProps) {
   return (
     <div className="flex w-full flex-col gap-7 pt-[50px]">
@@ -39,7 +39,7 @@ export default function PositionSummary({
           <div className="flex flex-col gap-[6px]">
             <div className="flex items-baseline justify-between">
               <p className="text-lg font-normal">${withdrawals}</p>
-              <p className="text-sm font-normal text-white">USD</p>
+              <p className="text-sm font-normal text-white">USDT</p>
             </div>
             <p className="text-mm-gray-light text-[10px] font-normal">
               Pending Withdrawals
