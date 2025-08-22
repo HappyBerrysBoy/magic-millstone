@@ -127,7 +127,9 @@ export default function Stake() {
       }
     } finally {
       setIsStaking(false);
-      fetchBalance();
+      setTimeout(() => {
+        fetchBalance();
+      }, 1000);
     }
   };
 

@@ -124,7 +124,10 @@ export default function Withdraw() {
       }
     } finally {
       setIsWithdrawing(false);
-      fetchBalance()
+      setTimeout(()=>{
+        fetchBalance()
+        
+      }, 1000)
     }
   };
 
