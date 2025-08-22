@@ -4,12 +4,13 @@ import { Logo } from "public/svgs/Logo";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { callApi } from "@/app/_utils/callApi";
+import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 
 export const WalletButton = () => {
   const { connectAndSign } = useKaiaWalletSdk();
 
   const { setAccount } = useWalletAccountStore();
-
+  const showToast = useBottomToastStore((s) => s.show);
   const handleConnect = async () => {
     try {
       const [account] = await connectAndSign("connect");
@@ -22,6 +23,7 @@ export const WalletButton = () => {
           address: account,
         },
       });
+      showToast("Line Wallet connected successfully.", "success");
     } catch (error: unknown) {
       console.log(error);
     }

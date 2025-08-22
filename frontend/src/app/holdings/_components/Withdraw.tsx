@@ -8,7 +8,11 @@ import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { mmUSDTABI } from "@/app/_abis/mmUSDT";
 import { vaultABI } from "@/app/_abis/vault";
 import { formatUnits, parseUnits } from "ethers";
-import { mmUSDTContractAddress, vaultContractAddress } from "@/utils/contractAddress";
+import {
+  mmUSDTContractAddress,
+  vaultContractAddress,
+} from "@/utils/contractAddress";
+import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 
 interface PercentageButtonProps {
   percentage: number;
@@ -35,10 +39,11 @@ function PercentageButton({
   );
 }
 
-
 export default function Withdraw() {
   const { account } = useWalletAccountStore();
   const { callContractFunction, sendContractTransaction } = useKaiaWalletSdk();
+  const showToast = useBottomToastStore((s) => s.show);
+
   const [balance, setBalance] = useState<number>(0);
   const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
   const [selectedPercentage, setSelectedPercentage] = useState<number | null>(
@@ -111,6 +116,7 @@ export default function Withdraw() {
       setWithdrawAmount(0);
       setInputValue("");
       setSelectedPercentage(null);
+      showToast("Withdrawal request sent successfully.", "success");
     } catch (error: any) {
       console.error("❌ Withdrawal request failed:", error);
 
@@ -124,7 +130,9 @@ export default function Withdraw() {
       }
     } finally {
       setIsWithdrawing(false);
-      fetchBalance()
+      setTimeout(() => {
+        fetchBalance();
+      }, 1000);
     }
   };
 

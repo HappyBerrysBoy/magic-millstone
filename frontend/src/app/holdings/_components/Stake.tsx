@@ -5,6 +5,7 @@ import { vaultABI } from "@/app/_abis/vault";
 import ButtonDefault from "@/app/_components/ButtonDefault";
 import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
+import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 import { useCountdownToNoonMidnight } from "@/app/hooks/time.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { vaultContractAddress } from "@/utils/contractAddress";
@@ -45,6 +46,8 @@ export default function Stake() {
     useKaiaWalletSdk();
 
   const { timeLeft, targetLabel } = useCountdownToNoonMidnight();
+  const showToast = useBottomToastStore((s) => s.show);
+
   const [stakeAmount, setStakeAmount] = useState<number>(0);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedPercentage, setSelectedPercentage] = useState<number | null>(
@@ -52,6 +55,7 @@ export default function Stake() {
   );
   const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
   const [isStaking, setIsStaking] = useState<boolean>(false);
+
   const router = useRouter();
 
   const fetchBalance = async () => {
@@ -114,6 +118,7 @@ export default function Stake() {
       setStakeAmount(0);
       setInputValue("");
       setSelectedPercentage(null);
+      showToast("Stake completed successfully.", "success");
     } catch (error: any) {
       console.error("❌ Stake request failed:", error);
 
@@ -127,7 +132,9 @@ export default function Stake() {
       }
     } finally {
       setIsStaking(false);
-      fetchBalance();
+      setTimeout(() => {
+        fetchBalance();
+      }, 1000);
     }
   };
 

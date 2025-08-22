@@ -8,7 +8,7 @@ const MillstoneTextIconLoading = ({ className }: { className?: string }) => {
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      <g clip-path="url(#clip0_502_24)">
+      <g clipPath="url(#clip0_502_24)">
         <path
           d="M0.455078 2.444H3.43389L8.8797 15.222L14.3255 2.444H17.3043V18.36H14.8844V6.674H14.7923L9.83579 18.36H7.92771L2.94459 6.674H2.87498V18.36H0.455078V2.444Z"
           fill="#00FBFF"
