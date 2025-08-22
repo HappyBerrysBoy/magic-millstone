@@ -13,6 +13,7 @@ import { usdtTokenAddress } from "@/utils/tokenAddress";
 import { parseUnits } from "ethers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useBottomToastStore } from "../hooks/bottomToast.hooks";
 
 interface PercentageButtonProps {
   percentage: number;
@@ -53,6 +54,7 @@ export default function StakeForm() {
   const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
   const [isStaking, setIsStaking] = useState<boolean>(false);
   const router = useRouter();
+  const showToast = useBottomToastStore((s) => s.show);
 
   const fetchBalance = async () => {
     if (account) {
@@ -109,6 +111,7 @@ export default function StakeForm() {
       );
       console.log("depositTx :", depositTx);
       console.log("✅ Stake request sent successfully!");
+      showToast("Stake completed successfully.", "success");
 
       // Reset form
       setStakeAmount(0);
