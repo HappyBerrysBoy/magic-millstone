@@ -11,6 +11,7 @@ import {
 } from "@/utils/contractAddress";
 import { formatUnits } from "ethers";
 import { vaultABI } from "@/app/_abis/vault";
+import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 
 // 1) 컨트랙트 반환 타입(제네릭에 쓸 것)
 type UserWithdrawalsRet = readonly [
@@ -39,6 +40,7 @@ type WithdrawalItemUI = {
 export default function Claim() {
   const { callContractFunction, sendContractTransaction } = useKaiaWalletSdk();
   const { account } = useWalletAccountStore();
+  const showToast = useBottomToastStore((s) => s.show);
 
   const [isLoading, setIsLoading] = useState(true);
   const [userWithdraws, setUserWithdraws] = useState<WithdrawalItemUI[]>([]);
@@ -77,7 +79,7 @@ export default function Claim() {
           console.log(`res ${id} :`, res);
           console.log(`amount : ${res.amount}, status : ${res.status}`);
           const statusNum = Number(res.status);
-          console.log(statusNum)
+          console.log(statusNum);
           return {
             id: id.toString(),
             amountText: formatUnits(res.amount, 6), // 여기서 문자열로 변환
@@ -111,6 +113,7 @@ export default function Claim() {
       );
 
       console.log("✅ Claim request sent successfully!");
+      showToast("Claim request sent successfully.", "success");
     } catch (error: any) {
       console.error("❌ Withdrawal request failed:", error);
 
