@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useKaiaWalletSdk } from "../app/hooks/walletSdk.hooks";
-import Button from "./Common/Button";
+import Button from "@/components/Common/Button";
 
 interface DepositFormProps {
   balance: number;
@@ -10,11 +9,7 @@ interface DepositFormProps {
 
 const PERCENTS = [25, 50, 75, 100];
 
-const DepositForm: React.FC<DepositFormProps> = ({
-  balance,
-  onStake,
-  onClose,
-}) => {
+const DepositForm: React.FC<DepositFormProps> = ({ balance, onStake }) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -83,7 +78,7 @@ const DepositForm: React.FC<DepositFormProps> = ({
           <span>USDT</span>
         </div>
       </div>
-      <Button className="w-full" onClick={handleStake}>
+      <Button className="w-full" onClick={handleStake} disabled={loading}>
         Stake
       </Button>
     </div>

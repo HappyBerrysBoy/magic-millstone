@@ -3,7 +3,7 @@ import styles from "./WalletButton.module.css";
 import { Logo } from "public/svgs/Logo";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
-import { callApi } from "@/app/_utils/callApi";
+import { callApi } from "@/utils/callApi";
 import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 
 export const WalletButton = () => {

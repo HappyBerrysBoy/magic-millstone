@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import ChartTabs from "@/components/Dashboard/ChartTabs";
 import VaultStats from "@/components/Dashboard/VaultStats";
 import Composition from "@/components/Dashboard/Composition";
-import { ApiResponse } from "../_utils/callApi";
-import getStatus from "../_services/getStatus";
+import { ApiResponse } from "@/utils/callApi";
+import getStatus from "@/app/_services/getStatus";
 
 type ChartPoint = { datetime: string; value: string | number };
 type PortfolioStatus = {

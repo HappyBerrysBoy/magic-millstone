@@ -1,6 +1,6 @@
 "use server";
 
-import { callApi } from "../_utils/callApi";
+import { callApi } from "@/utils/callApi";
 import { PortfolioStats } from "../page";
 
 export default async function getStatus(id: string) {

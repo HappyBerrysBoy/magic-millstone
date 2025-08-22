@@ -1,4 +1,4 @@
-import { formatBigNumber } from "@/app/_utils/formatFuncs";
+import { formatBigNumber } from "@/utils/formatFuncs";
 import React from "react";
 
 interface VaultStatsProps {

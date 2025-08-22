@@ -1,10 +1,10 @@
 "use client";
 
-import ButtonBack from "@/app/_components/ButtonBack";
-import Stake from "../_components/Stake";
+import ButtonBack from "@/components/ButtonBack";
 import { useRouter } from "next/navigation";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useEffect } from "react";
+import Stake from "@/components/Holdings/Stake";
 
 export default function StakePage() {
   const router = useRouter();
