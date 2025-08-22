@@ -22,7 +22,7 @@ async function bootstrap() {
   }
 
   const corsOptions: CorsOptions = {
-    origin: [''],
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Refresh-Token'],
     exposedHeaders: ['Authorization', 'Refresh-Token'],
