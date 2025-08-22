@@ -21,9 +21,11 @@ import {
 import { withdrawNFTABI } from "../_abis/withdrawNFT";
 import { mmUSDTABI } from "../_abis/mmUSDT";
 import { formatNumberWithCommas } from "../_utils/formatFuncs";
+import { useRouter } from "next/navigation";
 
 export default function Holdings() {
   const USDT_ADDRESS = usdtTokenAddress;
+  const router = useRouter();
   const { sdk } = useKaiaWalletSdkStore();
   const { getAccount, requestAccount, callContractFunction } =
     useKaiaWalletSdk();
@@ -64,6 +66,7 @@ export default function Holdings() {
       setIsLoading(false);
     }
   };
+
   // Fetch userWithdrawals balance
   const fetchUserWithdrawals = async () => {
     if (!account) {
@@ -118,19 +121,22 @@ export default function Holdings() {
 
   useEffect(() => {
     if (!provider) return; // sdk 준비 전이면 패스
+    if (!account) {
+      router.replace("/");
+    }
+
     fetchBalance();
     fetchUserWithdrawals();
     fetchTotalAmount();
-    // console.log(`balance : ${balance}`);
-    // console.log(`withdrawals : ${withdrawals}`);
-    // console.log(`exchange rate : ${exchangeRate}`);
-    // console.log(Number(withdrawals) * Number(exchangeRate));
   }, [provider, USDT_ADDRESS]);
+  if (!account) return;
   return (
     <div className="flex h-full min-h-[calc(100vh-148px)] flex-col">
       <div className="flex-1">
         <PositionSummary
-          totalValue={formatNumberWithCommas(balance * exchangeRate)}
+          totalValue={formatNumberWithCommas(
+            balance * exchangeRate + withdrawals,
+          )}
           withdrawals={formatNumberWithCommas(withdrawals)}
           balance={formatNumberWithCommas(balance)}
           exchangeRate={formatNumberWithCommas(exchangeRate)}

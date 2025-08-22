@@ -19,7 +19,7 @@ export default function PositionSummary({
           <div className="flex flex-col gap-[6px]">
             <div className="flex items-baseline justify-between">
               <p className="text-lg font-normal">${totalValue}</p>
-              <p className="text-mm-gray-default text-xs font-normal">USD</p>
+              <p className="text-sm font-normal text-white">USD</p>
             </div>
             <p className="text-mm-gray-light text-[10px] font-normal">
               Total value
@@ -38,8 +38,8 @@ export default function PositionSummary({
           <div className="bg-primary h-[0.3px] w-full" />
           <div className="flex flex-col gap-[6px]">
             <div className="flex items-baseline justify-between">
-              <p className="text-lg font-normal">{withdrawals}</p>
-              <p className="text-sm font-normal text-white">mmUSDT</p>
+              <p className="text-lg font-normal">${withdrawals}</p>
+              <p className="text-sm font-normal text-white">USD</p>
             </div>
             <p className="text-mm-gray-light text-[10px] font-normal">
               Pending Withdrawals

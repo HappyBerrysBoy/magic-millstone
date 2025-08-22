@@ -14,8 +14,7 @@ export default function StakePage() {
       router.replace("/"); // 뒤로가기 눌러도 못돌아오게
     }
   }, [account, router]);
-  // balance 불러오기
-
+  if (!account) return;
   return (
     <div className="flex min-h-[calc(100vh-148px)] flex-col gap-[20px]">
       <ButtonBack onClick={() => router.back()} />
