@@ -1,80 +1,168 @@
+// 🌉 브릿지 전용 입출금 시나리오 테스트를 시작합니다...
+
+// 📋 사용할 주소들:
+//   Steakhouse USDT Vault: 0xbEef047a543E45807105E51A8BBEFCc5950fcfBa
+//   AAVE Pool V3: 0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2
+//   USDT: 0xdAC17F958D2ee523a2206206994597C13D831ec7
+
+// 👤 계정 설정:
+//   배포자: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266
+//   Fee 수취인: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
+//   🌉 Polygon Bridge: 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
+//   🌉 Arbitrum Bridge: 0x90F79bf6EB2c4f870365E785982E1f101E93b906
+//   🌉 Base Bridge: 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
 import { ethers } from 'hardhat';
 
-// 여기에 실제 배포 로그에서 나온 주소들을 입력하세요
-const TOKEN_ADDRESSES = {
-  wbtc: '0x29f2D40B0605204364af54EC677bD022dA425d03',
-  link: '0xf8Fb3713D459D7C1018BD0A49D19b4C44290EBE5',
-  dai: '0xFF34B3d4Aee8ddCd6F9AFFFB6Fe49bD371b8a357',
-  usdt: '0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0', // 실제 USDT 주소
-  usdc: '0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8', // 실제 USDC 주소
-};
-
-const LENDING_ADDRESS = '0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951';
-
-const DEPLOYED_ADDRESSES = {
-  vault: '0x3fc7E69DeE13193a3F0172c12449F3eA34f588DF', // 실제 Vault 프록시 주소로 변경
-  implementation: '0xcb7A855a0cDC0a40Fd0Da65964DeA811B043b3C8', // 실제 구현체 주소
-};
-
 async function main() {
-  console.log('🚀 Sepolia 테스트넷...\n');
+  // 주소 정의
+  const USDT_ADDRESS = '0xdAC17F958D2ee523a2206206994597C13D831ec7';
+  const STEAKHOUSE_VAULT = '0xbEef047a543E45807105E51A8BBEFCc5950fcfBa';
+  const AAVE_POOL_V3 = '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2';
 
-  // 네트워크 확인
-  const network = await ethers.provider.getNetwork();
-  console.log('📡 배포 네트워크:', network.name, `(Chain ID: ${network.chainId})`);
+  // 계정 정보
+  const [deployer, feeRecipient, polygonBridge, arbitrumBridge, baseBridge] =
+    await ethers.getSigners();
 
-  if (network.chainId !== 11155111n) {
-    throw new Error(
-      '❌ Sepolia 네트워크가 아닙니다. --network sepolia 옵션을 사용하세요.',
-    );
+  // USDT 컨트랙트 인스턴스
+  const usdt = await ethers.getContractAt('IERC20', USDT_ADDRESS);
+
+  // Steakhouse Vault (ERC4626) 인스턴스
+  const steakhouseVault = await ethers.getContractAt('IERC4626', STEAKHOUSE_VAULT);
+
+  // AAVE Pool 인스턴스
+  const aavePool = await ethers.getContractAt('IAavePool', AAVE_POOL_V3);
+
+  // === USDT 정보 조회 ===
+  try {
+    const deployerUsdtBalance = await usdt.balanceOf(deployer.address);
+
+    console.log('=== USDT 정보 ===');
+    console.log(`주소: ${USDT_ADDRESS}`);
+    console.log(`소수점: 6 (USDT 고정)`);
+    console.log(`배포자 USDT 잔액: ${ethers.formatUnits(deployerUsdtBalance, 6)} USDT`);
+  } catch (error) {
+    console.log('⚠️  USDT 정보 조회 중 에러:', error.message);
   }
 
-  // 배포자 계정 가져오기
-  const [deployer] = await ethers.getSigners();
-  console.log('👤 배포자 주소:', deployer.address);
+  // === Steakhouse Vault 정보 조회 ===
+  const vaultAsset = await steakhouseVault.asset();
+  const vaultTotalAssets = await steakhouseVault.totalAssets();
+  const vaultTotalSupply = await steakhouseVault.totalSupply();
 
-  // 잔액 확인
-  const balance = await ethers.provider.getBalance(deployer.address);
-  console.log('💰 배포자 잔액:', ethers.formatEther(balance), 'ETH');
+  console.log('\n=== Steakhouse USDT Vault 정보 ===');
+  console.log(`기본 자산: ${vaultAsset}`);
+  console.log(`총 자산: ${ethers.formatUnits(vaultTotalAssets, 6)} USDT`);
+  console.log(`총 발행된 share: ${ethers.formatUnits(vaultTotalSupply, 18)}`);
 
-  if (balance < ethers.parseEther('0.01')) {
-    console.log(
-      '⚠️  경고: ETH 잔액이 부족할 수 있습니다. 최소 0.01 ETH 이상 필요합니다.',
-    );
+  // 배포자 Vault share 잔액
+  const deployerShares = await steakhouseVault.balanceOf(deployer.address);
+  console.log(`배포자 Vault share 잔액: ${ethers.formatUnits(deployerShares, 18)}`);
+
+  // === AAVE Pool 정보 조회 ===
+  // USDT에 대한 리저브 데이터
+  const reserveData = await aavePool.getReserveData(USDT_ADDRESS);
+  const aTokenAddress = reserveData[8];
+  console.log('\n=== AAVE Pool USDT 리저브 정보 ===');
+  console.log(`aUSDT 주소: ${aTokenAddress}`);
+
+  // aUSDT 잔액 조회
+  const aToken = await ethers.getContractAt('IERC20', aTokenAddress);
+  const deployerATokenBalance = await aToken.balanceOf(deployer.address);
+  console.log(`배포자 aUSDT 잔액: ${ethers.formatUnits(deployerATokenBalance, 6)} aUSDT`);
+
+  // AAVE Pool에서 배포자 계정 데이터 조회
+  const [
+    totalCollateralBase,
+    totalDebtBase,
+    availableBorrowsBase,
+    currentLiquidationThreshold,
+    ltv,
+    healthFactor,
+  ] = await aavePool.getUserAccountData(deployer.address);
+
+  console.log('\n=== AAVE Pool 배포자 계정 데이터 ===');
+  console.log(`총 담보: ${ethers.formatUnits(totalCollateralBase, 8)} (기본 단위)`);
+  console.log(`총 부채: ${ethers.formatUnits(totalDebtBase, 8)} (기본 단위)`);
+  console.log(
+    `대출 가능 금액: ${ethers.formatUnits(availableBorrowsBase, 8)} (기본 단위)`,
+  );
+  console.log(`청산 임계값: ${currentLiquidationThreshold}`);
+  console.log(`LTV: ${ltv}`);
+  console.log(`Health Factor: ${ethers.formatUnits(healthFactor, 18)}`);
+
+  // === 브릿지 계정별 USDT 잔액 조회 ===
+  const polygonBridgeUsdt = await usdt.balanceOf(polygonBridge.address);
+  const arbitrumBridgeUsdt = await usdt.balanceOf(arbitrumBridge.address);
+  const baseBridgeUsdt = await usdt.balanceOf(baseBridge.address);
+
+  console.log('\n=== 브릿지 계정별 USDT 잔액 ===');
+  console.log(`Polygon Bridge: ${ethers.formatUnits(polygonBridgeUsdt, 6)} USDT`);
+  console.log(`Arbitrum Bridge: ${ethers.formatUnits(arbitrumBridgeUsdt, 6)} USDT`);
+  console.log(`Base Bridge: ${ethers.formatUnits(baseBridgeUsdt, 6)} USDT`);
+
+  // === MillstoneAIVault 교환비 조회 ===
+  console.log('\n=== MillstoneAIVault 교환비 정보 조회 ===');
+
+  // 먼저 배포된 vault가 있는지 확인해보겠습니다
+  // 일반적으로 vault 주소를 하드코딩하거나 환경변수에서 가져와야 합니다
+  const VAULT_ADDRESS = '0x0474511540f5dE71f4e14027A765f35cF07949d8'; // .env에서 가져오기
+
+  if (VAULT_ADDRESS) {
+    try {
+      const vault = await ethers.getContractAt('MillstoneAIVault', VAULT_ADDRESS);
+
+      // StakedUSDT 전체 정보 조회
+      const [
+        currentExchangeRate,
+        totalSupply,
+        totalCurrentValue,
+        underlyingDepositedAmount,
+        accumulatedFeeAmount,
+      ] = await vault.getStakedTokenInfo(USDT_ADDRESS);
+
+      console.log(`📊 StakedUSDT Pool 정보:`);
+      console.log(
+        `  💱 교환비: 1 stakedUSDT = ${ethers.formatUnits(currentExchangeRate, 6)} USDT`,
+      );
+      console.log(`  🪙 총 발행량: ${ethers.formatUnits(totalSupply, 6)} stakedUSDT`);
+      console.log(`  💰 Pool 총 가치: ${ethers.formatUnits(totalCurrentValue, 6)} USDT`);
+      console.log(
+        `  🏦 총 입금액: ${ethers.formatUnits(underlyingDepositedAmount, 6)} USDT`,
+      );
+      console.log(`  💸 누적 Fee: ${ethers.formatUnits(accumulatedFeeAmount, 6)} USDT`);
+
+      // 프로토콜별 잔액도 조회
+      const [aaveBalance, morphoBalance, totalProtocolBalance] =
+        await vault.getProtocolBalances(USDT_ADDRESS);
+
+      console.log(`\n🏦 프로토콜 분산 투자 현황:`);
+      console.log(`  💼 AAVE: ${ethers.formatUnits(aaveBalance, 6)} USDT`);
+      console.log(`  🥩 Morpho: ${ethers.formatUnits(morphoBalance, 6)} USDT`);
+      console.log(`  💰 총 투자액: ${ethers.formatUnits(totalProtocolBalance, 6)} USDT`);
+
+      if (totalProtocolBalance > 0) {
+        const aavePerc = (aaveBalance * 10000n) / totalProtocolBalance;
+        const morphoPerc = (morphoBalance * 10000n) / totalProtocolBalance;
+        console.log(
+          `  📊 분배 비율: AAVE ${Number(aavePerc) / 100}%, Morpho ${
+            Number(morphoPerc) / 100
+          }%`,
+        );
+      }
+    } catch (error) {
+      console.log('⚠️  MillstoneAIVault 조회 중 에러:', error.message);
+      console.log(
+        '💡 Vault가 배포되지 않았을 수 있습니다. deploy 스크립트를 먼저 실행하세요.',
+      );
+    }
+  } else {
+    console.log('⚠️  VAULT_ADDRESS가 .env에 설정되지 않았습니다.');
+    console.log('💡 .env 파일에 VAULT_ADDRESS=0x... 를 추가하거나');
+    console.log('💡 deploy 스크립트를 먼저 실행하여 vault를 배포하세요.');
   }
-
-  console.log('vault contract 인스턴스 생성');
-  const MillstoneAIVault = await ethers.getContractFactory('MillstoneAIVault');
-
-  const vault = MillstoneAIVault.attach(DEPLOYED_ADDRESSES.vault);
-  // console.log('🪙 토큰 지원 설정 중...');
-  // const setUsdtTx = await vault.setSupportedToken(TOKEN_ADDRESSES.wbtc, true);
-  // await setUsdtTx.wait();
-
-  // add lending protocol
-  // const addWBTCProtocolTx = await vault.addLendingProtocol(
-  //   TOKEN_ADDRESSES.wbtc,
-  //   LENDING_ADDRESS,
-  // );
-  // await addWBTCProtocolTx.wait();
-  // const addLinkProtocolTx = await vault.addLendingProtocol(
-  //   TOKEN_ADDRESSES.link,
-  //   LENDING_ADDRESS,
-  // );
-  // await addLinkProtocolTx.wait();
-  // const addDaiProtocolTx = await vault.addLendingProtocol(
-  //   TOKEN_ADDRESSES.dai,
-  //   LENDING_ADDRESS,
-  // );
-  // await addDaiProtocolTx.wait();
-
-  console.log('✅ 렌딩 프로토콜 설정 완료');
 }
 
-main()
-  .then(() => process.exit(0))
-  .catch(error => {
-    console.error('❌ 배포 중 오류 발생:');
-    console.error(error);
-    process.exit(1);
-  });
+main().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

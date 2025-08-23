@@ -30,6 +30,10 @@ const config: HardhatUserConfig = {
         // blockNumber: 18500000, // 특정 블록에서 fork (선택사항)
         enabled: process.env.FORK_MAINNET === 'true', // 환경변수로 제어
       },
+      // Gas 설정 (새로운 노드 실행시 높은 baseFeePerGas 문제 해결)
+      gasPrice: 20000000000, // 20 gwei
+      gas: 10000000, // 10M gas limit
+      allowUnlimitedContractSize: true, // 대용량 컨트랙트 허용
       // 계정 설정
       accounts: {
         mnemonic:

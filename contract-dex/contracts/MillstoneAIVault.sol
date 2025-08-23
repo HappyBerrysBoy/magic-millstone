@@ -681,7 +681,7 @@ contract MillstoneAIVault is
     }
 
     /**
-     * @dev 리밸런싱 (간단 버전)
+     * @dev 리밸런싱
      */
     function rebalance(address token) external onlyOwner {
         (uint256 aaveBalance, uint256 morphoBalance, uint256 totalBalance) = this.getProtocolBalances(token);
