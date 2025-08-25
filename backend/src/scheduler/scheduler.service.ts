@@ -41,8 +41,8 @@ export class SchedulerService {
         this.kaiaWallet,
       );
 
-      const ethRpcUrls = process.env.ETH_RPC_URLS || 'https://eth.drpc.org';
-      this.ethProvider = new JsonRpcProvider(ethRpcUrls);
+      const ethRpcUrl = process.env.ETH_RPC_URL || 'https://eth.drpc.org';
+      this.ethProvider = new JsonRpcProvider(ethRpcUrl);
       this.ethWallet = new Wallet(privateKey, this.ethProvider);
       this.ethVaultContract = new Contract(
         process.env.MILLSTONE_AI_VAULT_ADDRESS!,

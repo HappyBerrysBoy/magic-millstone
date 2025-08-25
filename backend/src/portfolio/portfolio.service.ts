@@ -6,15 +6,11 @@ import { millstoneAIVaultAbi } from 'src/abis/millstoneAIVaultAbi';
 
 @Injectable()
 export class PortfolioService {
-  private providers: { [chainId: string]: JsonRpcProvider } = {};
+  private ethProvider: JsonRpcProvider;
 
   constructor(private readonly portfolioRepository: PortfolioRepository) {
-    const rpcUrls = JSON.parse(process.env.RPC_URLS!);
-
-    Object.entries(rpcUrls).forEach(([chainId, rpcUrl]) => {
-      const provider = new JsonRpcProvider(rpcUrl as string);
-      this.providers[chainId] = provider;
-    });
+    const ethRpcUrl = process.env.ETH_RPC_URL || 'https://eth.drpc.org';
+    this.ethProvider = new JsonRpcProvider(ethRpcUrl);
   }
 
   async getVaultStatus(portfolioId: string): Promise<any> {
@@ -155,7 +151,7 @@ export class PortfolioService {
       const millstoneAIVaultContract = new Contract(
         process.env.MILLSTONE_AI_VAULT_ADDRESS!,
         millstoneAIVaultAbi,
-        this.providers['1'],
+        this.ethProvider,
       );
 
       const [
