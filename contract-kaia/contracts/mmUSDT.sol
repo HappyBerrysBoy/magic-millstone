@@ -100,18 +100,16 @@ contract mmUSDT is
     function convertToAsset(uint256 mmUsdtAmount) external view returns (uint256) {
         address vault = getVaultContract();
         
-        // Get exchange rate from vault contract
         (bool success, bytes memory data) = vault.staticcall(
             abi.encodeWithSignature("getExchangeRate()")
         );
         
         if (!success) {
-            // If vault call fails, return 1:1 ratio as fallback
             return mmUsdtAmount;
         }
         
         uint256 exchangeRate = abi.decode(data, (uint256));
-        uint256 exchangeRateDecimals = 1e6; // EXCHANGE_RATE_DECIMALS from VaultContract
+        uint256 exchangeRateDecimals = 1e6;
         
         return (mmUsdtAmount * exchangeRate) / exchangeRateDecimals;
     }
@@ -127,7 +125,7 @@ contract mmUSDT is
         override(AccessControlUpgradeable) 
         returns (bool) 
     {
-        return interfaceId == 0x65787371 || // KIP-7 interface ID
+        return interfaceId == 0x65787371 ||
                super.supportsInterface(interfaceId);
     }
 

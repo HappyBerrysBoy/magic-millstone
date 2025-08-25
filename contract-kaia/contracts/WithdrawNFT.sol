@@ -25,10 +25,8 @@ contract WithdrawNFT is
 
     uint256 private _tokenIdCounter;
     
-    // Simple mapping: tokenId → amount (VaultContract manages all other logic)
     mapping(uint256 => uint256) public withdrawalAmounts;
     
-    // Reference to VaultContract to fetch status for display
     address public vaultContract;
 
     event WithdrawNFTMinted(
@@ -68,7 +66,6 @@ contract WithdrawNFT is
     ) external onlyRole(MINTER_ROLE) whenNotPaused returns (uint256) {
         uint256 tokenId = _tokenIdCounter++;
         
-        // Store only the amount - VaultContract handles all business logic
         withdrawalAmounts[tokenId] = amount;
 
         _safeMint(to, tokenId);
@@ -112,7 +109,6 @@ contract WithdrawNFT is
                         found++;
                     }
                 } catch {
-                    // Skip if ownerOf reverts
                     continue;
                 }
             }
@@ -129,7 +125,6 @@ contract WithdrawNFT is
         
         uint256 amount = withdrawalAmounts[tokenId];
         
-        // Get status from VaultContract for display
         string memory status = "UNKNOWN";
         uint256 requestTime = 0;
         uint256 readyTime = 0;
@@ -141,7 +136,7 @@ contract WithdrawNFT is
             requestTime = _requestTime;
             readyTime = _readyTime;
         } catch {
-            status = "PENDING"; // fallback
+            status = "PENDING";
         }
 
         string memory json = Base64.encode(
@@ -171,7 +166,6 @@ contract WithdrawNFT is
         return string(abi.encodePacked("data:application/json;base64,", json));
     }
 
-    // Helper function to get withdraw request from vault (external call)
     function getWithdrawRequestFromVault(uint256 tokenId) external view returns (
         uint256 amount,
         uint256 requestTime,
@@ -179,7 +173,6 @@ contract WithdrawNFT is
         uint8 status,
         address requester
     ) {
-        // Make external call to VaultContract to get status
         (bool success, bytes memory data) = vaultContract.staticcall(
             abi.encodeWithSignature("getWithdrawRequest(uint256)", tokenId)
         );
@@ -189,7 +182,6 @@ contract WithdrawNFT is
                 data, (uint256, uint256, uint256, uint8, address)
             );
         } else {
-            // Fallback values
             amount = withdrawalAmounts[tokenId];
             requestTime = 0;
             readyTime = 0;
@@ -199,12 +191,11 @@ contract WithdrawNFT is
     }
 
     function _generateSVG(uint256 tokenId, uint256 amount, string memory status) internal pure returns (string memory) {
-        // Determine status color
-        string memory statusColor = "#ffaa00"; // PENDING - orange
+        string memory statusColor = "#ffaa00";
         if (keccak256(bytes(status)) == keccak256(bytes("READY"))) {
-            statusColor = "#00ff00"; // READY - green
+            statusColor = "#00ff00";
         } else if (keccak256(bytes(status)) == keccak256(bytes("CLAIMED"))) {
-            statusColor = "#888888"; // CLAIMED - gray
+            statusColor = "#888888";
         }
 
         string memory svg = string(
@@ -262,7 +253,7 @@ contract WithdrawNFT is
         override(ERC721Upgradeable, AccessControlUpgradeable)
         returns (bool)
     {
-        return interfaceId == 0x80ac58cd || // KIP-17 interface ID  
+        return interfaceId == 0x80ac58cd ||  
                super.supportsInterface(interfaceId);
     }
 
