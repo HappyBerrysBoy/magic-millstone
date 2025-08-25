@@ -120,4 +120,19 @@ export class PortfolioRepository {
       { transaction },
     );
   }
+
+  async updatePortfolioAllocationAmount(
+    portfolioId: string,
+    platform: string,
+    newAmount: number,
+    transaction: Transaction,
+  ): Promise<void> {
+    await this.dbMillstone.models.mm_portfolio_allocations.update(
+      { allocationAmount: newAmount },
+      {
+        where: { portfolioId, platform },
+        transaction,
+      },
+    );
+  }
 }

@@ -164,6 +164,23 @@ export class PortfolioService {
         process.env.USDT_ADDRESS!,
       );
 
+      const [aaveBalance, morphoBalance] =
+        await millstoneAIVaultContract.getProtocolBalances(
+          process.env.USDT_ADDRESS!,
+        );
+      await this.portfolioRepository.updatePortfolioAllocationAmount(
+        portfolioId,
+        'aave',
+        Number(formatUnits(aaveBalance, 6)),
+        transaction,
+      );
+      await this.portfolioRepository.updatePortfolioAllocationAmount(
+        portfolioId,
+        'morpho',
+        Number(formatUnits(morphoBalance, 6)),
+        transaction,
+      );
+
       const exchangeRateHsts =
         await this.portfolioRepository.getExchangeRateHistoryByPortfolioId(
           portfolio.dataValues.tokenAddress,
