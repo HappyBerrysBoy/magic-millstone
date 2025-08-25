@@ -73,10 +73,16 @@ export class PortfolioService {
         };
       });
 
+      const totalAllocation = allocations.reduce(
+        (sum, allocation) =>
+          sum + (Number(allocation.dataValues.allocationAmount) || 0),
+        0,
+      );
       const composition = allocations.reduce((acc, allocation) => {
         const vaultName = allocation.dataValues.vaultContractName;
-        const allocationAmount = allocation.dataValues.allocationAmount;
-        acc[vaultName] = (acc[vaultName] || 0) + allocationAmount / tvl;
+        const allocationAmount = Number(allocation.dataValues.allocationAmount);
+        acc[vaultName] =
+          (acc[vaultName] || 0) + allocationAmount / totalAllocation;
         return acc;
       }, {});
 
