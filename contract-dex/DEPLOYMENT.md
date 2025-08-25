@@ -1,144 +1,221 @@
-# 🚀 Sepolia 테스트넷 배포 가이드
+# Deployment Guide
 
-## 📋 사전 준비
+## Prerequisites
 
-### 1. 환경변수 설정
+### 1. Environment Setup
 
-프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 입력하세요:
+Create a `.env` file in the project root with the following content:
 
 ```bash
-# Sepolia 배포용 Private Key (0x 접두사 포함)
-SEPOLIA_PRIVATE_KEY=your_private_key_here
+# Private Key for deployment (with 0x prefix)
+PRIVATE_KEY=your_private_key_here
 
-# Sepolia RPC URL (선택 사항 - 기본값 사용 가능)
+# RPC URLs
+MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/your_api_key
 SEPOLIA_RPC_URL=https://sepolia.gateway.tenderly.co
 
-# Etherscan API Key (컨트랙트 검증용 - 선택 사항)
+# API Keys (optional)
 ETHERSCAN_API_KEY=your_etherscan_api_key_here
+ALCHEMY_API_KEY=your_alchemy_api_key_here
+
+# Fork Configuration
+FORK_BLOCK_NUMBER=19000000
 ```
 
-### 2. Sepolia ETH 확보
-
-배포자 계정에 최소 **0.01 ETH** 이상의 Sepolia ETH가 필요합니다.
-
-무료 Faucet에서 받을 수 있습니다:
-
-- [Alchemy Sepolia Faucet](https://sepoliafaucet.com/)
-- [Infura Sepolia Faucet](https://www.infura.io/faucet/sepolia)
-- [Chainlink Sepolia Faucet](https://faucets.chain.link/sepolia)
-
-### 3. 의존성 설치
+### 2. Dependencies Installation
 
 ```bash
 yarn install
 ```
 
-## 🔧 배포 방법
+## Local Development with Mainnet Fork
 
-### 1. 컴파일 확인
-
-```bash
-yarn hardhat compile
-```
-
-### 2. Sepolia 배포 실행
+### 1. Start Local Hardhat Node with Mainnet Fork
 
 ```bash
-yarn hardhat run scripts/deploy-sepolia.ts --network sepolia
+# Start local node with mainnet fork
+npx hardhat node --fork-block-number 19000000
+
+# Or with custom RPC
+npx hardhat node --fork https://eth-mainnet.g.alchemy.com/v2/your_api_key --fork-block-number 19000000
 ```
 
-### 3. 배포 결과 확인
-
-배포가 성공하면 다음과 같은 정보가 출력됩니다:
-
-```
-🎉 ==================== 배포 완료 ====================
-🌐 네트워크: sepolia
-👤 배포자: 0x...
-💎 USDT 토큰: 0x...
-💎 USDC 토큰: 0x...
-🏦 MockLendingProtocol: 0x...
-🏗️  MillstoneAIVault 구현체: 0x...
-🎯 MillstoneAIVault 프록시: 0x...
-=======================================================
-```
-
-## 🔍 컨트랙트 검증 (선택 사항)
-
-Etherscan에서 컨트랙트 소스코드를 공개하려면:
+### 2. Deploy to Local Fork
 
 ```bash
-# MillstoneAIVault 구현체 검증
-npx hardhat verify --network sepolia <구현체_주소>
-
-# 프록시 검증
-npx hardhat verify --network sepolia <프록시_주소> <구현체_주소> "<초기화_데이터>"
-
-# ERC20 토큰들 검증
-npx hardhat verify --network sepolia <USDT_주소> "Tether USD (Test)" "USDT" 6 1000000000000
-npx hardhat verify --network sepolia <USDC_주소> "USD Coin (Test)" "USDC" 6 1000000000000
-
-# MockLendingProtocol 검증
-npx hardhat verify --network sepolia <렌딩프로토콜_주소>
+# Deploy to local fork network
+npx hardhat run scripts/1. deploy-vault-mainnet-fork.ts --network localhost
 ```
 
-## 🧪 배포 후 테스트
+### 3. Run Tests on Fork
 
-### 1. 기본 상호작용
+```bash
+# Test AAVE USDT only
+npx hardhat run scripts/2. test-aave-usdt-only.ts --network localhost
 
-```typescript
-// vault 인스턴스 생성
-const vault = await ethers.getContractAt('MillstoneAIVault', '<프록시_주소>');
+# Test Morpho Steakhouse vault
+npx hardhat run scripts/3. morpho-steakhouse-vault-test.ts --network localhost
 
-// 토큰 받기 (브릿지 시뮬레이션)
-const amount = ethers.parseUnits('100', 6); // 100 USDT
-await usdt.approve(vault.address, amount);
-await vault.receiveFromBridge(usdt.address, amount);
+# Test multi-protocol functionality
+npx hardhat run scripts/4. multi-protocol-test.ts --network localhost
 
-// 잔액 확인
-const [contractBalance, protocolBalance, totalBalance] = await vault.getTokenBalance(
-  usdt.address,
-);
+# Test performance fees
+npx hardhat run scripts/5. performance-fee-test.ts --network localhost
 
-// 출금 요청
-const requestId = await vault.requestWithdraw(usdt.address, ethers.parseUnits('50', 6));
+# Full integration test
+npx hardhat run scripts/6. full-test.ts --network localhost
 
-// 출금 클레임 (대기 기간 후)
-await vault.claimWithdraw(requestId);
+# Test exchange rate calculations
+npx hardhat run scripts/7. exchange-rate-test.ts --network localhost
+
+# Test staked USDT functionality
+npx hardhat run scripts/8. staked-usdt-test.ts --network localhost
+
+# Test bridge-only operations
+npx hardhat run scripts/9. bridge-only-test.ts --network localhost
+
+# Interactive bridge test
+npx hardhat run scripts/10. interactive-bridge-test.ts --network localhost
 ```
 
-### 2. 관리자 기능
+## Sepolia Testnet Deployment
 
-```typescript
-// 새 렌딩 프로토콜 추가
-await vault.addLendingProtocol(usdt.address, newProtocolAddress);
+### 1. Compile Contracts
 
-// 특정 프로토콜에 예치
-await vault.depositToSpecificProtocol(usdt.address, protocolAddress, amount);
-
-// 프로토콜별 잔액 확인
-const balance = await vault.getTokenBalanceInProtocol(usdt.address, protocolAddress);
+```bash
+npx hardhat compile
 ```
 
-## 🔧 문제 해결
+### 2. Deploy to Sepolia
 
-### 가스비 부족
+```bash
+npx hardhat run scripts/deploy-sepolia.ts --network sepolia
+```
 
-- 가스 가격이 높을 때는 `hardhat.config.ts`에서 `gasPrice` 조정
-- 또는 배포 시 `--gas-price` 옵션 사용
+### 3. Verify Contracts (Optional)
 
-### RPC 연결 문제
+```bash
+# Verify MillstoneAIVault implementation
+npx hardhat verify --network sepolia <implementation_address>
 
-- `.env`에서 `SEPOLIA_RPC_URL` 변경
-- 다른 RPC 프로바이더 사용 (Infura, Alchemy 등)
+# Verify proxy contract
+npx hardhat verify --network sepolia <proxy_address> <implementation_address> "<initialization_data>"
 
-### Private Key 오류
+# Verify ERC20 tokens
+npx hardhat verify --network sepolia <USDT_address> "Tether USD (Test)" "USDT" 6 1000000000000
+npx hardhat verify --network sepolia <USDC_address> "USD Coin (Test)" "USDC" 6 1000000000000
 
-- Private Key가 `0x`로 시작하는지 확인
-- 계정에 충분한 ETH가 있는지 확인
+# Verify MockLendingProtocol
+npx hardhat verify --network sepolia <lending_protocol_address>
+```
 
-## 📚 추가 정보
+## Mainnet Deployment
 
-- [Hardhat 문서](https://hardhat.org/)
-- [OpenZeppelin 업그레이드 가이드](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
-- [Sepolia 테스트넷 정보](https://ethereum.org/en/developers/docs/networks/#sepolia)
+### 1. Security Audit
+
+Before mainnet deployment, ensure:
+
+- All security vulnerabilities have been addressed
+- Exchange rate calculations are consistent (1e6 scale)
+- Reentrancy protection is implemented
+- Bridge authorization is properly configured
+- Performance fee mechanisms are tested
+
+### 2. Deploy to Mainnet
+
+```bash
+npx hardhat run scripts/deploy-mainnet.ts --network mainnet
+```
+
+## Contract Architecture
+
+### Core Contracts
+
+- **MillstoneAIVault**: Main vault contract with upgradeable proxy
+- **EIP1967Proxy**: Upgradeable proxy implementation
+- **MockERC20**: Test USDT/USDC tokens
+- **MockLendingProtocol**: Test lending protocol
+
+### Key Features
+
+- **Multi-Protocol Support**: AAVE and Morpho integration
+- **StakedToken System**: ERC4626-like token with exchange rate mechanism
+- **Bridge Integration**: Cross-chain deposit/withdrawal support
+- **Performance Fees**: Automated fee collection and distribution
+- **Security Features**: Reentrancy protection, rate limiting, emergency pause
+
+### Security Considerations
+
+- Exchange rate calculations use 1e6 scale for consistency
+- All external calls are wrapped in try-catch blocks
+- Bridge operations have daily limits and emergency pause functionality
+- Rate increases are limited to prevent manipulation
+- TimeLock mechanism for critical operations
+
+## Testing
+
+### Unit Tests
+
+```bash
+# Run all tests
+npx hardhat test
+
+# Run specific test file
+npx hardhat test test/MillstoneAIVault.test.ts
+npx hardhat test test/BridgeLendingVault.test.ts
+```
+
+### Integration Tests
+
+```bash
+# Run integration tests on fork
+npx hardhat run scripts/6. full-test.ts --network localhost
+```
+
+## Configuration
+
+### Hardhat Configuration
+
+The `hardhat.config.ts` includes:
+
+- Mainnet forking configuration
+- Network-specific gas settings
+- Compiler optimization settings
+- Etherscan verification settings
+
+### Contract Configuration
+
+Key configuration parameters:
+
+- `performanceFeeRate`: Performance fee percentage (basis points)
+- `aaveAllocations`: AAVE allocation percentages per token
+- `morphoAllocations`: Morpho allocation percentages per token
+- `bridgeDailyLimits`: Daily limits for bridge operations
+- `maxDailyRateIncrease`: Maximum daily exchange rate increase
+
+## Troubleshooting
+
+### Gas Issues
+
+- Adjust gas settings in `hardhat.config.ts`
+- Use `--gas-price` option for deployment
+- Monitor gas prices on mainnet
+
+### RPC Connection Issues
+
+- Check RPC URL configuration in `.env`
+- Use alternative RPC providers (Infura, Alchemy, etc.)
+- Verify API key permissions
+
+### Contract Verification Issues
+
+- Ensure all constructor parameters are correct
+- Check contract bytecode matches source code
+- Verify proxy implementation addresses
+
+## Additional Resources
+
+- [Hardhat Documentation](https://hardhat.org/)
+- [OpenZeppelin Upgrades Guide](https://docs.openzeppelin.com/upgrades-plugins/1.x/)
+- [Ethereum Mainnet Information](https://ethereum.org/en/developers/docs/networks/#ethereum-mainnet)
+- [Sepolia Testnet Information](https://ethereum.org/en/developers/docs/networks/#sepolia)

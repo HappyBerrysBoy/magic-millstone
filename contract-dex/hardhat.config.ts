@@ -24,9 +24,7 @@ const config: HardhatUserConfig = {
       chainId: 1337,
       // 메인넷 fork 설정
       forking: {
-        url:
-          process.env.MAINNET_RPC_URL ||
-          'https://eth-mainnet.g.alchemy.com/v2/G1L6TFk5SMqXf_9IXKUmiu1IgpCfi-ex',
+        url: process.env.MAINNET_RPC_URL || 'https://rpc.mevblocker.io',
         // blockNumber: 18500000, // 특정 블록에서 fork (선택사항)
         enabled: process.env.FORK_MAINNET === 'true', // 환경변수로 제어
       },
@@ -49,9 +47,7 @@ const config: HardhatUserConfig = {
     },
     // 메인넷 직접 연결용 (실제 배포시 사용)
     mainnet: {
-      url:
-        process.env.MAINNET_RPC_URL ||
-        'https://eth-mainnet.g.alchemy.com/v2/G1L6TFk5SMqXf_9IXKUmiu1IgpCfi-ex',
+      url: process.env.MAINNET_RPC_URL || 'https://rpc.mevblocker.io',
       accounts: process.env.MAINNET_PRIVATE_KEY ? [process.env.MAINNET_PRIVATE_KEY] : [],
       chainId: 1,
       gasPrice: 'auto',

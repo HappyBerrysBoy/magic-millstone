@@ -26,21 +26,33 @@ import type {
 export interface MillstoneAIVaultInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "MAX_RATE_INCREASE_LIMIT"
       | "UPGRADE_INTERFACE_VERSION"
+      | "_withdrawFromAave"
+      | "_withdrawFromMorpho"
       | "aTokens"
       | "aaveAllocations"
       | "aavePool"
       | "accumulatedFees"
+      | "applyPendingRateImmediately"
       | "authorizedBridges"
+      | "bridgeDailyLimits"
+      | "bridgeDailyUsed"
+      | "bridgeEmergencyPause"
+      | "bridgeLastResetTime"
       | "calculateNetYield"
       | "calculateYield"
+      | "cancelPendingRate"
       | "deposit"
       | "exchangeRateStakedToUnderlying"
       | "feeRecipient"
       | "getAllocations"
+      | "getBridgeSecurityStatus"
       | "getExchangeRate"
       | "getFeeInfo"
+      | "getPendingRateInfo"
       | "getProtocolBalances"
+      | "getSecurityStatus"
       | "getStakedTokenBalance"
       | "getStakedTokenInfo"
       | "getTokenStats"
@@ -48,27 +60,39 @@ export interface MillstoneAIVaultInterface extends Interface {
       | "getTotalValue"
       | "getUserInfo"
       | "initialize"
+      | "lastRateUpdateTime"
       | "lastRecordedValue"
+      | "maxDailyRateIncrease"
       | "morphoAllocations"
       | "morphoVaults"
       | "owner"
+      | "pendingRateIncrease"
       | "performanceFeeRate"
       | "previewDeposit"
       | "previewRedeem"
       | "proxiableUUID"
+      | "queueExchangeRateIncrease"
+      | "queueTimelockOperation"
+      | "rateIncreaseStartTime"
       | "rebalance"
       | "receiveFromBridge"
       | "redeem"
       | "renounceOwnership"
       | "setAaveConfig"
       | "setBridgeAuthorization"
+      | "setBridgeEmergencyPause"
+      | "setBridgeLimit"
       | "setFeeRecipient"
+      | "setMaxRateIncrease"
       | "setMorphoVault"
       | "setPerformanceFeeRate"
       | "setProtocolAllocations"
       | "setSupportedToken"
+      | "setTimelockDelay"
       | "simulateExchangeRateUpdate"
       | "supportedTokens"
+      | "timelockDelay"
+      | "timelockOperations"
       | "totalDeposited"
       | "totalFeesWithdrawn"
       | "totalStakedTokenSupply"
@@ -85,23 +109,43 @@ export interface MillstoneAIVaultInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "AllocationSet"
+      | "BridgeEmergencyPause"
+      | "BridgeLimitSet"
       | "ExchangeRateUpdated"
       | "FeeRecipientSet"
       | "Initialized"
+      | "MaxRateIncreaseSet"
       | "OwnershipTransferred"
       | "PerformanceFeeCollected"
       | "PerformanceFeeSet"
       | "PerformanceFeeWithdrawn"
       | "ProtocolDeposit"
+      | "ProtocolWithdrawalFailed"
+      | "RateIncreaseQueued"
       | "StakedTokenBurned"
       | "StakedTokenMinted"
+      | "TimelockOperationExecuted"
+      | "TimelockOperationQueued"
       | "TokenSupported"
       | "Upgraded"
+      | "WithdrawalDebug"
   ): EventFragment;
 
   encodeFunctionData(
+    functionFragment: "MAX_RATE_INCREASE_LIMIT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "UPGRADE_INTERFACE_VERSION",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "_withdrawFromAave",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "_withdrawFromMorpho",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "aTokens",
@@ -117,7 +161,27 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "applyPendingRateImmediately",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "authorizedBridges",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bridgeDailyLimits",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bridgeDailyUsed",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bridgeEmergencyPause",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "bridgeLastResetTime",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -126,6 +190,10 @@ export interface MillstoneAIVaultInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "calculateYield",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "cancelPendingRate",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -145,6 +213,10 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getBridgeSecurityStatus",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getExchangeRate",
     values: [AddressLike]
   ): string;
@@ -153,7 +225,15 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "getPendingRateInfo",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "getProtocolBalances",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getSecurityStatus",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -185,7 +265,15 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "lastRateUpdateTime",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "lastRecordedValue",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "maxDailyRateIncrease",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -197,6 +285,10 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pendingRateIncrease",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "performanceFeeRate",
     values?: undefined
@@ -212,6 +304,18 @@ export interface MillstoneAIVaultInterface extends Interface {
   encodeFunctionData(
     functionFragment: "proxiableUUID",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "queueExchangeRateIncrease",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "queueTimelockOperation",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rateIncreaseStartTime",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "rebalance",
@@ -238,8 +342,20 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setBridgeEmergencyPause",
+    values: [AddressLike, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setBridgeLimit",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "setFeeRecipient",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setMaxRateIncrease",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setMorphoVault",
@@ -258,12 +374,24 @@ export interface MillstoneAIVaultInterface extends Interface {
     values: [AddressLike, boolean]
   ): string;
   encodeFunctionData(
+    functionFragment: "setTimelockDelay",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "simulateExchangeRateUpdate",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "supportedTokens",
     values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "timelockDelay",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "timelockOperations",
+    values: [BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "totalDeposited",
@@ -311,7 +439,19 @@ export interface MillstoneAIVaultInterface extends Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "MAX_RATE_INCREASE_LIMIT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "UPGRADE_INTERFACE_VERSION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "_withdrawFromAave",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "_withdrawFromMorpho",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "aTokens", data: BytesLike): Result;
@@ -325,7 +465,27 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "applyPendingRateImmediately",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "authorizedBridges",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "bridgeDailyLimits",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "bridgeDailyUsed",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "bridgeEmergencyPause",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "bridgeLastResetTime",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -334,6 +494,10 @@ export interface MillstoneAIVaultInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "calculateYield",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "cancelPendingRate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "deposit", data: BytesLike): Result;
@@ -350,12 +514,24 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getBridgeSecurityStatus",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getExchangeRate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "getFeeInfo", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getPendingRateInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getProtocolBalances",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getSecurityStatus",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -384,7 +560,15 @@ export interface MillstoneAIVaultInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "lastRateUpdateTime",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "lastRecordedValue",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "maxDailyRateIncrease",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -396,6 +580,10 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pendingRateIncrease",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "performanceFeeRate",
     data: BytesLike
@@ -410,6 +598,18 @@ export interface MillstoneAIVaultInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "proxiableUUID",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "queueExchangeRateIncrease",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "queueTimelockOperation",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "rateIncreaseStartTime",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "rebalance", data: BytesLike): Result;
@@ -431,7 +631,19 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setBridgeEmergencyPause",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setBridgeLimit",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "setFeeRecipient",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaxRateIncrease",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -451,11 +663,23 @@ export interface MillstoneAIVaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "setTimelockDelay",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "simulateExchangeRateUpdate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "supportedTokens",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "timelockDelay",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "timelockOperations",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -526,6 +750,32 @@ export namespace AllocationSetEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace BridgeEmergencyPauseEvent {
+  export type InputTuple = [bridge: AddressLike, paused: boolean];
+  export type OutputTuple = [bridge: string, paused: boolean];
+  export interface OutputObject {
+    bridge: string;
+    paused: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace BridgeLimitSetEvent {
+  export type InputTuple = [bridge: AddressLike, dailyLimit: BigNumberish];
+  export type OutputTuple = [bridge: string, dailyLimit: bigint];
+  export interface OutputObject {
+    bridge: string;
+    dailyLimit: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace ExchangeRateUpdatedEvent {
   export type InputTuple = [
     token: AddressLike,
@@ -565,6 +815,19 @@ export namespace InitializedEvent {
   export type OutputTuple = [version: bigint];
   export interface OutputObject {
     version: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MaxRateIncreaseSetEvent {
+  export type InputTuple = [token: AddressLike, newMaxIncrease: BigNumberish];
+  export type OutputTuple = [token: string, newMaxIncrease: bigint];
+  export interface OutputObject {
+    token: string;
+    newMaxIncrease: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -646,6 +909,53 @@ export namespace ProtocolDepositEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace ProtocolWithdrawalFailedEvent {
+  export type InputTuple = [
+    token: AddressLike,
+    protocol: string,
+    requestedAmount: BigNumberish,
+    actualAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    token: string,
+    protocol: string,
+    requestedAmount: bigint,
+    actualAmount: bigint
+  ];
+  export interface OutputObject {
+    token: string;
+    protocol: string;
+    requestedAmount: bigint;
+    actualAmount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace RateIncreaseQueuedEvent {
+  export type InputTuple = [
+    token: AddressLike,
+    targetRate: BigNumberish,
+    executeTime: BigNumberish
+  ];
+  export type OutputTuple = [
+    token: string,
+    targetRate: bigint,
+    executeTime: bigint
+  ];
+  export interface OutputObject {
+    token: string;
+    targetRate: bigint;
+    executeTime: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace StakedTokenBurnedEvent {
   export type InputTuple = [
     user: AddressLike,
@@ -696,6 +1006,34 @@ export namespace StakedTokenMintedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace TimelockOperationExecutedEvent {
+  export type InputTuple = [operationHash: BytesLike];
+  export type OutputTuple = [operationHash: string];
+  export interface OutputObject {
+    operationHash: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace TimelockOperationQueuedEvent {
+  export type InputTuple = [
+    operationHash: BytesLike,
+    executeTime: BigNumberish
+  ];
+  export type OutputTuple = [operationHash: string, executeTime: bigint];
+  export interface OutputObject {
+    operationHash: string;
+    executeTime: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace TokenSupportedEvent {
   export type InputTuple = [token: AddressLike, supported: boolean];
   export type OutputTuple = [token: string, supported: boolean];
@@ -714,6 +1052,34 @@ export namespace UpgradedEvent {
   export type OutputTuple = [implementation: string];
   export interface OutputObject {
     implementation: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace WithdrawalDebugEvent {
+  export type InputTuple = [
+    token: AddressLike,
+    requestedAmount: BigNumberish,
+    aaveAmount: BigNumberish,
+    morphoAmount: BigNumberish,
+    totalWithdrawn: BigNumberish
+  ];
+  export type OutputTuple = [
+    token: string,
+    requestedAmount: bigint,
+    aaveAmount: bigint,
+    morphoAmount: bigint,
+    totalWithdrawn: bigint
+  ];
+  export interface OutputObject {
+    token: string;
+    requestedAmount: bigint;
+    aaveAmount: bigint;
+    morphoAmount: bigint;
+    totalWithdrawn: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -764,7 +1130,21 @@ export interface MillstoneAIVault extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  MAX_RATE_INCREASE_LIMIT: TypedContractMethod<[], [bigint], "view">;
+
   UPGRADE_INTERFACE_VERSION: TypedContractMethod<[], [string], "view">;
+
+  _withdrawFromAave: TypedContractMethod<
+    [token: AddressLike, amount: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+
+  _withdrawFromMorpho: TypedContractMethod<
+    [token: AddressLike, amount: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
 
   aTokens: TypedContractMethod<[arg0: AddressLike], [string], "view">;
 
@@ -774,9 +1154,31 @@ export interface MillstoneAIVault extends BaseContract {
 
   accumulatedFees: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  applyPendingRateImmediately: TypedContractMethod<
+    [token: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   authorizedBridges: TypedContractMethod<
     [arg0: AddressLike],
     [boolean],
+    "view"
+  >;
+
+  bridgeDailyLimits: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  bridgeDailyUsed: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  bridgeEmergencyPause: TypedContractMethod<
+    [arg0: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  bridgeLastResetTime: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
     "view"
   >;
 
@@ -808,6 +1210,12 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  cancelPendingRate: TypedContractMethod<
+    [token: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   deposit: TypedContractMethod<
     [token: AddressLike, assets: BigNumberish],
     [bigint],
@@ -828,6 +1236,19 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  getBridgeSecurityStatus: TypedContractMethod<
+    [bridge: AddressLike],
+    [
+      [bigint, bigint, bigint, boolean] & {
+        dailyLimit: bigint;
+        dailyUsed: bigint;
+        lastResetTime: bigint;
+        isPaused: boolean;
+      }
+    ],
+    "view"
+  >;
+
   getExchangeRate: TypedContractMethod<[token: AddressLike], [bigint], "view">;
 
   getFeeInfo: TypedContractMethod<
@@ -843,6 +1264,19 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
 
+  getPendingRateInfo: TypedContractMethod<
+    [token: AddressLike],
+    [
+      [bigint, bigint, bigint, boolean] & {
+        pendingRate: bigint;
+        startTime: bigint;
+        progress: bigint;
+        isActive: boolean;
+      }
+    ],
+    "view"
+  >;
+
   getProtocolBalances: TypedContractMethod<
     [token: AddressLike],
     [
@@ -850,6 +1284,19 @@ export interface MillstoneAIVault extends BaseContract {
         aaveBalance: bigint;
         morphoBalance: bigint;
         totalBalance: bigint;
+      }
+    ],
+    "view"
+  >;
+
+  getSecurityStatus: TypedContractMethod<
+    [token: AddressLike],
+    [
+      [bigint, bigint, bigint, boolean] & {
+        maxDailyRate: bigint;
+        lastUpdateTime: bigint;
+        pendingRate: bigint;
+        hasPendingIncrease: boolean;
       }
     ],
     "view"
@@ -911,13 +1358,31 @@ export interface MillstoneAIVault extends BaseContract {
 
   initialize: TypedContractMethod<[_owner: AddressLike], [void], "nonpayable">;
 
+  lastRateUpdateTime: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
+
   lastRecordedValue: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  maxDailyRateIncrease: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
 
   morphoAllocations: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
   morphoVaults: TypedContractMethod<[arg0: AddressLike], [string], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
+
+  pendingRateIncrease: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
 
   performanceFeeRate: TypedContractMethod<[], [bigint], "view">;
 
@@ -934,6 +1399,24 @@ export interface MillstoneAIVault extends BaseContract {
   >;
 
   proxiableUUID: TypedContractMethod<[], [string], "view">;
+
+  queueExchangeRateIncrease: TypedContractMethod<
+    [token: AddressLike, targetRate: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  queueTimelockOperation: TypedContractMethod<
+    [operationHash: BytesLike],
+    [void],
+    "nonpayable"
+  >;
+
+  rateIncreaseStartTime: TypedContractMethod<
+    [arg0: AddressLike],
+    [bigint],
+    "view"
+  >;
 
   rebalance: TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
 
@@ -963,8 +1446,26 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
 
+  setBridgeEmergencyPause: TypedContractMethod<
+    [bridge: AddressLike, paused: boolean],
+    [void],
+    "nonpayable"
+  >;
+
+  setBridgeLimit: TypedContractMethod<
+    [bridge: AddressLike, dailyLimit: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   setFeeRecipient: TypedContractMethod<
     [_feeRecipient: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  setMaxRateIncrease: TypedContractMethod<
+    [token: AddressLike, maxIncrease: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -997,6 +1498,12 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
 
+  setTimelockDelay: TypedContractMethod<
+    [delay: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   simulateExchangeRateUpdate: TypedContractMethod<
     [token: AddressLike],
     [
@@ -1012,6 +1519,10 @@ export interface MillstoneAIVault extends BaseContract {
   >;
 
   supportedTokens: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+
+  timelockDelay: TypedContractMethod<[], [bigint], "view">;
+
+  timelockOperations: TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
 
   totalDeposited: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
@@ -1076,8 +1587,25 @@ export interface MillstoneAIVault extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "MAX_RATE_INCREASE_LIMIT"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "UPGRADE_INTERFACE_VERSION"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "_withdrawFromAave"
+  ): TypedContractMethod<
+    [token: AddressLike, amount: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "_withdrawFromMorpho"
+  ): TypedContractMethod<
+    [token: AddressLike, amount: BigNumberish],
+    [bigint],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "aTokens"
   ): TypedContractMethod<[arg0: AddressLike], [string], "view">;
@@ -1091,8 +1619,23 @@ export interface MillstoneAIVault extends BaseContract {
     nameOrSignature: "accumulatedFees"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "applyPendingRateImmediately"
+  ): TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "authorizedBridges"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "bridgeDailyLimits"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "bridgeDailyUsed"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "bridgeEmergencyPause"
+  ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "bridgeLastResetTime"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "calculateNetYield"
   ): TypedContractMethod<
@@ -1124,6 +1667,9 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "cancelPendingRate"
+  ): TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "deposit"
   ): TypedContractMethod<
     [token: AddressLike, assets: BigNumberish],
@@ -1144,6 +1690,20 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getBridgeSecurityStatus"
+  ): TypedContractMethod<
+    [bridge: AddressLike],
+    [
+      [bigint, bigint, bigint, boolean] & {
+        dailyLimit: bigint;
+        dailyUsed: bigint;
+        lastResetTime: bigint;
+        isPaused: boolean;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "getExchangeRate"
   ): TypedContractMethod<[token: AddressLike], [bigint], "view">;
   getFunction(
@@ -1161,6 +1721,20 @@ export interface MillstoneAIVault extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getPendingRateInfo"
+  ): TypedContractMethod<
+    [token: AddressLike],
+    [
+      [bigint, bigint, bigint, boolean] & {
+        pendingRate: bigint;
+        startTime: bigint;
+        progress: bigint;
+        isActive: boolean;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "getProtocolBalances"
   ): TypedContractMethod<
     [token: AddressLike],
@@ -1169,6 +1743,20 @@ export interface MillstoneAIVault extends BaseContract {
         aaveBalance: bigint;
         morphoBalance: bigint;
         totalBalance: bigint;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getSecurityStatus"
+  ): TypedContractMethod<
+    [token: AddressLike],
+    [
+      [bigint, bigint, bigint, boolean] & {
+        maxDailyRate: bigint;
+        lastUpdateTime: bigint;
+        pendingRate: bigint;
+        hasPendingIncrease: boolean;
       }
     ],
     "view"
@@ -1233,7 +1821,13 @@ export interface MillstoneAIVault extends BaseContract {
     nameOrSignature: "initialize"
   ): TypedContractMethod<[_owner: AddressLike], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "lastRateUpdateTime"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "lastRecordedValue"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "maxDailyRateIncrease"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "morphoAllocations"
@@ -1244,6 +1838,9 @@ export interface MillstoneAIVault extends BaseContract {
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "pendingRateIncrease"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "performanceFeeRate"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -1264,6 +1861,19 @@ export interface MillstoneAIVault extends BaseContract {
   getFunction(
     nameOrSignature: "proxiableUUID"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "queueExchangeRateIncrease"
+  ): TypedContractMethod<
+    [token: AddressLike, targetRate: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "queueTimelockOperation"
+  ): TypedContractMethod<[operationHash: BytesLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "rateIncreaseStartTime"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "rebalance"
   ): TypedContractMethod<[token: AddressLike], [void], "nonpayable">;
@@ -1299,8 +1909,29 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setBridgeEmergencyPause"
+  ): TypedContractMethod<
+    [bridge: AddressLike, paused: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setBridgeLimit"
+  ): TypedContractMethod<
+    [bridge: AddressLike, dailyLimit: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "setFeeRecipient"
   ): TypedContractMethod<[_feeRecipient: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setMaxRateIncrease"
+  ): TypedContractMethod<
+    [token: AddressLike, maxIncrease: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "setMorphoVault"
   ): TypedContractMethod<
@@ -1330,6 +1961,9 @@ export interface MillstoneAIVault extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setTimelockDelay"
+  ): TypedContractMethod<[delay: BigNumberish], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "simulateExchangeRateUpdate"
   ): TypedContractMethod<
     [token: AddressLike],
@@ -1347,6 +1981,12 @@ export interface MillstoneAIVault extends BaseContract {
   getFunction(
     nameOrSignature: "supportedTokens"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "timelockDelay"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "timelockOperations"
+  ): TypedContractMethod<[arg0: BytesLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "totalDeposited"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
@@ -1405,6 +2045,20 @@ export interface MillstoneAIVault extends BaseContract {
     AllocationSetEvent.OutputObject
   >;
   getEvent(
+    key: "BridgeEmergencyPause"
+  ): TypedContractEvent<
+    BridgeEmergencyPauseEvent.InputTuple,
+    BridgeEmergencyPauseEvent.OutputTuple,
+    BridgeEmergencyPauseEvent.OutputObject
+  >;
+  getEvent(
+    key: "BridgeLimitSet"
+  ): TypedContractEvent<
+    BridgeLimitSetEvent.InputTuple,
+    BridgeLimitSetEvent.OutputTuple,
+    BridgeLimitSetEvent.OutputObject
+  >;
+  getEvent(
     key: "ExchangeRateUpdated"
   ): TypedContractEvent<
     ExchangeRateUpdatedEvent.InputTuple,
@@ -1424,6 +2078,13 @@ export interface MillstoneAIVault extends BaseContract {
     InitializedEvent.InputTuple,
     InitializedEvent.OutputTuple,
     InitializedEvent.OutputObject
+  >;
+  getEvent(
+    key: "MaxRateIncreaseSet"
+  ): TypedContractEvent<
+    MaxRateIncreaseSetEvent.InputTuple,
+    MaxRateIncreaseSetEvent.OutputTuple,
+    MaxRateIncreaseSetEvent.OutputObject
   >;
   getEvent(
     key: "OwnershipTransferred"
@@ -1461,6 +2122,20 @@ export interface MillstoneAIVault extends BaseContract {
     ProtocolDepositEvent.OutputObject
   >;
   getEvent(
+    key: "ProtocolWithdrawalFailed"
+  ): TypedContractEvent<
+    ProtocolWithdrawalFailedEvent.InputTuple,
+    ProtocolWithdrawalFailedEvent.OutputTuple,
+    ProtocolWithdrawalFailedEvent.OutputObject
+  >;
+  getEvent(
+    key: "RateIncreaseQueued"
+  ): TypedContractEvent<
+    RateIncreaseQueuedEvent.InputTuple,
+    RateIncreaseQueuedEvent.OutputTuple,
+    RateIncreaseQueuedEvent.OutputObject
+  >;
+  getEvent(
     key: "StakedTokenBurned"
   ): TypedContractEvent<
     StakedTokenBurnedEvent.InputTuple,
@@ -1473,6 +2148,20 @@ export interface MillstoneAIVault extends BaseContract {
     StakedTokenMintedEvent.InputTuple,
     StakedTokenMintedEvent.OutputTuple,
     StakedTokenMintedEvent.OutputObject
+  >;
+  getEvent(
+    key: "TimelockOperationExecuted"
+  ): TypedContractEvent<
+    TimelockOperationExecutedEvent.InputTuple,
+    TimelockOperationExecutedEvent.OutputTuple,
+    TimelockOperationExecutedEvent.OutputObject
+  >;
+  getEvent(
+    key: "TimelockOperationQueued"
+  ): TypedContractEvent<
+    TimelockOperationQueuedEvent.InputTuple,
+    TimelockOperationQueuedEvent.OutputTuple,
+    TimelockOperationQueuedEvent.OutputObject
   >;
   getEvent(
     key: "TokenSupported"
@@ -1488,6 +2177,13 @@ export interface MillstoneAIVault extends BaseContract {
     UpgradedEvent.OutputTuple,
     UpgradedEvent.OutputObject
   >;
+  getEvent(
+    key: "WithdrawalDebug"
+  ): TypedContractEvent<
+    WithdrawalDebugEvent.InputTuple,
+    WithdrawalDebugEvent.OutputTuple,
+    WithdrawalDebugEvent.OutputObject
+  >;
 
   filters: {
     "AllocationSet(address,uint256,uint256)": TypedContractEvent<
@@ -1499,6 +2195,28 @@ export interface MillstoneAIVault extends BaseContract {
       AllocationSetEvent.InputTuple,
       AllocationSetEvent.OutputTuple,
       AllocationSetEvent.OutputObject
+    >;
+
+    "BridgeEmergencyPause(address,bool)": TypedContractEvent<
+      BridgeEmergencyPauseEvent.InputTuple,
+      BridgeEmergencyPauseEvent.OutputTuple,
+      BridgeEmergencyPauseEvent.OutputObject
+    >;
+    BridgeEmergencyPause: TypedContractEvent<
+      BridgeEmergencyPauseEvent.InputTuple,
+      BridgeEmergencyPauseEvent.OutputTuple,
+      BridgeEmergencyPauseEvent.OutputObject
+    >;
+
+    "BridgeLimitSet(address,uint256)": TypedContractEvent<
+      BridgeLimitSetEvent.InputTuple,
+      BridgeLimitSetEvent.OutputTuple,
+      BridgeLimitSetEvent.OutputObject
+    >;
+    BridgeLimitSet: TypedContractEvent<
+      BridgeLimitSetEvent.InputTuple,
+      BridgeLimitSetEvent.OutputTuple,
+      BridgeLimitSetEvent.OutputObject
     >;
 
     "ExchangeRateUpdated(address,uint256,uint256)": TypedContractEvent<
@@ -1532,6 +2250,17 @@ export interface MillstoneAIVault extends BaseContract {
       InitializedEvent.InputTuple,
       InitializedEvent.OutputTuple,
       InitializedEvent.OutputObject
+    >;
+
+    "MaxRateIncreaseSet(address,uint256)": TypedContractEvent<
+      MaxRateIncreaseSetEvent.InputTuple,
+      MaxRateIncreaseSetEvent.OutputTuple,
+      MaxRateIncreaseSetEvent.OutputObject
+    >;
+    MaxRateIncreaseSet: TypedContractEvent<
+      MaxRateIncreaseSetEvent.InputTuple,
+      MaxRateIncreaseSetEvent.OutputTuple,
+      MaxRateIncreaseSetEvent.OutputObject
     >;
 
     "OwnershipTransferred(address,address)": TypedContractEvent<
@@ -1589,6 +2318,28 @@ export interface MillstoneAIVault extends BaseContract {
       ProtocolDepositEvent.OutputObject
     >;
 
+    "ProtocolWithdrawalFailed(address,string,uint256,uint256)": TypedContractEvent<
+      ProtocolWithdrawalFailedEvent.InputTuple,
+      ProtocolWithdrawalFailedEvent.OutputTuple,
+      ProtocolWithdrawalFailedEvent.OutputObject
+    >;
+    ProtocolWithdrawalFailed: TypedContractEvent<
+      ProtocolWithdrawalFailedEvent.InputTuple,
+      ProtocolWithdrawalFailedEvent.OutputTuple,
+      ProtocolWithdrawalFailedEvent.OutputObject
+    >;
+
+    "RateIncreaseQueued(address,uint256,uint256)": TypedContractEvent<
+      RateIncreaseQueuedEvent.InputTuple,
+      RateIncreaseQueuedEvent.OutputTuple,
+      RateIncreaseQueuedEvent.OutputObject
+    >;
+    RateIncreaseQueued: TypedContractEvent<
+      RateIncreaseQueuedEvent.InputTuple,
+      RateIncreaseQueuedEvent.OutputTuple,
+      RateIncreaseQueuedEvent.OutputObject
+    >;
+
     "StakedTokenBurned(address,address,uint256,uint256)": TypedContractEvent<
       StakedTokenBurnedEvent.InputTuple,
       StakedTokenBurnedEvent.OutputTuple,
@@ -1611,6 +2362,28 @@ export interface MillstoneAIVault extends BaseContract {
       StakedTokenMintedEvent.OutputObject
     >;
 
+    "TimelockOperationExecuted(bytes32)": TypedContractEvent<
+      TimelockOperationExecutedEvent.InputTuple,
+      TimelockOperationExecutedEvent.OutputTuple,
+      TimelockOperationExecutedEvent.OutputObject
+    >;
+    TimelockOperationExecuted: TypedContractEvent<
+      TimelockOperationExecutedEvent.InputTuple,
+      TimelockOperationExecutedEvent.OutputTuple,
+      TimelockOperationExecutedEvent.OutputObject
+    >;
+
+    "TimelockOperationQueued(bytes32,uint256)": TypedContractEvent<
+      TimelockOperationQueuedEvent.InputTuple,
+      TimelockOperationQueuedEvent.OutputTuple,
+      TimelockOperationQueuedEvent.OutputObject
+    >;
+    TimelockOperationQueued: TypedContractEvent<
+      TimelockOperationQueuedEvent.InputTuple,
+      TimelockOperationQueuedEvent.OutputTuple,
+      TimelockOperationQueuedEvent.OutputObject
+    >;
+
     "TokenSupported(address,bool)": TypedContractEvent<
       TokenSupportedEvent.InputTuple,
       TokenSupportedEvent.OutputTuple,
@@ -1631,6 +2404,17 @@ export interface MillstoneAIVault extends BaseContract {
       UpgradedEvent.InputTuple,
       UpgradedEvent.OutputTuple,
       UpgradedEvent.OutputObject
+    >;
+
+    "WithdrawalDebug(address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+      WithdrawalDebugEvent.InputTuple,
+      WithdrawalDebugEvent.OutputTuple,
+      WithdrawalDebugEvent.OutputObject
+    >;
+    WithdrawalDebug: TypedContractEvent<
+      WithdrawalDebugEvent.InputTuple,
+      WithdrawalDebugEvent.OutputTuple,
+      WithdrawalDebugEvent.OutputObject
     >;
   };
 }
