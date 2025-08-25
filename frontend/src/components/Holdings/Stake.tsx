@@ -1,19 +1,19 @@
 "use client";
 
-import { testUSDTABI } from "@/app/_abis/testUSDT";
-import { vaultABI } from "@/app/_abis/vault";
-import ButtonDefault from "@/app/_components/ButtonDefault";
-import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
+import { testUSDTABI } from "@/abis/testUSDT";
+import { vaultABI } from "@/abis/vault";
+import ButtonDefault from "@/components/ButtonDefault";
+import { formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
+import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 import { useCountdownToNoonMidnight } from "@/app/hooks/time.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { vaultContractAddress } from "@/utils/contractAddress";
 import { microUSDTHexToUSDTDecimal } from "@/utils/format";
 import { usdtTokenAddress } from "@/utils/tokenAddress";
-import { parseUnits } from "ethers";
+import { parseUnits, formatUnits } from "ethers";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useBottomToastStore } from "../hooks/bottomToast.hooks";
 
 interface PercentageButtonProps {
   percentage: number;
@@ -40,12 +40,18 @@ function PercentageButton({
   );
 }
 
-export default function StakeForm() {
+export default function Stake() {
   const { account } = useWalletAccountStore();
-  const { getErc20TokenBalance, sendContractTransaction, web3Provider } =
-    useKaiaWalletSdk();
+  const {
+    getErc20TokenBalance,
+    sendContractTransaction,
+    web3Provider,
+    callContractFunction,
+  } = useKaiaWalletSdk();
 
   const { timeLeft, targetLabel } = useCountdownToNoonMidnight();
+  const showToast = useBottomToastStore((s) => s.show);
+
   const [stakeAmount, setStakeAmount] = useState<number>(0);
   const [inputValue, setInputValue] = useState<string>("");
   const [selectedPercentage, setSelectedPercentage] = useState<number | null>(
@@ -53,8 +59,9 @@ export default function StakeForm() {
   );
   const [usdtBalance, setUsdtBalance] = useState<number | string>("-");
   const [isStaking, setIsStaking] = useState<boolean>(false);
+  const [exchangeRate, setExchangeRate] = useState<number>(0);
+
   const router = useRouter();
-  const showToast = useBottomToastStore((s) => s.show);
 
   const fetchBalance = async () => {
     if (account) {
@@ -67,8 +74,26 @@ export default function StakeForm() {
       });
     }
   };
+
+  const fetchExchangeRate = async () => {
+    try {
+      const rate = await callContractFunction(
+        vaultContractAddress,
+        vaultABI as unknown as unknown[],
+        "exchangeRate",
+      );
+      console.log("Exchange rate:", rate);
+      const formattedRate = Number(formatUnits(rate[0], 6));
+      setExchangeRate(formattedRate);
+    } catch (error) {
+      console.error("Error fetching exchangeRate:", error);
+      setExchangeRate(0);
+    }
+  };
+
   useEffect(() => {
     fetchBalance();
+    fetchExchangeRate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account]);
 
@@ -111,12 +136,12 @@ export default function StakeForm() {
       );
       console.log("depositTx :", depositTx);
       console.log("✅ Stake request sent successfully!");
-      showToast("Stake completed successfully.", "success");
 
       // Reset form
       setStakeAmount(0);
       setInputValue("");
       setSelectedPercentage(null);
+      showToast("Stake completed successfully.", "success");
     } catch (error: any) {
       console.error("❌ Stake request failed:", error);
 
@@ -179,41 +204,70 @@ export default function StakeForm() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-end gap-2">
-          {percentages.map((percentage) => (
-            <PercentageButton
-              key={percentage}
-              percentage={percentage}
-              isActive={selectedPercentage === percentage}
-              onClick={() => handlePercentageClick(percentage)}
-            />
-          ))}
-        </div>
-        <div className="border-primary flex flex-col gap-5 rounded-lg border-[0.8px] p-3">
-          <div className="text-mm-gray-default flex items-center justify-between text-[10px] font-normal">
-            <p>Stake</p>
-            <p>Balance: {formatNumberWithCommas(usdtBalance)} USDT</p>
-          </div>
-          <div className="flex items-baseline justify-between">
-            <div className="flex items-center gap-1 text-2xl font-normal text-white">
-              <span className="">$</span>
-              <input
-                type="text"
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder="0.00"
-                className="bg-taransparent w-full border-none font-normal text-white outline-none"
-              />
+    <>
+      <div className="flex flex-col gap-16">
+        <div className="flex flex-col gap-16">
+          <div className="flex flex-col gap-[38px]">
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between gap-2">
+                <h1 className="text-base font-medium text-white">USDT Stake</h1>
+                <div className="flex gap-2">
+                  {percentages.map((percentage) => (
+                    <PercentageButton
+                      key={percentage}
+                      percentage={percentage}
+                      isActive={selectedPercentage === percentage}
+                      onClick={() => handlePercentageClick(percentage)}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="mt-7 mb-6 flex">
+                <span className="text-[28px] font-normal text-white">$</span>
+                <input
+                  type="text"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  placeholder="0"
+                  className="bg-taransparent w-full border-none text-[28px] font-normal text-white outline-none"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-mm-gray-default text-xs font-normal">
+                  Available
+                </p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-xs font-normal text-white">
+                    {formatNumberWithCommas(usdtBalance)}
+                  </p>
+                  <p className="text-mm-gray-default text-xs font-normal">
+                    USDT
+                  </p>
+                </div>
+              </div>
+              <div className="flex justify-end gap-1">
+                <p className="text-mm-gray-default text-xs font-normal">
+                  1 mmUSDT = ${exchangeRate} USDT
+                </p>
+              </div>
             </div>
-            <p className="text-base font-normal text-white">USDT</p>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="text-mm-gray-default text-[10px]">
+              Next vault settlement (to {targetLabel}) in approx.
+            </div>
+            <div className="text-[16px] text-white">{timeLeft}</div>
           </div>
         </div>
       </div>
-      <ButtonDefault theme="primary" onClick={handleStakeRequest}>
-        Stake
-      </ButtonDefault>
-    </div>
+      <div className="mt-auto flex flex-col gap-2">
+        <ButtonDefault theme="primary" onClick={handleStakeRequest}>
+          Stake
+        </ButtonDefault>
+        <ButtonDefault theme="outline" onClick={() => router.push("/holdings")}>
+          Cancel
+        </ButtonDefault>
+      </div>
+    </>
   );
 }

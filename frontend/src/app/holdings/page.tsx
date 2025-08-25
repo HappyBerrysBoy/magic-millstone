@@ -1,27 +1,26 @@
 "use client";
 
-import PositionSummary from "./_components/PositionSummary";
-import HoldingButtons from "./_components/HoldingButtons";
 import { usdtTokenAddress } from "@/utils/tokenAddress";
-import { ethers, formatUnits } from "ethers";
+import { formatUnits } from "ethers";
 import {
   useKaiaWalletSdk,
   useKaiaWalletSdkStore,
 } from "../hooks/walletSdk.hooks";
-import { millstoneAIVault } from "../_abis/millstoneAIVault";
-import { TxTypeValueTransfer, Web3Provider } from "@kaiachain/ethers-ext/v6";
+import { Web3Provider } from "@kaiachain/ethers-ext/v6";
 import { useEffect, useMemo, useState } from "react";
-import { vaultABI } from "../_abis/vault";
+import { vaultABI } from "@/abis/vault";
 import { useWalletAccountStore } from "../hooks/auth.hooks";
 import {
   mmUSDTContractAddress,
   vaultContractAddress,
   withdrawNFTAddress,
 } from "@/utils/contractAddress";
-import { withdrawNFTABI } from "../_abis/withdrawNFT";
-import { mmUSDTABI } from "../_abis/mmUSDT";
-import { formatNumberWithCommas } from "../_utils/formatFuncs";
+import { withdrawNFTABI } from "@/abis/withdrawNFT";
+import { mmUSDTABI } from "@/abis/mmUSDT";
+import { formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useRouter } from "next/navigation";
+import PositionSummary from "@/components/Holdings/PositionSummary";
+import HoldingButtons from "@/components/Holdings/HoldingButtons";
 
 export default function Holdings() {
   const USDT_ADDRESS = usdtTokenAddress;

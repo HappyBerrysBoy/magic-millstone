@@ -1,6 +1,6 @@
 "use client";
 
-import { callApi } from "@/app/_utils/callApi";
+import { callApi } from "@/utils/callApi";
 import { Web3Provider } from "@kaiachain/ethers-ext/v6";
 import DappPortalSDK, {
   PaymentProvider,

@@ -1,4 +1,4 @@
-import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
+import { formatNumberWithCommas } from "@/utils/formatFuncs";
 
 interface ClaimCardProps {
   id: string;
@@ -24,8 +24,8 @@ export default function ClaimCard({
   const statusTextStyles = "text-[10px] font-normal text-primary";
 
   const buttonStyles = isAvailable
-    ? "text-[10px] font-normal text-black bg-primary rounded-sm py-2 w-full"
-    : "text-[10px] font-normal text-mm-gray-light bg-[#808787] rounded-sm py-2 w-full";
+    ? "text-[10px] font-normal text-black bg-primary rounded-sm py-2 w-full cursor-pointer"
+    : "text-[10px] font-normal text-mm-gray-light bg-[#808787] rounded-sm py-2 w-full cursor-not-allowed";
 
   return (
     <div className={cardStyles}>

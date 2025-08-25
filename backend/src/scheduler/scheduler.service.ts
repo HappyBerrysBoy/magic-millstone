@@ -168,7 +168,7 @@ export class SchedulerService {
     }
 
     const startTime = Date.now();
-    let result: any = {
+    const result: any = {
       success: false,
       bridgeAddress,
       executionTime: 0,
@@ -241,6 +241,125 @@ export class SchedulerService {
       result.executionTime = Date.now() - startTime;
 
       this.logger.error('❌ Manual Magic Time execution failed:', error);
+      return result;
+    }
+  }
+
+  async depositToVault(amount: bigint) {
+    this.logger.log('💰 Deposit to vault initiated');
+    this.logger.log(`Amount: ${amount.toString()} (raw)`);
+
+    const startTime = Date.now();
+    const result: any = {
+      success: false,
+      amount: amount.toString(),
+      executionTime: 0,
+      error: null,
+      transactionHash: null,
+      blockNumber: null,
+      gasUsed: null,
+      gasPrice: null,
+      approvalHash: null,
+    };
+
+    try {
+      // Get USDT contract
+      const usdtAddress = process.env.KAIA_USDT_ADDRESS;
+      if (!usdtAddress) {
+        throw new Error('USDT_ADDRESS environment variable is required');
+      }
+
+      const usdtContract = new Contract(
+        usdtAddress,
+        [
+          'function allowance(address,address) view returns (uint256)',
+          'function approve(address,uint256) returns (bool)',
+        ],
+        this.kaiaWallet,
+      );
+
+      // Check current allowance
+      const currentAllowance = await usdtContract.allowance(
+        this.kaiaWallet.address,
+        process.env.VAULT_ADDRESS,
+      );
+
+      this.logger.log(
+        `Current USDT allowance: ${formatUnits(currentAllowance, 6)} USDT`,
+      );
+      this.logger.log(`Required amount: ${formatUnits(amount, 6)} USDT`);
+
+      // If allowance is insufficient, approve the vault contract
+      if (currentAllowance < amount) {
+        this.logger.log('🔐 Approving USDT spend...');
+        const approveTx = await usdtContract.approve(
+          process.env.VAULT_ADDRESS,
+          amount,
+        );
+        result.approvalHash = approveTx.hash;
+        this.logger.log(`Approval transaction sent: ${approveTx.hash}`);
+
+        await approveTx.wait();
+        this.logger.log('✅ USDT approval confirmed');
+      } else {
+        this.logger.log('✅ Sufficient allowance already exists');
+      }
+
+      // Now execute the deposit
+      const tx = await this.kaiaVaultContract.depositToVault(amount);
+      result.transactionHash = tx.hash;
+
+      this.logger.log(`Transaction sent: ${tx.hash}`);
+
+      const receipt = await tx.wait();
+      result.blockNumber = receipt.blockNumber;
+      result.gasUsed = receipt.gasUsed.toString();
+      result.gasPrice = tx.gasPrice ? formatUnits(tx.gasPrice, 'gwei') : null;
+
+      this.logger.log(
+        `✅ Deposit transaction confirmed in block: ${receipt.blockNumber}`,
+      );
+
+      const vaultDepositEvents = receipt.logs.filter((log: any) => {
+        try {
+          const parsed = this.kaiaVaultContract.interface.parseLog(log);
+          return parsed && parsed.name === 'VaultDeposit';
+        } catch {
+          return false;
+        }
+      });
+
+      if (vaultDepositEvents.length > 0) {
+        const parsed = this.kaiaVaultContract.interface.parseLog(
+          vaultDepositEvents[0],
+        );
+        if (parsed) {
+          result.vaultDepositEvent = {
+            depositor: parsed.args.depositor,
+            amount: formatUnits(parsed.args.amount, 6),
+            timestamp: parsed.args.timestamp.toString(),
+          };
+          this.logger.log('🎉 Vault deposit successful:');
+          this.logger.log(`  Depositor: ${parsed.args.depositor}`);
+          this.logger.log(
+            `  Amount: ${formatUnits(parsed.args.amount, 6)} USDT`,
+          );
+        }
+      }
+
+      result.success = true;
+      result.executionTime = Date.now() - startTime;
+
+      return result;
+    } catch (error) {
+      result.error = {
+        message: error.message,
+        code: error.code,
+        reason: error.reason,
+      };
+      result.executionTime = Date.now() - startTime;
+
+      this.logger.error('❌ Deposit to vault failed:', error);
       return result;
     }
   }

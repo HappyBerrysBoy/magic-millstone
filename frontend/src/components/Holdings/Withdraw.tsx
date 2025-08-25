@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ButtonDefault from "@/app/_components/ButtonDefault";
-import { formatNumberWithCommas } from "@/app/_utils/formatFuncs";
+import ButtonDefault from "@/components/ButtonDefault";
+import { formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
-import { mmUSDTABI } from "@/app/_abis/mmUSDT";
-import { vaultABI } from "@/app/_abis/vault";
+import { mmUSDTABI } from "@/abis/mmUSDT";
+import { vaultABI } from "@/abis/vault";
 import { formatUnits, parseUnits } from "ethers";
 import {
   mmUSDTContractAddress,
@@ -39,7 +39,11 @@ function PercentageButton({
   );
 }
 
-export default function Withdraw() {
+interface WithdrawProps {
+  onWithdrawSuccess?: () => void;
+}
+
+export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
   const { account } = useWalletAccountStore();
   const { callContractFunction, sendContractTransaction } = useKaiaWalletSdk();
   const showToast = useBottomToastStore((s) => s.show);
@@ -117,6 +121,11 @@ export default function Withdraw() {
       setInputValue("");
       setSelectedPercentage(null);
       showToast("Withdrawal request sent successfully.", "success");
+
+      // Trigger claim refresh
+      if (onWithdrawSuccess) {
+        onWithdrawSuccess();
+      }
     } catch (error: any) {
       console.error("❌ Withdrawal request failed:", error);
 

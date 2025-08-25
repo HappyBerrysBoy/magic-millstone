@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import ClaimCard from "./ClaimCard";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
-import { withdrawNFTABI } from "@/app/_abis/withdrawNFT";
+import { withdrawNFTABI } from "@/abis/withdrawNFT";
 import {
   vaultContractAddress,
   withdrawNFTAddress,
 } from "@/utils/contractAddress";
 import { formatUnits } from "ethers";
-import { vaultABI } from "@/app/_abis/vault";
+import { vaultABI } from "@/abis/vault";
 import { useBottomToastStore } from "@/app/hooks/bottomToast.hooks";
 
 // 1) 컨트랙트 반환 타입(제네릭에 쓸 것)
@@ -37,7 +37,7 @@ type WithdrawalItemUI = {
   status: "available" | "pending";
 };
 
-export default function Claim() {
+const Claim = forwardRef<{ refresh: () => void }>((_, ref) => {
   const { callContractFunction, sendContractTransaction } = useKaiaWalletSdk();
   const { account } = useWalletAccountStore();
   const showToast = useBottomToastStore((s) => s.show);
@@ -132,6 +132,10 @@ export default function Claim() {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    refresh: fetchPendingWithdraws,
+  }));
+
   return (
     <div className="flex flex-col gap-[10px]">
       <h1 className="text-base font-medium text-white">Claim</h1>
@@ -155,4 +159,8 @@ export default function Claim() {
       )}
     </div>
   );
-}
+});
+
+Claim.displayName = "Claim";
+
+export default Claim;
