@@ -138,7 +138,7 @@ export default function Holdings() {
           )}
           withdrawals={formatNumberWithCommas(withdrawals)}
           balance={formatNumberWithCommas(balance)}
-          exchangeRate={formatNumberWithCommas(exchangeRate)}
+          exchangeRate={String(exchangeRate)}
         />
       </div>
       <HoldingButtons />
