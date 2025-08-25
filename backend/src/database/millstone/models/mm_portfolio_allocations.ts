@@ -14,29 +14,12 @@ export interface mm_portfolio_allocationsAttributes {
   updatedAt?: Date;
 }
 
-export type mm_portfolio_allocationsPk =
-  | 'portfolioId'
-  | 'platform'
-  | 'vaultContractAddress';
-export type mm_portfolio_allocationsId =
-  mm_portfolio_allocations[mm_portfolio_allocationsPk];
-export type mm_portfolio_allocationsOptionalAttributes =
-  | 'allocationAmount'
-  | 'targetRate'
-  | 'createdAt'
-  | 'updatedAt';
-export type mm_portfolio_allocationsCreationAttributes = Optional<
-  mm_portfolio_allocationsAttributes,
-  mm_portfolio_allocationsOptionalAttributes
->;
+export type mm_portfolio_allocationsPk = "portfolioId" | "platform" | "vaultContractAddress";
+export type mm_portfolio_allocationsId = mm_portfolio_allocations[mm_portfolio_allocationsPk];
+export type mm_portfolio_allocationsOptionalAttributes = "allocationAmount" | "targetRate" | "createdAt" | "updatedAt";
+export type mm_portfolio_allocationsCreationAttributes = Optional<mm_portfolio_allocationsAttributes, mm_portfolio_allocationsOptionalAttributes>;
 
-export class mm_portfolio_allocations
-  extends Model<
-    mm_portfolio_allocationsAttributes,
-    mm_portfolio_allocationsCreationAttributes
-  >
-  implements mm_portfolio_allocationsAttributes
-{
+export class mm_portfolio_allocations extends Model<mm_portfolio_allocationsAttributes, mm_portfolio_allocationsCreationAttributes> implements mm_portfolio_allocationsAttributes {
   portfolioId!: string;
   platform!: string;
   vaultChainId!: number;
@@ -48,64 +31,60 @@ export class mm_portfolio_allocations
   createdAt?: Date;
   updatedAt?: Date;
 
-  static initModel(
-    sequelize: Sequelize.Sequelize,
-  ): typeof mm_portfolio_allocations {
-    return mm_portfolio_allocations.init(
+
+  static initModel(sequelize: Sequelize.Sequelize): typeof mm_portfolio_allocations {
+    return mm_portfolio_allocations.init({
+    portfolioId: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      primaryKey: true
+    },
+    platform: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      primaryKey: true
+    },
+    vaultChainId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    vaultContractName: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    vaultContractAddress: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      primaryKey: true
+    },
+    vaultTokenAddress: {
+      type: DataTypes.STRING(100),
+      allowNull: false
+    },
+    allocationAmount: {
+      type: DataTypes.DECIMAL(20,6),
+      allowNull: true
+    },
+    targetRate: {
+      type: DataTypes.DECIMAL(5,3),
+      allowNull: true
+    }
+  }, {
+    sequelize,
+    tableName: 'mm_portfolio_allocations',
+    timestamps: true,
+    indexes: [
       {
-        portfolioId: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-          primaryKey: true,
-        },
-        platform: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-          primaryKey: true,
-        },
-        vaultChainId: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
-        vaultContractName: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-        },
-        vaultContractAddress: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-          primaryKey: true,
-        },
-        vaultTokenAddress: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-        },
-        allocationAmount: {
-          type: DataTypes.DECIMAL(20, 5),
-          allowNull: true,
-        },
-        targetRate: {
-          type: DataTypes.DECIMAL(5, 3),
-          allowNull: true,
-        },
+        name: "PRIMARY",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "portfolioId" },
+          { name: "platform" },
+          { name: "vaultContractAddress" },
+        ]
       },
-      {
-        sequelize,
-        tableName: 'mm_portfolio_allocations',
-        timestamps: true,
-        indexes: [
-          {
-            name: 'PRIMARY',
-            unique: true,
-            using: 'BTREE',
-            fields: [
-              { name: 'portfolioId' },
-              { name: 'platform' },
-              { name: 'vaultContractAddress' },
-            ],
-          },
-        ],
-      },
-    );
+    ]
+  });
   }
 }

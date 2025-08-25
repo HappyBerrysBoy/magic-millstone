@@ -6,43 +6,40 @@ export interface mm_globalsAttributes {
   value: object;
 }
 
-export type mm_globalsPk = 'name';
+export type mm_globalsPk = "name";
 export type mm_globalsId = mm_globals[mm_globalsPk];
 export type mm_globalsCreationAttributes = mm_globalsAttributes;
 
-export class mm_globals
-  extends Model<mm_globalsAttributes, mm_globalsCreationAttributes>
-  implements mm_globalsAttributes
-{
+export class mm_globals extends Model<mm_globalsAttributes, mm_globalsCreationAttributes> implements mm_globalsAttributes {
   name!: string;
   value!: object;
 
+
   static initModel(sequelize: Sequelize.Sequelize): typeof mm_globals {
-    return mm_globals.init(
+    return mm_globals.init({
+    name: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      primaryKey: true
+    },
+    value: {
+      type: DataTypes.JSON,
+      allowNull: false
+    }
+  }, {
+    sequelize,
+    tableName: 'mm_globals',
+    timestamps: false,
+    indexes: [
       {
-        name: {
-          type: DataTypes.STRING(100),
-          allowNull: false,
-          primaryKey: true,
-        },
-        value: {
-          type: DataTypes.JSON,
-          allowNull: false,
-        },
+        name: "PRIMARY",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "name" },
+        ]
       },
-      {
-        sequelize,
-        tableName: 'mm_globals',
-        timestamps: false,
-        indexes: [
-          {
-            name: 'PRIMARY',
-            unique: true,
-            using: 'BTREE',
-            fields: [{ name: 'name' }],
-          },
-        ],
-      },
-    );
+    ]
+  });
   }
 }
