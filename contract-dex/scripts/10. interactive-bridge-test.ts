@@ -86,6 +86,32 @@ async function main() {
   await ethers.provider.send('hardhat_impersonateAccount', [USDT_WHALE]);
   const whale = await ethers.getSigner(USDT_WHALE);
 
+  // USDT_WHALE의 현재 ETH 잔액 확인
+  let whaleEthBalance = await ethers.provider.getBalance(USDT_WHALE);
+  console.log(
+    `🐋 USDT_WHALE (${USDT_WHALE})의 현재 ETH 잔액: ${ethers.formatEther(
+      whaleEthBalance,
+    )} ETH`,
+  );
+
+  // 만약 잔액이 부족하다면, deployer가 ETH를 전송
+  const minEth = ethers.parseEther('10.0');
+  if (whaleEthBalance < minEth) {
+    const tx = await (
+      await ethers.getSigner()
+    ).sendTransaction({
+      to: USDT_WHALE,
+      value: minEth - whaleEthBalance,
+    });
+    await tx.wait();
+    whaleEthBalance = await ethers.provider.getBalance(USDT_WHALE);
+    console.log(
+      `✅ USDT_WHALE에게 ETH 전송 완료. 새로운 잔액: ${ethers.formatEther(
+        whaleEthBalance,
+      )} ETH`,
+    );
+  }
+
   // 각 브릿지에 USDT 전송 (실제 브릿지 운영자금)
   const bridgeFunding = ethers.parseUnits('1000000', 6); // 각 50,000 USDT
   await usdt.connect(whale).transfer(bridge1.address, bridgeFunding);
