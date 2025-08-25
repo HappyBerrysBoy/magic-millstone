@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 import { PortfolioService } from './portfolio.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -17,5 +17,13 @@ export class PortfolioController {
   @Get(':id/stats')
   async getStats(@Param('id') id: string) {
     return this.portfolioService.getStats(id);
+  }
+
+  @ApiOperation({
+    summary: 'Manually trigger Magic Time execution (for testing)',
+  })
+  @Post('trigger-magic-time')
+  async triggerMagicTime() {
+    return this.portfolioService.createPortfolioStatusManually();
   }
 }
