@@ -202,16 +202,17 @@ export class PortfolioService {
       const timeDiffYears = timeDiffMs / (1000 * 60 * 60 * 24 * 365.25);
       const apy =
         timeDiffYears > 0
-          ? (Number(formatUnits(currentExchangeRate, 6)) -
+          ? ((Number(formatUnits(currentExchangeRate, 6)) -
               exchangeRate.dataValues.rate) /
-            exchangeRate.dataValues.rate /
-            timeDiffYears
+              exchangeRate.dataValues.rate /
+              timeDiffYears) *
+            100
           : 0;
 
       await this.portfolioRepository.createApyHistory(
         portfolioId,
         datetime,
-        apy,
+        parseFloat(apy.toFixed(2)),
         transaction,
       );
 
