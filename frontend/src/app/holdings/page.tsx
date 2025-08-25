@@ -26,8 +26,7 @@ export default function Holdings() {
   const USDT_ADDRESS = usdtTokenAddress;
   const router = useRouter();
   const { sdk } = useKaiaWalletSdkStore();
-  const { getAccount, requestAccount, callContractFunction } =
-    useKaiaWalletSdk();
+  const { callContractFunction } = useKaiaWalletSdk();
   const { account } = useWalletAccountStore();
   const [loading, setIsLoading] = useState(false);
   const [withdrawals, setWithdrawals] = useState<number>(0);
