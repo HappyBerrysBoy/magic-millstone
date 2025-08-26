@@ -2,7 +2,7 @@
 
 import { testUSDTABI } from "@/abis/testUSDT";
 import { vaultABI } from "@/abis/vault";
-import ButtonDefault from "@/components/ButtonDefault";
+import ButtonDefault from "@/components/Common/ButtonDefault";
 import { formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useCountdownToNoonMidnight } from "@/app/hooks/time.hooks";

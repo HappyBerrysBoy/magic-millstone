@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import ButtonDefault from "@/components/ButtonDefault";
+import ButtonDefault from "@/components/Common/ButtonDefault";
 import { formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";

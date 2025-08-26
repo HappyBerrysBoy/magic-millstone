@@ -1,6 +1,6 @@
 "use client";
 
-import ButtonBack from "@/components/ButtonBack";
+import ButtonBack from "@/components/Common/ButtonBack";
 
 import { useRouter } from "next/navigation";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";

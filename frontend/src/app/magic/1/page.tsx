@@ -1,4 +1,4 @@
-import MagicTime from "@/components/MagicTime";
+import MagicTime from "@/components/Magic/MagicTime";
 
 export default function MagicTimePage() {
   return <MagicTime />;
