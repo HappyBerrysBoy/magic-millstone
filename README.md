@@ -174,7 +174,6 @@ git push origin feature/amazing-feature
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
-- **Website**: [Magic Millstone](https://magicmillstone.app)
 - **Demo Video**: [Watch Magic Millstone in Action](https://www.youtube.com/watch?v=LiVESAGOlNU)
 - **Documentation**: [Detailed Technical Docs](https://github.com/HappyBerrysBoy/magic-millstone)
 
