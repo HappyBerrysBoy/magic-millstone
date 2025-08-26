@@ -1,14 +1,22 @@
 # Magic Millstone AI Vault
 
 An Ethereum-based, multi-protocol decentralized investment vault integrated with AAVE and
-Morpho, offering bridge support, performance fees, and advanced security mechanisms.
+Morpho(increasing gradually), offering bridge support, performance fees, and advanced
+security mechanisms.
 
 ## Overview
 
 Magic Millstone AI Vault is a sophisticated DeFi vault that allows users to deposit assets
-and automatically distributes them across multiple lending protocols (AAVE and Morpho) for
-optimal yield generation. The system includes bridge integration for cross-chain
-operations, performance fee collection, and comprehensive security features.
+and automatically distributes them across multiple lending protocols (AAVE and Morpho,
+increasing gradually) for optimal yield generation. The system includes bridge integration
+for cross-chain operations, performance fee collection, and comprehensive security
+features.
+
+## Addresses (ETH Mainnet Real Contracts for Forked Network)
+
+- Morpho Steakhouse USDT Vault: 0xbEef047a543E45807105E51A8BBEFCc5950fcfBa
+- AAVE Pool V3: 0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2
+- USDT: 0xdAC17F958D2ee523a2206206994597C13D831ec7
 
 ## Key Features
 
@@ -45,19 +53,16 @@ operations, performance fee collection, and comprehensive security features.
 Create a `.env` file in the project root:
 
 ```bash
-# Private Key for deployment (with 0x prefix)
+# Private Key for deployment (with 0x prefix)(required)
 PRIVATE_KEY=your_private_key_here
 
-# RPC URLs
+# RPC URLs(required)
 MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/your_api_key
 SEPOLIA_RPC_URL=https://sepolia.gateway.tenderly.co
 
 # API Keys (optional)
 ETHERSCAN_API_KEY=your_etherscan_api_key_here
 ALCHEMY_API_KEY=your_alchemy_api_key_here
-
-# Fork Configuration
-FORK_BLOCK_NUMBER=19000000
 ```
 
 ### Dependencies
@@ -75,17 +80,7 @@ real AAVE and Morpho protocols.
 
 ```bash
 # Start local node with mainnet fork
-npx hardhat node --fork-block-number 19000000
-
-# Or with custom RPC
-npx hardhat node --fork https://eth-mainnet.g.alchemy.com/v2/your_api_key --fork-block-number 19000000
-```
-
-### Deploy to Local Fork
-
-```bash
-# Deploy to local fork network
-npx hardhat run scripts/1. deploy-vault-mainnet-fork.ts --network localhost
+npx hardhat node
 ```
 
 ### Run Integration Tests
@@ -105,7 +100,6 @@ npx hardhat test
 
 # Run specific test file
 npx hardhat test test/MillstoneAIVault.test.ts
-npx hardhat test test/BridgeLendingVault.test.ts
 ```
 
 ### Integration Tests on Fork

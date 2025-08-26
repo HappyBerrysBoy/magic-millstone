@@ -48,22 +48,17 @@ const config: HardhatUserConfig = {
     // 메인넷 직접 연결용 (실제 배포시 사용)
     mainnet: {
       url: process.env.MAINNET_RPC_URL || 'https://rpc.mevblocker.io',
-      accounts: process.env.MAINNET_PRIVATE_KEY ? [process.env.MAINNET_PRIVATE_KEY] : [],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 1,
       gasPrice: 'auto',
     },
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || 'https://sepolia.gateway.tenderly.co',
-      accounts: process.env.SEPOLIA_PRIVATE_KEY ? [process.env.SEPOLIA_PRIVATE_KEY] : [],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gasPrice: 20000000000, // 20 gwei
       chainId: 11155111,
     },
   },
-  // etherscan: {
-  //   apiKey: {
-  //     sepolia: process.env.ETHERSCAN_API_KEY || '',
-  //   },
-  // },
 };
 
 export default config;
