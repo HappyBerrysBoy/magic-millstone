@@ -176,7 +176,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔗 Links
 - **Website**: [Magic Millstone](https://magicmillstone.app)
 - **Demo Video**: [Watch Magic Millstone in Action](https://www.youtube.com/watch?v=LiVESAGOlNU)
-- **LINE MiniDapp**: Available in LINE DApp Portal
 - **Documentation**: [Detailed Technical Docs](https://github.com/HappyBerrysBoy/magic-millstone)
 
 ## 🙏 Acknowledgments
