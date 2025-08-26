@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/app/hooks/QueryClient.hooks";
-import BottomNavbar from "@/components/BottomNavbar";
+import BottomNavbar from "@/components/Common/BottomNavbar";
 import BottomToast from "@/components/Common/BottomToast";
 import { DappPortalProvider } from "@/_providers/DappPortalProvider";
 import { Bootstrap } from "@/components/Bootstrap";

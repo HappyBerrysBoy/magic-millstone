@@ -2,8 +2,8 @@
 
 import { testUSDTABI } from "@/abis/testUSDT";
 import { vaultABI } from "@/abis/vault";
-import ButtonDefault from "@/components/ButtonDefault";
-import { formatNumberWithCommas } from "@/utils/formatFuncs";
+import ButtonDefault from "@/components/Common/ButtonDefault";
+import { clampToDecimals, formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useCountdownToNoonMidnight } from "@/app/hooks/time.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
@@ -61,7 +61,7 @@ export default function StakeForm() {
       getErc20TokenBalance(usdtTokenAddress, account).then((balance) => {
         const formattedUSDTBalance = Number(
           microUSDTHexToUSDTDecimal(balance as string),
-        ).toFixed(2);
+        );
         console.log(`balance updated ${formattedUSDTBalance}`);
         setUsdtBalance(formattedUSDTBalance);
       });
@@ -152,10 +152,11 @@ export default function StakeForm() {
   };
 
   const handlePercentageClick = (percentage: number) => {
-    const amount = (Number(usdtBalance) * percentage) / 100;
+    const raw = (Number(usdtBalance) * percentage) / 100;
+    const amount = clampToDecimals(raw, 6);
     setStakeAmount(amount);
     setSelectedPercentage(percentage);
-    setInputValue(formatDisplayValue(amount.toFixed(2)));
+    setInputValue(formatDisplayValue(amount.toFixed(6)));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +165,7 @@ export default function StakeForm() {
     const cleanValue = value.replace(/,/g, "");
 
     // Only allow numbers and one decimal point
-    if (!/^\d*\.?\d*$/.test(cleanValue)) return;
+    if (!/^\d*(\.\d{0,6})?$/.test(value)) return;
 
     const numValue = parseFloat(cleanValue) || 0;
     setStakeAmount(numValue);
@@ -172,12 +173,24 @@ export default function StakeForm() {
 
     // Format in real-time while typing
     if (cleanValue) {
-      setInputValue(formatDisplayValue(cleanValue));
+      setInputValue(cleanValue);
     } else {
       setInputValue("");
     }
   };
 
+  const handleBlur = () => {
+    if (!inputValue) return;
+    const num = parseFloat(inputValue);
+    setInputValue(
+      num.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 6,
+      }),
+    );
+  };
+
+  const isInvalid = stakeAmount < 1;
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3">
@@ -203,15 +216,23 @@ export default function StakeForm() {
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
-                placeholder="0.00"
-                className="bg-taransparent w-full border-none font-normal text-white outline-none"
+                placeholder="0"
+                onBlur={handleBlur}
+                onFocus={() => {
+                  setInputValue(String(stakeAmount || ""));
+                }}
+                className="bg-taransparent w-full border-none text-[28px] font-normal text-white outline-none"
               />
             </div>
             <p className="text-base font-normal text-white">USDT</p>
           </div>
         </div>
       </div>
-      <ButtonDefault theme="primary" onClick={handleStakeRequest}>
+      <ButtonDefault
+        theme="primary"
+        onClick={handleStakeRequest}
+        disabled={isInvalid}
+      >
         Stake
       </ButtonDefault>
     </div>

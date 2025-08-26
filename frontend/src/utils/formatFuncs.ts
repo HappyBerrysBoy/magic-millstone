@@ -2,7 +2,7 @@ export function formatNumberWithCommas(num: string | number): string {
   if (typeof num === "string" && num.trim() === "") return "0";
   const n = typeof num === "number" ? num : Number(num.replace(/,/g, ""));
   if (isNaN(n)) return String(num);
-  return n.toLocaleString("en-US");
+  return n.toLocaleString("en-US", { maximumFractionDigits: 6 });
 }
 
 export const formatBigNumber = (num: number): string => {
@@ -21,4 +21,9 @@ export const formatBigNumber = (num: number): string => {
 
   const formatted = num.toFixed(2);
   return formatted.replace(/\.?0+$/, "");
+};
+
+export const clampToDecimals = (n: number, decimals: number) => {
+  const f = Math.pow(10, decimals);
+  return Math.floor(n * f) / f;
 };

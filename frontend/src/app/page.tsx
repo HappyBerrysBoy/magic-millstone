@@ -2,7 +2,7 @@
 
 import { WalletButton } from "@/components/Button/WalletButton";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
-import HomeStats from "@/components/HomeStats";
+import HomeStats from "@/components/Home/HomeStats";
 import MillstoneIcon from "public/svgs/MillstoneIcon";
 import MillstoneTextIcon from "public/svgs/MillstoneTextIcon";
 import StakeForm from "@/components/Home/StakeForm";

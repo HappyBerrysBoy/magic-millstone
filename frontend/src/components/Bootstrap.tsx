@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { useKaiaWalletSecurity } from "@/app/hooks/walletSdk.hooks";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Loading from "@/components/Loading";
+import Loading from "@/components/Common/Loading";
 
 export type BootstrapProps = {
   className?: string;
