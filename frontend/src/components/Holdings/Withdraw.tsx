@@ -150,7 +150,7 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
     const [wholePart, decimalPart] = value.split(".");
 
     // Format the whole part with commas
-    const formattedWhole = parseInt(wholePart || "0").toLocaleString("en-US");
+    const formattedWhole = parseInt(wholePart || "0").toLocaleString("en-US",{maximumFractionDigits:6});
 
     // Return with decimal part if it exists
     return decimalPart !== undefined
@@ -161,8 +161,8 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
   const handlePercentageClick = (percentage: number) => {
     const amount = (balance * percentage) / 100;
     setSelectedPercentage(percentage);
-    setInputValue(formatDisplayValue(amount.toFixed(2)));
-    setWithdrawAmount(parseFloat(amount.toFixed(2)));
+    setInputValue(formatDisplayValue(amount.toFixed(6)));
+    setWithdrawAmount(parseFloat(amount.toFixed(6)));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

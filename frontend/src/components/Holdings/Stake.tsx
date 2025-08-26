@@ -180,7 +180,7 @@ export default function Stake() {
     const amount = (Number(usdtBalance) * percentage) / 100;
     setStakeAmount(amount);
     setSelectedPercentage(percentage);
-    setInputValue(formatDisplayValue(amount.toFixed(2)));
+    setInputValue(formatDisplayValue(amount.toFixed(6)));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
