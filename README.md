@@ -2,16 +2,16 @@
 
 **Korea Stablecoin Hackathon - Kaia-Native USDT DeFi Track Participant**
 
-A cutting-edge DeFi yield optimization platform built on Kaia blockchain, featuring automated yield generation through cross-chain deployment strategies. Magic Millstone enables users to earn passive income on their USDT holdings while maintaining liquidity through innovative NFT-based withdrawal mechanics.
+A cutting-edge DeFi yield optimization platform built on the Kaia blockchain, featuring automated yield generation via cross-chain deployment strategies. Magic Millstone enables users to earn passive income on their USDT holdings while maintaining liquidity through innovative NFT-based withdrawal mechanics.
 
 ## 🌈 Overview
 
-Magic Millstone is a comprehensive DeFi ecosystem that bridges traditional yield farming with innovative user experience design. By leveraging Kaia's native USDT and integrating with LINE Messenger as a MiniDapp, we provide seamless access to DeFi yield generation for mainstream users.
+Magic Millstone is a comprehensive DeFi ecosystem that bridges traditional yield farming with innovative user experience design. By leveraging Kaia's native USDT and integrating with LINE Messenger MiniDapp, we provide mainstream users with seamless access to DeFi yield generation.
 
 ### Key Innovation
 
-- **Automated Yield Generation**: Smart deployment of funds to lending protocols through the `magicTime()` function
-- **NFT Withdrawal System**: Revolutionary approach to withdrawal management with dynamic SVG metadata
+- **Automated Yield Generation**: Automated fund deployment to lending protocols via the `magicTime()` function
+- **NFT Withdrawal System**: A novel withdrawal management system powered by dynamic SVG metadata
 - **Cross-Chain Bridge Integration**: Seamless capital deployment across multiple chains for maximum yield
 - **LINE MiniDapp Integration**: Native mobile experience within LINE Messenger ecosystem
 
@@ -39,8 +39,8 @@ The platform consists of four main components:
 
 1. **Frontend** (`/frontend`): Next.js MiniDapp with LINE integration
 2. **Backend** (`/backend`): NestJS API server for data analytics and user management
-3. **Kaia Contracts** (`/contract-kaia`): Core DeFi protocols on Kaia blockchain
-4. **DEX Contracts** (`/contract-dex`): Cross-chain deployment infrastructure
+3. **Kaia Contracts** (`/contract-kaia`): Kaia Contracts (/contract-kaia): Core DeFi logic on the Kaia blockchain
+4. **DEX Contracts** (`/contract-dex`): Infrastructure for cross-chain deployment
 
 ## 🚀 Quick Start
 
@@ -61,9 +61,9 @@ Each component has its own specific setup requirements, environment variables, a
 
 ### For Users
 
-- **Simple Deposits**: Deposit USDT and start earning immediately
+- **Simple Deposits**: Simple Deposits: Stake USDT and start earning
 - **Dynamic Yields**: Automated yield generation across multiple protocols
-- **Flexible Withdrawals**: NFT-based withdrawal system with status tracking
+- **Flexible Withdrawals**: NFT-based withdrawal system with real-time status tracking
 - **Real-time Analytics**: Comprehensive portfolio tracking and performance metrics
 - **Mobile First**: Native LINE Messenger integration for seamless mobile experience
 
@@ -76,7 +76,7 @@ Each component has its own specific setup requirements, environment variables, a
 
 ## 📱 LINE MiniDapp Integration
 
-Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobile DeFi experience:
+Magic Millstone is designed as a LINE Messenger MiniDapp, providing a native mobile-first DeFi experience:
 
 ### Supported Features
 
@@ -98,7 +98,7 @@ Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobil
 - **Language**: Solidity ^0.8.20
 - **Framework**: Hardhat with TypeScript
 - **Standards**: KIP-7 (mmUSDT), KIP-17 (WithdrawNFT)
-- **Upgradability**: UUPS Proxy Pattern
+- **Upgradability**: Implemented with the UUPS Proxy Pattern
 - **Security**: OpenZeppelin contracts with custom extensions
 
 ### Frontend
@@ -112,14 +112,14 @@ Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobil
 
 - **Framework**: NestJS with TypeScript
 - **Database**: MySQL with Sequelize ORM
-- **APIs**: RESTful with Swagger documentation
+- **APIs**: RESTful endpoints with Swagger documentation
 
 ## 🔒 Security
 
 ### Audit Status
 
 - Internal security review completed
-- External audit planned for mainnet deployment
+- External audit scheduled for mainnet deployment
 
 ### Security Features
 
@@ -141,7 +141,7 @@ Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobil
 
 - Mainnet deployment
 - External security audit
-- Enhanced yield deployment strategies
+- Advanced yield deployment strategies
 - Cross-chain bridge integrations
 
 ### Phase 3 (Planned) 📋
@@ -162,7 +162,7 @@ git clone https://github.com/your-username/magic-millstone.git
 # Create a new branch
 git checkout -b feature/amazing-feature
 
-# Make your changes and commit
+# Implement your changes and commit
 git commit -m 'Add amazing feature'
 
 # Push and create a Pull Request
