@@ -57,7 +57,7 @@ Each component has its own specific setup requirements, environment variables, a
 
 ### Preview
 
-<img width="900" alt="user flow" src="https://i.imgur.com/7IbtZMK.png">
+<img width="900" alt="user flow" src="https://i.imgur.com/Ta9v8wh.png">
 
 ### For Users
 
