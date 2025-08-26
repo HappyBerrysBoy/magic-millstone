@@ -4,7 +4,7 @@
 
 A cutting-edge DeFi yield optimization platform built on Kaia blockchain, featuring automated yield generation through cross-chain deployment strategies. Magic Millstone enables users to earn passive income on their USDT holdings while maintaining liquidity through innovative NFT-based withdrawal mechanics.
 
-## 🌟 Overview
+## 🌈 Overview
 
 Magic Millstone is a comprehensive DeFi ecosystem that bridges traditional yield farming with innovative user experience design. By leveraging Kaia's native USDT and integrating with LINE Messenger as a MiniDapp, we provide seamless access to DeFi yield generation for mainstream users.
 
