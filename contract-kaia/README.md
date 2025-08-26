@@ -109,16 +109,8 @@ _To be updated after deployment_
 
 ### Deployment
 
-Deploy to testnet:
-
 ```bash
-npx hardhat run scripts/deploy-all.ts --network kairos
-```
-
-Deploy to mainnet:
-
-```bash
-npx hardhat run scripts/deploy-all.ts --network kaia
+npx hardhat run scripts/deploy-all.ts --network [network]
 ```
 
 ### Testing Scripts
@@ -127,19 +119,22 @@ The project includes comprehensive testing scripts:
 
 ```bash
 # Test deposit functionality
-npx hardhat run scripts/test-depositUsdt.ts --network kairos
+npx hardhat run scripts/test-depositUsdt.ts --network [network]
 
 # Test withdrawal request
-npx hardhat run scripts/test-requestWithdrawal.ts --network kairos
+npx hardhat run scripts/test-requestWithdrawal.ts --network [network]
 
 # Test withdrawal execution
-npx hardhat run scripts/test-executeWithdraw.ts --network kairos
+npx hardhat run scripts/test-executeWithdraw.ts --network [network]
 
 # Check NFT statuses
-npx hardhat run scripts/check-all-nfts.ts --network kairos
+npx hardhat run scripts/test-nfts.ts --network [network]
 
 # Test magic time (bridge transfers)
-npx hardhat run scripts/test-magicTime.ts --network kairos
+npx hardhat run scripts/test-magicTime.ts --network [network]
+
+# Test deposit to vault (bridge transfers)
+npx hardhat run scripts/test-depositToVault.ts --network [network]
 ```
 
 ## 📊 Contract Interactions
@@ -152,7 +147,7 @@ npx hardhat run scripts/test-magicTime.ts --network kairos
    // Approve USDT spending
    usdt.approve(vaultAddress, amount);
 
-   // Deposit to vault
+   // Deposit to vault (mints mmUSDT)
    vault.deposit(amount);
    ```
 
@@ -188,15 +183,15 @@ vault.markWithdrawReady([nftId1, nftId2]);
 
 ```
 contract-kaia/
-├── contracts/           # Smart contracts
+├── contracts/             # Smart contracts
 │   ├── VaultContract.sol
 │   ├── mmUSDT.sol
 │   ├── WithdrawNFT.sol
 │   └── TestUSDT.sol
-├── scripts/            # Deployment and testing scripts
-├── test/              # Test files
-├── artifacts/         # Compiled contracts
-└── types/            # TypeScript type definitions
+├── scripts/               # Deployment and testing scripts
+├── test/                  # Test files
+├── artifacts/             # Compiled contracts
+└── types/                 # TypeScript type definitions
 ```
 
 ### Key Constants
