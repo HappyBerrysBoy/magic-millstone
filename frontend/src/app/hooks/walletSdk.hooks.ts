@@ -9,7 +9,8 @@ import {
 } from "@/utils/dapp-portal-sdk";
 import { Web3Provider } from "@kaiachain/ethers-ext/v6";
 // Contract will be created using wallet provider directly
-// import {liff} from "@/utils/liff";
+import {liff} from "@/utils/liff";
+import { useWalletAccountStore } from "./auth.hooks";
 
 type KaiaWalletSdkState = {
   sdk: DappPortalSDKType | null;
@@ -39,9 +40,9 @@ export const useKaiaWalletSecurity = () => {
   return useQuery({
     queryKey: ["wallet", "sdk"],
     queryFn: async () => {
-      // await liff.init({
-      //     liffId: process.env.NEXT_PUBLIC_LIFF_ID as string,
-      // })
+      await liff.init({
+          liffId: process.env.NEXT_PUBLIC_LIFF_ID as string,
+      })
       setSdk(await initializeKaiaWalletSdk());
       return true;
     },
@@ -191,7 +192,7 @@ export const useKaiaWalletSdk = () => {
         const iface = new Interface(abi as any);
 
         const data = iface.encodeFunctionData(targetFunction, params);
-        const fromAddress = await getAccount();
+        const fromAddress = useWalletAccountStore.getState().account!
 
         const txParams = {
           from: fromAddress,
