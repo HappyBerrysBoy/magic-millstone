@@ -1,4 +1,4 @@
-# Magic Millstone 🌟
+# ![Magic Millstone Logo](/frontend/public/images/MillstoneIcon.png) Magic Millstone
 
 **Korea Stablecoin Hackathon - Kaia-Native USDT DeFi Track Participant**
 
