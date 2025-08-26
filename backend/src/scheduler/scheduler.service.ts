@@ -182,6 +182,18 @@ export class SchedulerService {
     };
 
     try {
+      const [
+        currentExchangeRate,
+        totalSupply,
+        totalCurrentValue,
+        underlyingDepositedAmount,
+        accumulatedFeeAmount,
+      ] = await this.ethVaultContract.getStakedTokenInfo(
+        process.env.USDT_ADDRESS!,
+      );
+
+      await this.kaiaVaultContract.setExchangeRate(currentExchangeRate);
+
       // Get static call results first
       const staticResult =
         await this.kaiaVaultContract.magicTime.staticCall(bridgeAddress);
