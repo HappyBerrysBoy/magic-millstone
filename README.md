@@ -88,7 +88,6 @@ Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobil
 ### MiniDapp Guidelines Compliance
 
 - Case 3 Implementation: DApp Portal Wallet connection to external DeFi services
-- All DeFi operations (Staking, Lending, Liquid Staking) fully supported
 - Seamless integration with LINE ecosystem
 
 ## 📊 Technical Specifications
@@ -174,7 +173,7 @@ git push origin feature/amazing-feature
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
-
+- **Demo Video**: [Watch Magic Millstone in Action](https://www.youtube.com/watch?v=LiVESAGOlNU)
 - **LINE MiniDapp**: Available in LINE DApp Portal
 - **Documentation**: [Detailed Technical Docs](https://github.com/HappyBerrysBoy/magic-millstone)
 

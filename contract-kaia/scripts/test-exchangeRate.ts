@@ -5,7 +5,7 @@ async function main() {
 
   const [admin] = await ethers.getSigners();
   const VAULT_ADDRESS = process.env.VAULT_ADDRESS;
-  const NEW_RATE: string = process.env.NEW_RATE || "1.2";
+  const NEW_RATE: string = process.env.NEW_RATE || "1.002619";
   if (!VAULT_ADDRESS) {
     console.error("❌ Missing vault address");
     process.exit(1);
@@ -17,16 +17,28 @@ async function main() {
   );
 
   console.log("\n📊 Current Exchange Rate:");
-  const currentRate = await vaultContract.getExchangeRate();
-  console.log("Current rate:", ethers.formatUnits(currentRate, 6));
+  let currentRate: bigint;
+  try {
+    currentRate = await vaultContract.getExchangeRate();
+    // Exchange rate is stored with 6 decimals (1e6 = 1.0)
+    console.log("Current rate:", ethers.formatUnits(currentRate, 6));
+  } catch (error: any) {
+    console.log("❌ Error getting exchange rate:", error.message);
+    // Fallback to vault info
+    const vaultInfo = await vaultContract.getVaultInfo();
+    currentRate = vaultInfo[6];
+    console.log(
+      "Current rate (from vault info):",
+      ethers.formatUnits(currentRate, 6)
+    );
+  }
   console.log("(1.0 = no yield, 1.1 = 10% yield, 1.2 = 20% yield)");
 
   // Show impact on existing withdrawals
   console.log("\n💰 Current Withdrawal Situation:");
   const vaultInfo = await vaultContract.getVaultInfo();
   const totalRequested = vaultInfo[5];
-  const currentReserves =
-    (Number(totalRequested) * Number(currentRate)) / 1000000;
+  const currentReserves = (totalRequested * currentRate) / BigInt(1000000);
 
   console.log(
     "Total mmUSDT requested:",
@@ -58,7 +70,7 @@ async function main() {
     "USDT"
   );
 
-  const additionalReserves = Number(newReserves) - Number(currentReserves);
+  const additionalReserves = newReserves - currentReserves;
   console.log(
     "Additional reserves needed:",
     ethers.formatUnits(additionalReserves, 6),
