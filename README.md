@@ -55,6 +55,10 @@ Each component has its own specific setup requirements, environment variables, a
 
 ## ✨ Features
 
+### Preview
+
+<img width="900" alt="user flow" src="https://i.imgur.com/7IbtZMK.png">
+
 ### For Users
 
 - **Simple Deposits**: Deposit USDT and start earning immediately
