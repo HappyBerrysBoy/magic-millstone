@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ButtonDefault from "@/components/Common/ButtonDefault";
-import { formatNumberWithCommas } from "@/utils/formatFuncs";
+import { clampToDecimals, formatNumberWithCommas } from "@/utils/formatFuncs";
 import { useWalletAccountStore } from "@/app/hooks/auth.hooks";
 import { useKaiaWalletSdk } from "@/app/hooks/walletSdk.hooks";
 import { mmUSDTABI } from "@/abis/mmUSDT";
@@ -150,7 +150,9 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
     const [wholePart, decimalPart] = value.split(".");
 
     // Format the whole part with commas
-    const formattedWhole = parseInt(wholePart || "0").toLocaleString("en-US",{maximumFractionDigits:6});
+    const formattedWhole = parseInt(wholePart || "0").toLocaleString("en-US", {
+      maximumFractionDigits: 6,
+    });
 
     // Return with decimal part if it exists
     return decimalPart !== undefined
@@ -159,10 +161,11 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
   };
 
   const handlePercentageClick = (percentage: number) => {
-    const amount = (balance * percentage) / 100;
+    const raw = (Number(balance) * percentage) / 100;
+    const amount = clampToDecimals(raw, 6);
     setSelectedPercentage(percentage);
     setInputValue(formatDisplayValue(amount.toFixed(6)));
-    setWithdrawAmount(parseFloat(amount.toFixed(6)));
+    setWithdrawAmount(Number(amount.toFixed(6)));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -171,7 +174,7 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
     const cleanValue = value.replace(/,/g, "");
 
     // Only allow numbers and one decimal point
-    if (!/^\d*\.?\d*$/.test(cleanValue)) return;
+    if (!/^\d*(\.\d{0,6})?$/.test(value)) return;
 
     const numValue = parseFloat(cleanValue) || 0;
     setWithdrawAmount(numValue);
@@ -179,10 +182,20 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
 
     // Format in real-time while typing
     if (cleanValue) {
-      setInputValue(formatDisplayValue(cleanValue));
+      setInputValue(cleanValue);
     } else {
       setInputValue("");
     }
+  };
+  const handleBlur = () => {
+    if (!inputValue) return;
+    const num = parseFloat(inputValue);
+    setInputValue(
+      num.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 6,
+      }),
+    );
   };
 
   return (
@@ -208,6 +221,10 @@ export default function Withdraw({ onWithdrawSuccess }: WithdrawProps) {
             onChange={handleInputChange}
             placeholder="0"
             className="w-full border-none bg-transparent text-[28px] font-normal text-white outline-none"
+            onBlur={handleBlur}
+            onFocus={() => {
+              setInputValue(String(withdrawAmount || ""));
+            }}
           />
           <span className="text-[14px] font-normal text-white">mmUSDT</span>
         </div>
