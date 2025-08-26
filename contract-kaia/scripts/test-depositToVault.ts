@@ -9,7 +9,7 @@ async function main(): Promise<void> {
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
   const MMUSDT_ADDRESS: string =
     process.env.MMUSDT_ADDRESS || "YOUR_MMUSDT_ADDRESS";
-  const DEPOSIT_AMOUNT: string = process.env.DEPOSIT_AMOUNT || "100";
+  const DEPOSIT_AMOUNT: string = process.env.DEPOSIT_AMOUNT || "10000";
 
   // Connect to deployed contracts
   const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
