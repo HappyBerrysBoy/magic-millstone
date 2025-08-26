@@ -140,14 +140,12 @@ contract VaultContract is
 
         usdt.safeTransferFrom(msg.sender, address(this), amount);
         
-        // Calculate mmUSDT to mint: usdtAmount / exchangeRate
         uint256 mmUSDTToMint = (amount * EXCHANGE_RATE_DECIMALS) / exchangeRate;
         mmUSDTToken.mint(msg.sender, mmUSDTToMint);
 
         userDeposits[msg.sender] += amount;
         totalDeposited += amount;
 
-        // Auto-update PENDING withdrawals to READY if vault now has sufficient funds
         _updatePendingWithdrawalsToReady();
 
         emit Deposited(msg.sender, amount, mmUSDTToMint, block.timestamp);
@@ -162,7 +160,6 @@ contract VaultContract is
 
         usdt.safeTransferFrom(msg.sender, address(this), amount);
 
-        // Auto-update PENDING withdrawals to READY if vault now has sufficient funds
         _updatePendingWithdrawalsToReady();
 
         emit VaultDeposit(msg.sender, amount, block.timestamp);
@@ -178,16 +175,12 @@ contract VaultContract is
         require(amount > 0, "VaultContract: Amount must be greater than 0");
         require(mmUSDTToken.balanceOf(msg.sender) >= amount, "VaultContract: Insufficient mmUSDT balance");
 
-        // Burn mmUSDT tokens
         mmUSDTToken.burn(msg.sender, amount);
 
-        // Apply exchange rate to calculate final USDT amount (with yield)
         uint256 finalUsdtAmount = (amount * exchangeRate) / EXCHANGE_RATE_DECIMALS;
 
-        // Mint NFT with final USDT amount (exchange rate applied)
         uint256 nftId = withdrawNFT.mint(msg.sender, finalUsdtAmount);
 
-        // Store withdrawal request as PENDING initially
         withdrawRequests[nftId] = WithdrawRequest({
             amount: finalUsdtAmount,
             requestTime: block.timestamp,
@@ -231,21 +224,17 @@ contract VaultContract is
         require(request.status == WithdrawStatus.READY, "VaultContract: Withdraw not ready");
         require(request.requester == msg.sender, "VaultContract: Not original requester");
 
-        uint256 payoutAmount = request.amount; // Exchange rate already applied when NFT was minted
+        uint256 payoutAmount = request.amount;
         
         require(usdt.balanceOf(address(this)) >= payoutAmount, "VaultContract: Insufficient USDT balance");
 
-        // Update tracking
         totalWithdrawn += payoutAmount;
         userWithdrawals[msg.sender] += payoutAmount;
 
-        // Burn the NFT (this automatically removes the withdrawal request)
         withdrawNFT.burn(nftId);
 
-        // Transfer exact USDT amount stored in NFT
         usdt.safeTransfer(msg.sender, payoutAmount);
 
-        // Auto-update PENDING withdrawals to READY after withdrawal execution
         _updatePendingWithdrawalsToReady();
 
         emit WithdrawExecuted(msg.sender, payoutAmount, nftId, block.timestamp);

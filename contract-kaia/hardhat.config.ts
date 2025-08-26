@@ -24,12 +24,14 @@ const config: HardhatUserConfig = {
   },
   networks: {
     kairos: {
+      chainId: 1001,
       url: "https://public-en-kairos.node.kaia.io",
       accounts: process.env.KAIROS_PRIVATE_KEY
         ? [process.env.KAIROS_PRIVATE_KEY]
         : [],
     },
     kaia: {
+      chainId: 8217,
       url: "https://public-en.node.kaia.io",
       accounts: process.env.KAIA_PRIVATE_KEY
         ? [process.env.KAIA_PRIVATE_KEY]
