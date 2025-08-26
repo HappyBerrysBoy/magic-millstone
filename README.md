@@ -80,10 +80,11 @@ Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobil
 
 ### Supported Features
 
-- **Staking**: Direct USDT staking within MiniDapp
-- **Lending**: Yield generation through external lending protocols
-- **Liquid Staking**: Maintain liquidity while earning yield
-- **Portfolio Tracking**: Real-time balance and yield monitoring
+- **Vault Deposits**: Users deposit USDT and receive mmUSDT (Magic Millstone USDT) tokens
+- **Cross-Chain Yield Generation**: Deposited USDT is bridged to other chains and deployed to lending protocols
+- **Liquid Receipt Tokens**: mmUSDT tokens represent your vault share while maintaining liquidity
+- **Automated Yield Optimization**: Automatically find and deploy to highest-yield lending protocols
+- **Portfolio Tracking**: Real-time monitoring of vault performance and your holdings
 
 ### MiniDapp Guidelines Compliance
 
@@ -150,7 +151,7 @@ Magic Millstone is designed as a LINE Messenger MiniDapp, providing native mobil
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+We welcome contributions from the community! 
 
 ### Development Setup
 
@@ -173,6 +174,7 @@ git push origin feature/amazing-feature
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Links
+- **Website**: [Magic Millstone](https://magicmillstone.app)
 - **Demo Video**: [Watch Magic Millstone in Action](https://www.youtube.com/watch?v=LiVESAGOlNU)
 - **LINE MiniDapp**: Available in LINE DApp Portal
 - **Documentation**: [Detailed Technical Docs](https://github.com/HappyBerrysBoy/magic-millstone)
