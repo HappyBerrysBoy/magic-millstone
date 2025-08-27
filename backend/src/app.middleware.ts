@@ -5,7 +5,7 @@ import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class AppMiddleware implements NestMiddleware {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor() {}
 
   excludedRoutes = [
     { method: 'GET', url: '/logger' },
@@ -14,7 +14,10 @@ export class AppMiddleware implements NestMiddleware {
 
   isExcludedRoute = (req) => {
     for (const route of this.excludedRoutes) {
-      if (req.method === route.method && req.originalUrl.startsWith(route.url)) {
+      if (
+        req.method === route.method &&
+        req.originalUrl.startsWith(route.url)
+      ) {
         return true;
       }
     }
@@ -22,7 +25,11 @@ export class AppMiddleware implements NestMiddleware {
   };
 
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log('new request submitted |', req.method.toUpperCase(), req.originalUrl);
+    console.log(
+      'new request submitted |',
+      req.method.toUpperCase(),
+      req.originalUrl,
+    );
     try {
       if (req.originalUrl.startsWith('/ad') || this.isExcludedRoute(req)) {
         next();
@@ -31,19 +38,19 @@ export class AppMiddleware implements NestMiddleware {
 
       const authorization = req.headers.authorization;
       const token = authorization ? authorization.split(' ')[1] : '';
-      const decoded: JwtDecodeData = await this.jwtService.decode(token);
+      // const decoded: JwtDecodeData = await this.jwtService.decode(token);
 
-      if (!decoded.success) {
-        res.json({ success: false, error: 'NOT_VERIFIED' });
-        return;
-      }
+      // if (!decoded.success) {
+      //   res.json({ success: false, error: 'NOT_VERIFIED' });
+      //   return;
+      // }
 
-      const { address, chainId } = decoded.data;
+      // const { address, chainId } = decoded.data;
 
-      if (!address || !chainId) {
-        res.json({ success: false, error: 'INVALID_TOKEN_DATA' });
-        return;
-      }
+      // if (!address || !chainId) {
+      //   res.json({ success: false, error: 'INVALID_TOKEN_DATA' });
+      //   return;
+      // }
 
       next();
     } catch (error) {

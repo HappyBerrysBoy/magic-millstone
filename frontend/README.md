@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ![Magic Millstone Logo](/frontend/public/images/MillstoneIcon.png) Magic Millstone 
 
-## Getting Started
 
-First, run the development server:
+**Korea Stablecoin Hackathon - Kaia-Native USDT DeFi Track Participant**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This project was bootstrapped with Dapp Starter.
+
+---
+## 🚀 Getting Started
+
+### ✅ Prerequisites
+
+• Node.js v20.x (LTS) recommended (tested on v20.18.0, Node ≥ 18.0.0 works)
+
+• pnpm or npm
+
+---
+### 📂 Cloning
+```
+# Fork and clone the repository
+git clone https://github.com/your-username/magic-millstone.git
+
+# Move into project directory
+cd frontend
+
+```
+---
+
+### ▶️ Starting
+1. Install dependencies
+
+```
+# with pnpm (recommended)
+pnpm install
+# or npm
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. Add `.env.local and .env.production` file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+If needed, other environment files can be added.
+To open template code, `.env*` file should include basic variables. Here's example for `.env.local` file.
 
-## Learn More
+```
+NODE_ENV=local
+NEXT_PUBLIC_CLIENT_ID={clientId provided when applying for the SDK}
+NEXT_PUBLIC_CHAIN_ID=1001 //testnet
+CLIENT_SECRET={clientSecret provided when applying for the SDK}
+NEXT_PUBLIC_API_URL=https://dapp-starter.netlify.app //change with your domain
+NEXT_PUBLIC_LIFF_ID={LIFF ID provided when enrolling LIFF app at LINE Developers}
+```
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📚 References
 
-## Deploy on Vercel
+- [LINE Developers – LIFF Guide](https://developers.line.biz/en/docs/liff/overview/)
+- [Kaia Dapp Portal SDK Guide](https://docs.dappportal.io/mini-dapp/mini-dapp-sdk)
+- [Kaia Documentation](https://docs.kaia.io/)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🙏 Thanks to
+
+This project was bootstrapped with [Dapp Starter](https://docs.dappportal.io/mini-dapp/mini-dapp-sdk),  
+a framework integrated with **dapp-portal-sdk** and **LIFF** for easier Kaia Mini Dapp development.

@@ -13,6 +13,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AppMiddleware } from './app.middleware';
 import { JwtService } from '@common/jwt/jwt.service';
 import { MillstoneModule } from '@database/millstone/millstone.module';
+import { UserModule } from './user/user.module';
+import { PortfolioModule } from './portfolio/portfolio.module';
+import { SchedulerModule } from './scheduler/scheduler.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,13 +25,16 @@ import { MillstoneModule } from '@database/millstone/millstone.module';
         : '.env',
     }),
     ScheduleModule.forRoot(),
-      MillstoneModule,
-],
+    MillstoneModule,
+    UserModule,
+    PortfolioModule,
+    SchedulerModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
     AppMiddleware,
-    JwtService,
+    // JwtService,
     {
       provide: APP_FILTER,
       useClass: ControllerExceptionFilter,

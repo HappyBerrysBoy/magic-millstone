@@ -1,0 +1,12 @@
+{
+  "network": "mainnet-fork",
+  "chainId": "1337",
+  "vault": "0x2339Ce63D84e3980bbDf073fD77ce18f5F4A8A66",
+  "implementation": "0x6BaFf53CE58982818549C363387401cDab374BF9",
+  "aavePool": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+  "realTokens": {
+    "USDT": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+  },
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "timestamp": "2025-08-16T12:43:29.462Z"
+}

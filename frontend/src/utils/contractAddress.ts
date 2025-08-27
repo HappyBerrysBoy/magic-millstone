@@ -1,0 +1,3 @@
+export const vaultContractAddress = "0x582397784AE2a2C98647729fA6E760aea75634a6"
+export const mmUSDTContractAddress = "0xAf769Db63C17B0A14f774c561e05A5f6182B67bF"
+export const withdrawNFTAddress = "0x24F91240B669874ef4Ea60B81a6710ebc21d1EAD"
