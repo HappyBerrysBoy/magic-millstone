@@ -10,6 +10,9 @@ import { Bootstrap } from "@/components/Bootstrap";
 export const metadata: Metadata = {
   title: "Magic Millstone",
   description: "Magic Millstone",
+  icons: {
+    icon: "/images/MillstoneIcon.png",
+  },
 };
 
 export default function RootLayout({
