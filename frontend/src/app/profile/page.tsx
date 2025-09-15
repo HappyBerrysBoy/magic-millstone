@@ -54,7 +54,6 @@ export default function ProfilePage() {
         "faucet(uint256)",
       );
 
-
       if (!web3Provider) {
         throw new Error("Web3 provider not available");
       }
@@ -80,7 +79,7 @@ export default function ProfilePage() {
       <div className="flex w-full flex-col gap-10">
         <div className="flex flex-col items-center gap-4">
           <ProfileDefaultIcon className="h-[72px] w-[72px]" />
-          <p className="text-sm font-medium text-white">@username</p>
+          <p className="text-sm font-medium text-white"></p>
         </div>
         <div className="flex w-full flex-col gap-4">
           <p className="text-base font-medium text-white">Wallet</p>
@@ -93,18 +92,15 @@ export default function ProfilePage() {
             </button>
           </div>
           <ButtonDefault
-            theme="primary"
             onClick={handleFaucet}
+            theme="primary"
             disabled={isRunningFaucet}
           >
-            {isRunningFaucet ? "Processing..." : "Get 100 Test USDT"}
+            {isRunningFaucet ? "Processing..." : "Get Faucet"}
           </ButtonDefault>
-          <button
-            className="h-[26px] w-full rounded-[4px] bg-[#808787] text-[10px] text-white"
-            onClick={handleDisconnect}
-          >
+          <ButtonDefault onClick={handleDisconnect} theme="outline">
             Disconnect
-          </button>
+          </ButtonDefault>
         </div>
       </div>
     </div>
